@@ -28,6 +28,8 @@
 #include "../../../../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
 #include "../../../../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
 
+#include "guiCreator.h"
+
 namespace soul
 {
 namespace patch
@@ -288,9 +290,14 @@ public:
             runCode.setButtonText("Run");
             addAndMakeVisible(runCode);
             
+            addGUI.setSize(50,50);
+            addGUI.setButtonText("GUI");
+            addAndMakeVisible(addGUI);
+            
 
             //Editor listens for "run" button to update SOUL file
             runCode.addListener(this);
+            addGUI.addListener(this);
 
 
             
@@ -299,6 +306,7 @@ public:
         ~Editor() override
         {
             owner.editorBeingDeleted (this);
+            if (guiWindow){delete guiWindow;}
             setLookAndFeel (nullptr);
         }
 
@@ -335,6 +343,7 @@ public:
                 
                 codeWindow.setBounds(0, getHeight()-200, getWidth(), 150);
                 runCode.setBounds(50, getHeight()-40, 50, 30);
+                addGUI.setBounds(150, getHeight()-40, 50, 30);
             }
             
         }
@@ -402,6 +411,18 @@ public:
                 
                 DBG("Button Works");
             }
+            
+            if (button == &addGUI)
+            {
+                
+                guiWindow = new guiCreator("guiComponents");
+                guiWindow->setUsingNativeTitleBar(true);
+                //guiWindow->setContentOwned(new InformationComponent(), true);
+                guiWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
+                guiWindow->setAlwaysOnTop(true);
+                guiWindow->setVisible(true);
+                DBG("Button Works");
+            }
         }
 
         EZDSPPlugin& owner;
@@ -411,7 +432,9 @@ public:
         
         
         juce::CodeEditorComponent codeWindow{ owner.document, nullptr };
-        juce::TextButton runCode;
+        //juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
+        juce::ScopedPointer<guiCreator> guiWindow;
+        juce::TextButton runCode,addGUI;
         
 
     };

@@ -10,6 +10,9 @@
   <MAINGROUP id="M2AbSF" name="EZDSP">
     <GROUP id="{D613C43B-7197-5FCA-4372-AC3446E57C2B}" name="Source">
       <FILE id="pO8QGY" name="EzdspSoul.h" compile="0" resource="0" file="Source/EzdspSoul.h"/>
+      <FILE id="iykRVr" name="guiCreator.h" compile="0" resource="0" file="Source/guiCreator.h"/>
+      <FILE id="lyuxff" name="componentCreator.h" compile="0" resource="0"
+            file="Source/componentCreator.h"/>
       <FILE id="UZ7i8I" name="PatchLoaderPlugin.cpp" compile="1" resource="0"
             file="Source/PatchLoaderPlugin.cpp"/>
     </GROUP>
