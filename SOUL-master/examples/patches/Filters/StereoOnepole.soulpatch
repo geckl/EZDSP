@@ -1,0 +1,14 @@
+{
+    "soulPatchV1":
+    {
+        "ID":               "dev.soul.examples.StereoOnepole",
+        "version":          "0.1",
+        "name":             "OnepoleTester",
+        "description":      "This is a SOUL Patch called StereoOnepole!",
+        "category":         "effect",
+        "manufacturer":     "SOUL.dev",
+        "isInstrument":     false,
+
+        "source":           [ "StereoOnepole.soul" ]
+    }
+}

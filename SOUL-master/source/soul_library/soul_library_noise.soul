@@ -1,0 +1,188 @@
+/*
+    _____ _____ _____ __
+   |   __|     |  |  |  |      The SOUL language
+   |__   |  |  |  |  |  |__    Copyright (c) 2019 - ROLI Ltd.
+   |_____|_____|_____|_____|
+
+   The code in this file is provided under the terms of the ISC license:
+
+   Permission to use, copy, modify, and/or distribute this software for any purpose
+   with or without fee is hereby granted, provided that the above copyright notice and
+   this permission notice appear in all copies.
+
+   THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD
+   TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN
+   NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+   DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+   IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+   CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+
+/** Title: RNGs and noise-generators
+
+    This module contains a range of simple RNG and noise generating functions and processors.
+*/
+
+/** This namespace contains some random number generation helpers.
+    We're assuming that nobody's going to be using these RNGs for security-critical cryptographic
+    applications. All the algorithms here are chosen to be fast, and definitely not cryptographically
+    strong!
+*/
+namespace soul::random
+{
+    /// State for a Park-Miller random number generator.
+    struct RandomNumberState
+    {
+        /** The current seed.
+
+            **Top tip:** when generating a seed, you might want to use the `processor.id` constant,
+            to make sure that each instance of a processor has a differently-seeded RNG. If you
+            want the RNG to be different each time the program runs, you could also throw the
+            `processor.session` constant into the mix too.
+
+            For example:
+
+            ```soul
+            processor MyProcessorUsingRandomNumbers
+            {
+                ...etc...
+
+                soul::random::RandomNumberState rng;
+
+                let mySeed = 12345; // Whenever seeding a RNG, you should pick a 'salt' value
+                                    // that's as unique as possible
+
+                void run()
+                {
+                    // Initialising it like this will produce the same sequence of numbers for
+                    // every instance of this processor:
+                    rng.reset (mySeed);
+
+                    // This will result in each instance of this processor generating a different
+                    // sequence, but each time you load and run the program, you may get the
+                    // same sequences as the last run:
+                    rng.reset (processor.id + mySeed);
+
+                    // This will result in each instance of this processor generating the same
+                    // sequence, but it will be different each time you load and run the program:
+                    rng.reset (processor.session + mySeed);
+
+                    // This will result in each instance of this processor producing a different
+                    // sequence, and each will also be different each time you load and run the program:
+                    rng.reset (processor.session + processor.id + mySeed);
+                }
+            }
+            ```
+        */
+        int64 seed;
+    }
+
+    /// Resets an RNG state object with the given seed value.
+    void reset (RandomNumberState& state, int64 seed)
+    {
+        state.seed = seed;
+    }
+
+    /// Returns the next number in the full 32-bit integer range.
+    int32 getNextInt32 (RandomNumberState& state)
+    {
+        let s = (state.seed * 48271) % 0x7fffffff;
+        state.seed = s + 1;
+        return int32 (s);
+    }
+
+    /// Advances the given RNG state and returns a value 0 to 1.
+    float getNextUnipolar (RandomNumberState& state)
+    {
+        return float (getNextInt32 (state)) * (1.0f / 2147483647.0f);
+    }
+
+    /// Advances the given RNG state and returns a value -1 to 1.
+    float getNextBipolar (RandomNumberState& state)
+    {
+        return (float (getNextInt32 (state)) * (2.0f / 2147483647.0f)) - 1.0f;
+    }
+}
+
+/// This namespace contains generators for various flavours of noise.
+namespace soul::noise
+{
+    /// White noise generator
+    processor White
+    {
+        output stream float out;
+
+        void run()
+        {
+            var rng = random::RandomNumberState (processor.id + 10);
+
+            loop
+            {
+                out << rng.getNextBipolar();
+                advance();
+            }
+        }
+    }
+
+    /// Brown noise generator
+    processor Brown
+    {
+        output stream float out;
+
+        void run()
+        {
+            let limit = 32.0f;
+            float runningTotal;
+            var rng = random::RandomNumberState (processor.id + 20);
+
+            loop
+            {
+                let white = rng.getNextBipolar();
+                runningTotal += white;
+
+                if (runningTotal > limit || runningTotal < -limit)
+                    runningTotal -= white;
+
+                runningTotal *= 0.998f;
+                out << runningTotal * (1.0f / limit);
+                advance();
+            }
+        }
+    }
+
+    /// Pink noise generator
+    processor Pink
+    {
+        output stream float out;
+
+        void run()
+        {
+            let pinkBits = 12;
+            int counter;
+            float[pinkBits] values;
+            float total;
+            var rng = random::RandomNumberState (processor.id + 30);
+
+            loop
+            {
+                let white = rng.getNextBipolar();
+                ++counter;
+
+                for (int bit = 0; bit < pinkBits; ++bit)
+                {
+                    if (((counter >> bit) & 1) != 0)
+                    {
+                        let index = wrap<pinkBits> (bit);
+                        total -= values[index];
+                        values[index] = white;
+                        total += white;
+                        break;
+                    }
+                }
+
+                out << total * (1.0f / float (pinkBits - 1));
+                advance();
+            }
+        }
+    }
+}

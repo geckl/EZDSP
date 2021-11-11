@@ -1,0 +1,14 @@
+{
+    "soulPatchV1":
+    {
+        "ID":               "dev.soul.examples.SOSCascadeTester",
+        "version":          "0.1",
+        "name":             "SOSCascadeTester",
+        "description":      "This is a SOUL Patch called SOSCascadeTester!",
+        "category":         "effect",
+        "manufacturer":     "SOUL.dev",
+        "isInstrument":     false,
+
+        "source":           [ "SOSCascadeTester.soul" ]
+    }
+}

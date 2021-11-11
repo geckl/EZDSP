@@ -1,0 +1,296 @@
+/*
+    == SOUL example code ==
+    == Author: Jules via the class Freeverb algorithm ==
+*/
+
+/// Title: An implementation of the classic Freeverb reverb algorithm.
+
+graph Reverb  [[ main ]]
+{
+    input  stream float    audioIn;
+    output stream float<2> audioOut;
+
+    input
+    {
+        ReverbParameterProcessorParam.roomSize  [[ name: "Room Size",       min: 0, max: 100, init:  80, text: "tiny|small|medium|large|hall" ]];
+        ReverbParameterProcessorParam.damping   [[ name: "Damping Factor",  min: 0, max: 100, init:  50, unit: "%",  step: 1 ]];
+        ReverbParameterProcessorParam.wetLevel  [[ name: "Wet Level",       min: 0, max: 100, init:  33, unit: "%",  step: 1 ]];
+        ReverbParameterProcessorParam.dryLevel  [[ name: "Dry Level",       min: 0, max: 100, init:  40, unit: "%",  step: 1 ]];
+        ReverbParameterProcessorParam.width     [[ name: "Width",           min: 0, max: 100, init: 100, unit: "%",  step: 1 ]];
+    }
+
+    let
+    {
+        dryGainParameterRamp  = ParameterRamp (20.0f);
+        wetGain1ParameterRamp = ParameterRamp (20.0f);
+        wetGain2ParameterRamp = ParameterRamp (20.0f);
+        dampingParameterRamp  = ParameterRamp (20.0f);
+        feedbackParameterRamp = ParameterRamp (20.0f);
+
+        reverbChannelLeft  = ReverbChannel (0);
+        reverbChannelRight = ReverbChannel (23);
+    }
+
+    connection
+    {
+        // Parameter outputs to smoothing processors
+        ReverbParameterProcessorParam.dryGainOut  -> dryGainParameterRamp.updateParameter;
+        ReverbParameterProcessorParam.wetGain1Out -> wetGain1ParameterRamp.updateParameter;
+        ReverbParameterProcessorParam.wetGain2Out -> wetGain2ParameterRamp.updateParameter;
+        ReverbParameterProcessorParam.dampingOut  -> dampingParameterRamp.updateParameter;
+        ReverbParameterProcessorParam.feedbackOut -> feedbackParameterRamp.updateParameter;
+
+        // Sum the audio
+        audioIn -> Mixer.audioInDry;
+
+        // Left channel
+        audioIn                            -> reverbChannelLeft.audioIn;
+        dampingParameterRamp.parameterOut  -> reverbChannelLeft.damping;
+        feedbackParameterRamp.parameterOut -> reverbChannelLeft.feedback;
+        reverbChannelLeft                  -> Mixer.audioInLeftWet;
+
+        // Right channel
+        audioIn                            -> reverbChannelRight.audioIn;
+        dampingParameterRamp.parameterOut  -> reverbChannelRight.damping;
+        feedbackParameterRamp.parameterOut -> reverbChannelRight.feedback;
+        reverbChannelRight.audioOut        -> Mixer.audioInRightWet;
+
+        // Mix parameters to the mixer
+        dryGainParameterRamp.parameterOut  -> Mixer.dryIn;
+        wetGain1ParameterRamp.parameterOut -> Mixer.wet1In;
+        wetGain2ParameterRamp.parameterOut -> Mixer.wet2In;
+
+        // Write the mixed values to the output
+        Mixer -> audioOut;
+    }
+}
+
+//==============================================================================
+processor AllpassFilter (int bufferSize)
+{
+    output stream float audioOut;
+    input  stream float audioIn;
+
+    float[bufferSize] buffer;
+
+    void run()
+    {
+        wrap<bufferSize> bufferIndex = 0;
+
+        loop
+        {
+            let in = audioIn;
+            let bufferedValue = buffer[bufferIndex];
+
+            buffer[bufferIndex] = in + (bufferedValue * 0.5f);
+
+            bufferIndex++;
+            audioOut << bufferedValue - in;
+
+            advance();
+        }
+    }
+}
+
+//==============================================================================
+processor CombFilter (int bufferSize)
+{
+    output stream float audioOut;
+    input  stream float audioIn, dampingIn, feedbackLevelIn;
+
+    float[bufferSize] buffer;
+
+    void run()
+    {
+        wrap<bufferSize> bufferIndex = 0;
+
+        let gain = 0.015f;
+        float last = 0.0f;
+
+        loop
+        {
+            let out = buffer[bufferIndex];
+            audioOut << out;
+
+            last = (out * (1.0f - dampingIn)) + (last * dampingIn);
+
+            buffer[bufferIndex] = (gain * audioIn) + (last * feedbackLevelIn);
+            ++bufferIndex;
+
+            advance();
+        }
+    }
+}
+
+//==============================================================================
+processor Mixer
+{
+    input stream float audioInDry;
+    input stream float dryIn, wet1In, wet2In,
+                       audioInLeftWet, audioInRightWet;
+
+    output stream float<2> audioOut;
+
+    void run()
+    {
+        loop
+        {
+            let left  = (audioInLeftWet  * wet1In) + (audioInRightWet * wet2In);
+            let right = (audioInRightWet * wet1In) + (audioInLeftWet  * wet2In);
+
+            audioOut << float<2> (left, right) + audioInDry * dryIn;
+            advance();
+        }
+    }
+}
+
+
+//==============================================================================
+// Converts an input value into a stream (limited to the given slewRate)
+processor ParameterRamp (float slewRate)
+{
+    input event float updateParameter;
+    output stream float parameterOut;
+
+    event updateParameter (float newTarget)
+    {
+        targetValue = newTarget;
+
+        let diff = targetValue - currentValue;
+        let rampSeconds = abs (diff) / slewRate;
+
+        rampSamples   = int (processor.frequency * rampSeconds);
+        rampIncrement = diff / float (rampSamples);
+    }
+
+    float targetValue;
+    float currentValue;
+    float rampIncrement;
+    int rampSamples;
+
+    void run()
+    {
+        loop
+        {
+            if (rampSamples > 0)
+            {
+                currentValue += rampIncrement;
+                --rampSamples;
+            }
+
+            parameterOut << currentValue;
+            advance();
+        }
+    }
+}
+
+//==============================================================================
+// Correctly applies parameter changes to the streams of input to the algorithm
+processor ReverbParameterProcessorParam
+{
+    input event float roomSize,
+                      damping,
+                      wetLevel,
+                      dryLevel,
+                      width;
+
+    output event float dryGainOut,
+                       wetGain1Out,
+                       wetGain2Out,
+                       dampingOut,
+                       feedbackOut;
+
+    event roomSize (float newValue)    { roomSizeScaled = newValue / 100.0f; onUpdate(); }
+    event damping  (float newValue)    { dampingScaled  = newValue / 100.0f; onUpdate(); }
+    event wetLevel (float newValue)    { wetLevelScaled = newValue / 100.0f; onUpdate(); }
+    event dryLevel (float newValue)    { dryLevelScaled = newValue / 100.0f; onUpdate(); }
+    event width    (float newValue)    { widthScaled    = newValue / 100.0f; onUpdate(); }
+
+    float roomSizeScaled = 0.5f;
+    float dampingScaled  = 0.5f;
+    float wetLevelScaled = 0.33f;
+    float dryLevelScaled = 0.4f;
+    float widthScaled    = 1.0f;
+
+    void onUpdate()
+    {
+        // Various tuning factors for the reverb
+        let wetScaleFactor  = 3.0f;
+        let dryScaleFactor  = 2.0f;
+
+        let roomScaleFactor = 0.28f;
+        let roomOffset      = 0.7f;
+        let dampScaleFactor = 0.4f;
+
+        // Write updated values
+        dryGainOut  << dryLevelScaled * dryScaleFactor;
+        wetGain1Out << 0.5f * wetLevelScaled * wetScaleFactor * (1.0f + widthScaled);
+        wetGain2Out << 0.5f * wetLevelScaled * wetScaleFactor * (1.0f - widthScaled);
+        dampingOut  << dampingScaled * dampScaleFactor;
+        feedbackOut << roomSizeScaled * roomScaleFactor + roomOffset;
+    }
+}
+
+//==============================================================================
+// Mono freeverb implementation
+graph ReverbChannel (int offset)
+{
+    input stream float audioIn, damping, feedback;
+    output stream float audioOut;
+
+    let
+    {
+        allpass_1 = AllpassFilter(225 + offset);
+        allpass_2 = AllpassFilter(341 + offset);
+        allpass_3 = AllpassFilter(441 + offset);
+        allpass_4 = AllpassFilter(556 + offset);
+
+        comb_1 = CombFilter(1116 + offset);
+        comb_2 = CombFilter(1188 + offset);
+        comb_3 = CombFilter(1277 + offset);
+        comb_4 = CombFilter(1356 + offset);
+        comb_5 = CombFilter(1422 + offset);
+        comb_6 = CombFilter(1491 + offset);
+        comb_7 = CombFilter(1557 + offset);
+        comb_8 = CombFilter(1617 + offset);
+    }
+
+    connection
+    {
+        damping -> comb_1.dampingIn,
+                   comb_2.dampingIn,
+                   comb_3.dampingIn,
+                   comb_4.dampingIn,
+                   comb_5.dampingIn,
+                   comb_6.dampingIn,
+                   comb_7.dampingIn,
+                   comb_8.dampingIn;
+
+        feedback -> comb_1.feedbackLevelIn,
+                    comb_2.feedbackLevelIn,
+                    comb_3.feedbackLevelIn,
+                    comb_4.feedbackLevelIn,
+                    comb_5.feedbackLevelIn,
+                    comb_6.feedbackLevelIn,
+                    comb_7.feedbackLevelIn,
+                    comb_8.feedbackLevelIn;
+
+        audioIn -> comb_1.audioIn,
+                   comb_2.audioIn,
+                   comb_3.audioIn,
+                   comb_4.audioIn,
+                   comb_5.audioIn,
+                   comb_6.audioIn,
+                   comb_7.audioIn,
+                   comb_8.audioIn;
+
+        comb_1,
+        comb_2,
+        comb_3,
+        comb_4,
+        comb_5,
+        comb_6,
+        comb_7,
+        comb_8  -> allpass_1 -> allpass_2 -> allpass_3 -> allpass_4 -> audioOut;
+    }
+}

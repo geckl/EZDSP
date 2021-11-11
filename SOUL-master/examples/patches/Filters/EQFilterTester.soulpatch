@@ -1,0 +1,14 @@
+{
+    "soulPatchV1":
+    {
+        "ID":               "dev.soul.examples.EQFilterTester",
+        "version":          "0.1",
+        "name":             "EQFilterTester",
+        "description":      "This is a SOUL Patch called EQFilterTester!",
+        "category":         "effect",
+        "manufacturer":     "SOUL.dev",
+        "isInstrument":     false,
+
+        "source":           [ "EQFilterTester.soul" ]
+    }
+}
