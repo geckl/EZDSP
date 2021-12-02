@@ -87,19 +87,21 @@ public:
 
         
         //Write .soul patch into codeWindow for user to edit
-        if (input->openedOk())
+        /*if (input->openedOk())
         {
             //input.read (etc...
             content = input->readString();
             //DBG(content);
-            document.replaceAllContent(content);
-        }
+            dspCode.replaceAllContent(content);
+        }*/
         
+        
+        loadCode();
         
         //Load soulpatch properties into ValueTree id
         state = juce::ValueTree (ids.SOULPatchPlugin);
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
-        state.setProperty(ids.patchCode, content, nullptr);
+        state.setProperty(ids.patchCode, fullCode.getAllContent(), nullptr);
         updatePatchState();
         
     }
@@ -121,6 +123,55 @@ public:
             state.setProperty (ids.patchURL, newFileOrURL.c_str(), nullptr);
             updatePatchState();
         }
+    }
+    
+    //loads code from input stream into three CodeDocuments, one containing the full soul code, one containing only the DSP, and one containing only the GUI components
+    void loadCode ()
+    {
+        int flag = 0;
+        juce::TextEditor tempFullCode, tempDspCode;
+        tempFullCode.setMultiLine(true);
+        tempDspCode.setMultiLine(true);
+        juce::int64 tempDspEndPosition, tempDspStartPosition;
+        
+        //Read .soul file line by line. Use Markers to add select lines to DSP and GUI CodeDocuments.
+        
+        input->setPosition(0);
+        while (! input->isExhausted())
+            {
+                auto line = input->readNextLine();
+                if (line.startsWith ("//ENDDSP"))
+                {
+                    flag=0;
+                    tempDspEndPosition=input->getPosition()-line.length()-1;
+                }
+                
+                if(flag==1)
+                {
+                    // append the text to the textContent
+                    tempDspCode.insertTextAtCaret (line + juce::newLine);
+                }
+                
+                if (line.startsWith ("//BEGINDSP"))
+                {
+                    flag=1;
+                    tempDspStartPosition=input->getPosition();
+                }
+                
+                tempFullCode.insertTextAtCaret(line + juce::newLine);
+            }
+        
+        fullCode.replaceAllContent(tempFullCode.getText());
+        dspCode.replaceAllContent(tempDspCode.getText());
+        
+        //Record the Start/End positions of DSP and GUI sections. These are used to replace the sections when user changes the plugin
+        dspEndPosition= juce::CodeDocument::Position(fullCode,tempDspEndPosition);
+        dspStartPosition= juce::CodeDocument::Position(fullCode,tempDspStartPosition);
+        
+        //This tracks the position of these markers. As code is added their position within the document will change
+        dspEndPosition.setPositionMaintained(true);
+        dspStartPosition.setPositionMaintained(true);
+        
     }
 
     //==============================================================================
@@ -197,7 +248,8 @@ public:
             output->flush();
             
             //write preset's code into CodeWindow
-            document.replaceAllContent(s.getProperty(ids.patchCode).toString().toStdString());
+            //dspCode.replaceAllContent(s.getProperty(ids.patchCode).toString().toStdString());
+            loadCode();
             
             state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
         }
@@ -399,14 +451,17 @@ public:
         {
             if (button == &runCode && owner.output->openedOk())
             {
+                
+                owner.fullCode.replaceSection(owner.dspStartPosition.getPosition(),owner.dspEndPosition.getPosition(),owner.dspCode.getAllContent());
+                
                 owner.output->setPosition(0);
                 owner.output->truncate();
                 //output->setNewLineString("\n");
-                owner.output->writeText(owner.document.getAllContent(),false,false, nullptr);
+                owner.output->writeText(owner.fullCode.getAllContent(),false,false, nullptr);
                 owner.output->flush();
                 
-                owner.content=owner.document.getAllContent();
-                owner.state.setProperty(owner.ids.patchCode, owner.document.getAllContent(), nullptr);
+                //owner.content=owner.fullCode.getAllContent();
+                owner.state.setProperty(owner.ids.patchCode, owner.fullCode.getAllContent(), nullptr);
                 
                 //owner.updatePatchState();
                 
@@ -442,7 +497,7 @@ public:
         bool isDragOver = false;
         
         
-        juce::CodeEditorComponent codeWindow{ owner.document, nullptr };
+        juce::CodeEditorComponent codeWindow{ owner.dspCode, nullptr };
         //juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
         juce::ScopedPointer<guiCreator> guiWindow;
         juce::TextButton runCode,addGUI;
@@ -451,17 +506,19 @@ public:
     };
     
     //public: (audio processor public variables)
-    juce::File presetCode= juce::File ("/Library/Application Support/EZDSP/DiodeClipper/DiodeClipper.soul");
-    juce::File presetPatch= juce::File("/Library/Application Support/EZDSP/DiodeClipper/DiodeClipper.soulpatch");
+    juce::File presetCode= juce::File ("/Library/Application Support/EZDSP/Default.soul");
+    juce::File presetPatch= juce::File("/Library/Application Support/EZDSP/Default.soulpatch");
     juce::TemporaryFile tempCode= juce::TemporaryFile (presetCode);
     juce::TemporaryFile tempPatch= juce::TemporaryFile (presetPatch);
-    juce::CodeDocument document,guiCode, dspCode;
     
     std::unique_ptr<juce::FileOutputStream> output;
     std::unique_ptr<juce::FileInputStream> input;
     
     std::unique_ptr<juce::FileOutputStream> outputPatch;
     std::unique_ptr<juce::FileInputStream> inputPatch;
+    
+    juce::CodeDocument fullCode ,guiCode, dspCode;
+    juce::CodeDocument::Position dspStartPosition, dspEndPosition;
 
 private:
     //==============================================================================
@@ -471,7 +528,7 @@ private:
     std::unique_ptr<soul::patch::SOULPatchAudioProcessor> plugin;
     juce::ValueTree state;
     soul::patch::CompilerCache::Ptr compilerCache;
-    juce::String content;
+    //juce::String content;
     
     
 

@@ -17,7 +17,8 @@ std::string compileCode(std::string guiCode, std::string dspCode)
 }
 
 
-std::string code1 = "processor test [[main]]
+/*std::string code1 = "processor test [[main]]
 {
     input stream float audioIn;
     output stream float audioOut;"
+*/

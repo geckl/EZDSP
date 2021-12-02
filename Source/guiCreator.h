@@ -36,7 +36,7 @@ public:
 
     ~guiCreator() override
     {
-        if (componentCreator){delete componentCreator;}
+        //if (componentCreator){delete componentCreator;}
     }
 
     void paint (juce::Graphics& g) override
