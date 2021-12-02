@@ -117,7 +117,7 @@ public:
         if (button == &createComponent)
         {
             
-            DBG("input event float cutoff  [[ name: \"Cut-off\", min: " + minValue.getText() +", max:" + maxValue.getText() + ", init: 0, step:" + intervalValue.getText() + "]];");
+            componentCode= "input event float cutoff  [[ name: \"Cut-off\", min: " + minValue.getText() +", max:" + maxValue.getText() + ", init: 0, step:" + intervalValue.getText() + "]];";
         }
     }
     
@@ -137,6 +137,7 @@ public:
                        buttonComponent    { "Button" };
     
     juce::TextEditor minValue, maxValue, intervalValue;
+    juce::String componentCode;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (componentCreator)

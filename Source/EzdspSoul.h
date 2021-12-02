@@ -29,6 +29,7 @@
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
 
 #include "guiCreator.h"
+#include "componentCreator.h"
 
 namespace soul
 {
@@ -424,6 +425,16 @@ public:
                 DBG("Button Works");
             }
         }
+        
+        /*void componentCreated(componentCreator* cc)
+        {
+            cc->createComponent.onClick = [this]()
+            {
+                owner.document->setPosition(0);
+                owner.document->writeText(cc->componentCode,false,false, nullptr);
+                componentCreated(nullptr)
+            };
+        }*/
 
         EZDSPPlugin& owner;
         std::unique_ptr<AudioProcessorEditor> pluginEditor;
@@ -444,7 +455,7 @@ public:
     juce::File presetPatch= juce::File("/Library/Application Support/EZDSP/DiodeClipper/DiodeClipper.soulpatch");
     juce::TemporaryFile tempCode= juce::TemporaryFile (presetCode);
     juce::TemporaryFile tempPatch= juce::TemporaryFile (presetPatch);
-    juce::CodeDocument document;
+    juce::CodeDocument document,guiCode, dspCode;
     
     std::unique_ptr<juce::FileOutputStream> output;
     std::unique_ptr<juce::FileInputStream> input;
