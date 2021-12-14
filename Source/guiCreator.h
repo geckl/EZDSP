@@ -33,8 +33,7 @@ public:
     void buttonClicked(juce::Button* button) override;
     
     juce::TextButton addGUIComponent;
-    //juce::ScopedPointer<juce::DialogWindow> createAComponentWindow;
-    juce::ScopedPointer<componentCreator> createAComponent;
+    juce::Component::SafePointer<componentCreator> createAComponentWindow;
     juce::String guiCodeLine;
 
 private:

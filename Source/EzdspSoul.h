@@ -472,7 +472,7 @@ public:
                 
                 guiWindow = new guiCreator("guiComponents");
                 guiWindow->setUsingNativeTitleBar(true);
-                //guiWindow->setContentOwned(new InformationComponent(), true);
+                //guiWindow->setContentOwned(new guiCreator("guiComponents"), true);
                 guiWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
                 guiWindow->setAlwaysOnTop(true);
                 guiWindow->setVisible(true);
@@ -497,8 +497,7 @@ public:
         
         
         juce::CodeEditorComponent codeWindow{ owner.dspCode, nullptr };
-        //juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
-        juce::ScopedPointer<guiCreator> guiWindow;
+        juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
         juce::TextButton runCode,addGUI;
         
 

@@ -60,6 +60,7 @@ void guiCreator::resized()
 void guiCreator::closeButtonPressed()
 {
     DBG(guiCodeLine);
+    this->getTopLevelComponent()->exitModalState(0);
     delete this;
 }
 
@@ -67,21 +68,15 @@ void guiCreator::buttonClicked(juce::Button* button)
 {
     if (button == &addGUIComponent)
     {
-        //createAComponent = new juce::DialogWindow("Component Creator", juce::Colours::grey, true, false);
+        //createAComponentWindow = new juce::DialogWindow("Component Creator", juce::Colours::grey, true, false);
         
-        createAComponent= new componentCreator(this);
+        createAComponentWindow= new componentCreator(this);
         
-        //createAComponent->setUsingNativeTitleBar(true);
-        //createAComponent->setContentOwned(new InformationComponent(), true);
-        //createAComponent->centreWithSize(640, 480);
-        //createAComponent->setAlwaysOnTop(true);
-        //createAComponent->setVisible(true);
-        
-        createAComponent->createComponent.addListener(this);
+        //createAComponentWindow->createComponent.addListener(this);
         
         juce::DialogWindow::LaunchOptions launchOptions;
         
-        launchOptions.content.setOwned(createAComponent);
+        launchOptions.content.setOwned(createAComponentWindow);
         launchOptions.content->setSize(640, 480);
         launchOptions.launchAsync();
         
