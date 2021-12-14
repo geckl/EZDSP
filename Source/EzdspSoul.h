@@ -29,7 +29,6 @@
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
 
 #include "guiCreator.h"
-#include "componentCreator.h"
 
 namespace soul
 {
