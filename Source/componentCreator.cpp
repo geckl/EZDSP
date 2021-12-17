@@ -117,9 +117,15 @@ void componentCreator::buttonClicked(juce::Button* button)
     if (button == &createComponent)
     {
         
-        juce::String componentCode= "input event float " + nameValue.getText() + " [[ name: \"" +  nameValue.getText() + "\", min: " + minValue.getText() +", max:" + maxValue.getText() + ", init: 0, step:" + intervalValue.getText() + "]];";
+        //juce::String componentCode= "input event float " + nameValue.getText() + " [[ name: \"" +  nameValue.getText() + "\", min: " + minValue.getText() +", max:" + maxValue.getText() + ", init: 0, step:" + intervalValue.getText() + "]];";
         
-        guiWindowCallback->guiCodeLine= componentCode;
+        juce::Array<juce::String> componentParameters;
+        componentParameters.add(nameValue.getText());
+        componentParameters.add(minValue.getText());
+        componentParameters.add(maxValue.getText());
+        componentParameters.add(intervalValue.getText());
+        
+        guiWindowCallback-> guiCodeArray->add(componentParameters);
         delete this->findParentComponentOfClass<juce::DialogWindow>();
     }
 }

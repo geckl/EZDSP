@@ -13,7 +13,7 @@
 #include "componentCreator.h"
 
 //==============================================================================
-guiCreator::guiCreator(const juce::String& name)
+guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::String>> *g)
 : DocumentWindow (name, juce::Colours::grey, juce::DocumentWindow::allButtons)
 {
     // In your constructor, you should add any child components, and
@@ -24,6 +24,8 @@ guiCreator::guiCreator(const juce::String& name)
     addAndMakeVisible(&addGUIComponent);
     
     addGUIComponent.addListener(this);
+    
+    guiCodeArray=g;
 }
 
 guiCreator::~guiCreator()
@@ -59,7 +61,7 @@ void guiCreator::resized()
 
 void guiCreator::closeButtonPressed()
 {
-    DBG(guiCodeLine);
+    DBG(guiCodeArray->size());
     this->getTopLevelComponent()->exitModalState(0);
     delete this;
 }

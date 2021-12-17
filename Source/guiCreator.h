@@ -23,7 +23,7 @@ class guiCreator  : public juce::DocumentWindow,
                      private juce::Button::Listener
 {
 public:
-    guiCreator(const juce::String& name);
+    guiCreator(const juce::String& name, juce::Array<juce::Array <juce::String>> *g);
     ~guiCreator() override;
 
     void paint (juce::Graphics&) override;
@@ -34,7 +34,7 @@ public:
     
     juce::TextButton addGUIComponent;
     juce::Component::SafePointer<componentCreator> createAComponentWindow;
-    juce::String guiCodeLine;
+    juce::Array<juce::Array <juce::String>> *guiCodeArray;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (guiCreator)

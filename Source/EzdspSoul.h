@@ -30,6 +30,7 @@
 
 #include "guiCreator.h"
 
+
 namespace soul
 {
 namespace patch
@@ -47,6 +48,7 @@ namespace patch
     The PatchLibrary template is a mechanism for providing different JIT engines.
     The PatchLibraryDLL is an example of a class that could be used for this parameter.
 */
+
 template <typename PatchLibrary>
 class EZDSPPlugin  : public juce::AudioProcessor
 {
@@ -97,6 +99,15 @@ public:
         
         loadCode();
         
+        juce::Array<juce::String> initialComponentParameters;
+        
+        initialComponentParameters.add("gainDb");
+        initialComponentParameters.add("-60.0");
+        initialComponentParameters.add("10.0");
+        initialComponentParameters.add("0.1");
+        
+        guiArray.add(initialComponentParameters);
+        
         //Load soulpatch properties into ValueTree id
         state = juce::ValueTree (ids.SOULPatchPlugin);
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
@@ -127,11 +138,12 @@ public:
     //loads code from input stream into three CodeDocuments, one containing the full soul code, one containing only the DSP, and one containing only the GUI components
     void loadCode ()
     {
-        int flag = 0;
-        juce::TextEditor tempFullCode, tempDspCode;
+        int flag1 = 0;
+        int flag2 = 0;
+        juce::TextEditor tempFullCode, tempDspCode, tempGuiCode;
         tempFullCode.setMultiLine(true);
         tempDspCode.setMultiLine(true);
-        juce::int64 tempDspEndPosition, tempDspStartPosition;
+        juce::int64 tempDspEndPosition=0, tempDspStartPosition=0, tempGuiEndPosition=0, tempGuiStartPosition=0;
         
         //Read .soul file line by line. Use Markers to add select lines to DSP and GUI CodeDocuments.
         
@@ -141,11 +153,11 @@ public:
                 auto line = input->readNextLine();
                 if (line.startsWith ("//ENDDSP"))
                 {
-                    flag=0;
+                    flag1=0;
                     tempDspEndPosition=input->getPosition()-line.length()-1;
                 }
                 
-                if(flag==1)
+                if(flag1==1)
                 {
                     // append the text to the textContent
                     tempDspCode.insertTextAtCaret (line + juce::newLine);
@@ -153,8 +165,26 @@ public:
                 
                 if (line.startsWith ("//BEGINDSP"))
                 {
-                    flag=1;
+                    flag1=1;
                     tempDspStartPosition=input->getPosition();
+                }
+                
+                if (line.startsWith ("//ENDGUI"))
+                {
+                    flag2=0;
+                    tempGuiEndPosition=input->getPosition()-line.length()-1;
+                }
+                
+                if(flag2==1)
+                {
+                    // append the text to the textContent
+                    tempGuiCode.insertTextAtCaret (line + juce::newLine);
+                }
+                
+                if (line.startsWith ("//BEGINGUI"))
+                {
+                    flag2=1;
+                    tempGuiStartPosition=input->getPosition();
                 }
                 
                 tempFullCode.insertTextAtCaret(line + juce::newLine);
@@ -162,14 +192,21 @@ public:
         
         fullCode.replaceAllContent(tempFullCode.getText());
         dspCode.replaceAllContent(tempDspCode.getText());
+        guiCode.replaceAllContent(tempGuiCode.getText());
         
         //Record the Start/End positions of DSP and GUI sections. These are used to replace the sections when user changes the plugin
         dspEndPosition= juce::CodeDocument::Position(fullCode,tempDspEndPosition);
         dspStartPosition= juce::CodeDocument::Position(fullCode,tempDspStartPosition);
         
+        guiEndPosition= juce::CodeDocument::Position(fullCode,tempGuiEndPosition);
+        guiStartPosition= juce::CodeDocument::Position(fullCode,tempGuiStartPosition);
+        
         //This tracks the position of these markers. As code is added their position within the document will change
         dspEndPosition.setPositionMaintained(true);
         dspStartPosition.setPositionMaintained(true);
+        
+        guiEndPosition.setPositionMaintained(true);
+        guiStartPosition.setPositionMaintained(true);
         
     }
 
@@ -453,6 +490,17 @@ public:
                 
                 owner.fullCode.replaceSection(owner.dspStartPosition.getPosition(),owner.dspEndPosition.getPosition(),owner.dspCode.getAllContent());
                 
+                juce::String tempGuiCode="";
+                
+                for(int i=0; i< owner.guiArray.size();i++)
+                {
+                tempGuiCode+= "input stream float " + owner.guiArray[i][0] + " [[ name: \"" +  owner.guiArray[i][0] + "\", min: " + owner.guiArray[i][1] +", max: " + owner.guiArray[i][2] + ", init: 0, step: " + owner.guiArray[i][3] + " ]];\n";
+                }
+                
+                owner.guiCode.replaceAllContent(tempGuiCode);
+                
+                owner.fullCode.replaceSection(owner.guiStartPosition.getPosition(),owner.guiEndPosition.getPosition(),owner.guiCode.getAllContent());
+                
                 owner.output->setPosition(0);
                 owner.output->truncate();
                 //output->setNewLineString("\n");
@@ -470,13 +518,14 @@ public:
             if (button == &addGUI)
             {
                 
-                guiWindow = new guiCreator("guiComponents");
+                guiWindow = new guiCreator("guiComponents", &owner.guiArray);
                 guiWindow->setUsingNativeTitleBar(true);
                 //guiWindow->setContentOwned(new guiCreator("guiComponents"), true);
                 guiWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
                 guiWindow->setAlwaysOnTop(true);
                 guiWindow->setVisible(true);
                 DBG("Button Works");
+                //DBG(owner.guiArray.getLast().getLast());
             }
         }
         
@@ -516,7 +565,7 @@ public:
     std::unique_ptr<juce::FileInputStream> inputPatch;
     
     juce::CodeDocument fullCode ,guiCode, dspCode;
-    juce::CodeDocument::Position dspStartPosition, dspEndPosition;
+    juce::CodeDocument::Position dspStartPosition, dspEndPosition, guiStartPosition, guiEndPosition;
 
 private:
     //==============================================================================
@@ -526,8 +575,7 @@ private:
     std::unique_ptr<soul::patch::SOULPatchAudioProcessor> plugin;
     juce::ValueTree state;
     soul::patch::CompilerCache::Ptr compilerCache;
-    //juce::String content;
-    
+    juce::Array<juce::Array <juce::String>> guiArray;
     
 
     struct IDs
