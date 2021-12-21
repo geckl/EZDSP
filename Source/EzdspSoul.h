@@ -101,9 +101,11 @@ public:
         
         juce::Array<juce::String> initialComponentParameters;
         
-        initialComponentParameters.add("gainDb");
+        initialComponentParameters.add("SLIDER");
+        initialComponentParameters.add("GAIN");
         initialComponentParameters.add("-60.0");
         initialComponentParameters.add("10.0");
+        initialComponentParameters.add("0.0");
         initialComponentParameters.add("0.1");
         
         guiArray.add(initialComponentParameters);
@@ -118,6 +120,7 @@ public:
 
     ~EZDSPPlugin() override
     {
+        //tempCode.get
         plugin.reset();
         patchInstance = nullptr;
     }
@@ -380,7 +383,7 @@ public:
             addAndMakeVisible(runCode);
             
             addGUI.setSize(50,50);
-            addGUI.setButtonText("GUI");
+            addGUI.setButtonText("Components");
             addAndMakeVisible(addGUI);
             
 
@@ -432,7 +435,7 @@ public:
                 
                 codeWindow.setBounds(0, getHeight()-200, getWidth(), 150);
                 runCode.setBounds(50, getHeight()-40, 50, 30);
-                addGUI.setBounds(150, getHeight()-40, 50, 30);
+                addGUI.setBounds(150, getHeight()-40, 150, 30);
             }
             
         }
@@ -494,7 +497,20 @@ public:
                 
                 for(int i=0; i< owner.guiArray.size();i++)
                 {
-                tempGuiCode+= "input stream float " + owner.guiArray[i][0] + " [[ name: \"" +  owner.guiArray[i][0] + "\", min: " + owner.guiArray[i][1] +", max: " + owner.guiArray[i][2] + ", init: 0, step: " + owner.guiArray[i][3] + " ]];\n";
+                    if(owner.guiArray[i][0]== "VARIABLE")
+                    {
+                        tempGuiCode+= "float " + owner.guiArray[i][1] + " = " + owner.guiArray[i][4] + ";\n";
+                    }
+                    
+                    else if(owner.guiArray[i][0]== "SLIDER")
+                    {
+                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", min: " + owner.guiArray[i][2] +", max: " + owner.guiArray[i][3] + ", init:  " + owner.guiArray[i][4] + ", step: " + owner.guiArray[i][5] + " ]];\n";
+                    }
+                    
+                    if(owner.guiArray[i][0]== "BUTTON")
+                    {
+                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\"boolean, ]];\n";
+                    }
                 }
                 
                 owner.guiCode.replaceAllContent(tempGuiCode);
@@ -517,15 +533,21 @@ public:
             
             if (button == &addGUI)
             {
-                
-                guiWindow = new guiCreator("guiComponents", &owner.guiArray);
-                guiWindow->setUsingNativeTitleBar(true);
-                //guiWindow->setContentOwned(new guiCreator("guiComponents"), true);
-                guiWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
-                guiWindow->setAlwaysOnTop(true);
-                guiWindow->setVisible(true);
-                DBG("Button Works");
-                //DBG(owner.guiArray.getLast().getLast());
+                if(guiWindow == nullptr)
+                {
+                    guiWindow = new guiCreator("guiComponents", &owner.guiArray, &runCode);
+                    guiWindow->setUsingNativeTitleBar(true);
+                    //guiWindow->setContentOwned(new guiCreator("guiComponents"), true);
+                    guiWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
+                    guiWindow->setAlwaysOnTop(true);
+                    guiWindow->setVisible(true);
+                    DBG("Button Works");
+                    //DBG(owner.guiArray.getLast().getLast());
+                }
+                else
+                {
+                    guiWindow->toFront(true);
+                }
             }
         }
         

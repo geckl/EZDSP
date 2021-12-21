@@ -34,7 +34,7 @@ public:
     
     enum RadioButtonIds
     {
-        typeButtons2 = 1001
+        typeButtons = 1001
     };
     
     juce::TextButton createComponent;
@@ -43,12 +43,14 @@ public:
     juce::Label rangeLabel  { {}, "Component Range: "};
     juce::Label minLabel { {}, "Min Value: "};
     juce::Label maxLabel { {}, "Max Value: "};
+    juce::Label initLabel { {}, "Initial Value: "};
     juce::Label intervalLabel { {}, "Step: "};
     juce::Label nameLabel { {}, "Variable Name: "};
     juce::ToggleButton sliderComponent  { "Slider" },
-                       buttonComponent    { "Button" };
+                       buttonComponent  { "Button" },
+                       variableComponent{ "Variable" };
     
-    juce::TextEditor minValue, maxValue, intervalValue, nameValue;
+    juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue;
     
     guiCreator *guiWindowCallback;
 

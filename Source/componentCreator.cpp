@@ -19,23 +19,28 @@ componentCreator::componentCreator(guiCreator* g)
     // initialise any special settings that your component needs.
     
     addAndMakeVisible(typeLabel);
+    addAndMakeVisible(variableComponent);
     addAndMakeVisible(sliderComponent);
     addAndMakeVisible(buttonComponent);
     
+    variableComponent.onClick = [this] { updateToggleState (&variableComponent, "Variable");};
     sliderComponent.onClick = [this] { updateToggleState (&sliderComponent, "Slider");};
     buttonComponent.onClick = [this] { updateToggleState (&buttonComponent, "Button");};
     
-    sliderComponent.setRadioGroupId(typeButtons2);
-    buttonComponent.setRadioGroupId(typeButtons2);
+    variableComponent.setRadioGroupId(typeButtons);
+    sliderComponent.setRadioGroupId(typeButtons);
+    buttonComponent.setRadioGroupId(typeButtons);
     
     addAndMakeVisible(rangeLabel);
     addAndMakeVisible(minLabel);
     addAndMakeVisible(maxLabel);
+    addAndMakeVisible(initLabel);
     addAndMakeVisible(intervalLabel);
     addAndMakeVisible(nameLabel);
     
     addAndMakeVisible(minValue);
     addAndMakeVisible(maxValue);
+    addAndMakeVisible(initValue);
     addAndMakeVisible(intervalValue);
     addAndMakeVisible(nameValue);
     
@@ -47,6 +52,7 @@ componentCreator::componentCreator(guiCreator* g)
     
     minValue.setInputRestrictions(0, "0123456789.-");
     maxValue.setInputRestrictions(0, "0123456789.-");
+    initValue.setInputRestrictions(0, "0123456789.-");
     intervalValue.setInputRestrictions(0, "0123456789.-");
     
     
@@ -88,18 +94,21 @@ void componentCreator::resized()
     // components that your component contains..
 
     typeLabel.setBounds (10, 10, getWidth() - 20, 20);
-    sliderComponent.setBounds (20, 40, getWidth() - 30, 20);
-    buttonComponent.setBounds (20, 70, getWidth() - 30, 20);
+    variableComponent.setBounds (20, 40, getWidth() - 30, 20);
+    sliderComponent.setBounds (20, 70, getWidth() - 30, 20);
+    buttonComponent.setBounds (20, 100, getWidth() - 30, 20);
     
-    rangeLabel.setBounds (10, 100, getWidth() - 20, 20);
-    minLabel.setBounds (0, 130, 120, 20);
-    minValue.setBounds (120, 130, 100, 20);
-    maxLabel.setBounds (0, 170, 120, 20);
-    maxValue.setBounds (120, 170, 100, 20);
-    intervalLabel.setBounds (0, 200, 120, 20);
-    intervalValue.setBounds (120, 200, 100, 20);
-    nameLabel.setBounds(0, 230, 120, 20);
-    nameValue.setBounds(120, 230, 100, 20);
+    rangeLabel.setBounds (10, 130, getWidth() - 20, 20);
+    minLabel.setBounds (0, 160, 120, 20);
+    minValue.setBounds (120, 160, 100, 20);
+    maxLabel.setBounds (0, 200, 120, 20);
+    maxValue.setBounds (120, 200, 100, 20);
+    initLabel.setBounds (0, 230, 120, 20);
+    initValue.setBounds (120, 230, 100, 20);
+    intervalLabel.setBounds (0, 260, 120, 20);
+    intervalValue.setBounds (120, 260, 100, 20);
+    nameLabel.setBounds(0, 290, 120, 20);
+    nameValue.setBounds(120, 290, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }
@@ -108,6 +117,32 @@ void componentCreator::updateToggleState (juce::Button* button, juce::String nam
 {
     auto state = button->getToggleState();
     juce::String stateString = state ? "ON" : "OFF";
+    
+    //Only activate input fields that are needed for given type (Standard variable, slider, or button)
+    if(stateString=="ON")
+    {
+        if(button->getName()=="Variable")
+        {
+            minValue.setEnabled(false);
+            maxValue.setEnabled(false);
+            intervalValue.setEnabled(false);
+            
+        }
+        else if(button->getName()=="Slider")
+        {
+            minValue.setEnabled(true);
+            maxValue.setEnabled(true);
+            intervalValue.setEnabled(true);
+            
+        }
+        else if(button->getName()=="Button")
+        {
+            minValue.setEnabled(false);
+            maxValue.setEnabled(false);
+            intervalValue.setEnabled(false);
+            
+        }
+    }
 
     juce::Logger::outputDebugString (name + " Button changed to " + stateString);
 }
@@ -117,15 +152,38 @@ void componentCreator::buttonClicked(juce::Button* button)
     if (button == &createComponent)
     {
         
-        //juce::String componentCode= "input event float " + nameValue.getText() + " [[ name: \"" +  nameValue.getText() + "\", min: " + minValue.getText() +", max:" + maxValue.getText() + ", init: 0, step:" + intervalValue.getText() + "]];";
-        
         juce::Array<juce::String> componentParameters;
-        componentParameters.add(nameValue.getText());
-        componentParameters.add(minValue.getText());
-        componentParameters.add(maxValue.getText());
-        componentParameters.add(intervalValue.getText());
         
-        guiWindowCallback-> guiCodeArray->add(componentParameters);
+        if (variableComponent.getToggleState()==true)
+        {
+            componentParameters.add("VARIABLE");
+            componentParameters.add(nameValue.getText());
+            componentParameters.add("");
+            componentParameters.add("");
+            componentParameters.add(initValue.getText());
+            componentParameters.add("");
+        }
+        else if (sliderComponent.getToggleState()==true)
+        {
+            componentParameters.add("SLIDER");
+            componentParameters.add(nameValue.getText());
+            componentParameters.add(minValue.getText());
+            componentParameters.add(maxValue.getText());
+            componentParameters.add(initValue.getText());
+            componentParameters.add(intervalValue.getText());
+        }
+        else if (buttonComponent.getToggleState()==true)
+        {
+            componentParameters.add("BUTTON");
+            componentParameters.add(nameValue.getText());
+            componentParameters.add("");
+            componentParameters.add("");
+            componentParameters.add("");
+            componentParameters.add("");
+        }
+        
+        guiWindowCallback->guiCodeArray->add(componentParameters);
+        guiWindowCallback->myTable->updateContent();
         delete this->findParentComponentOfClass<juce::DialogWindow>();
     }
 }
