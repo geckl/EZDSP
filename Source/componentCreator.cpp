@@ -152,6 +152,7 @@ void componentCreator::updateToggleState (juce::Button* button, juce::String nam
 
 void componentCreator::buttonClicked(juce::Button* button)
 {
+    //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
         
@@ -188,8 +189,17 @@ void componentCreator::buttonClicked(juce::Button* button)
             componentParameters.add("OFF");
         }
         
+        
         guiWindowCallback->guiCodeArray->add(componentParameters);
+        
+        //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
+        std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),
+          [](const auto& lhs, const auto& rhs) { return lhs[0] < rhs[0]; });
+        
+        //update table
         guiWindowCallback->myTable->updateContent();
+        
+        //close the component creator window
         delete this->findParentComponentOfClass<juce::DialogWindow>();
     }
 }
