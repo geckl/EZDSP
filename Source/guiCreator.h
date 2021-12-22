@@ -34,7 +34,7 @@ public:
     void buttonClicked(juce::Button* button) override;
     
     
-    juce::TextButton addGUIComponent;
+    juce::TextButton addGUIComponent, deleteSelectedComponents;
     juce::Component::SafePointer<componentCreator> createAComponentWindow;
     juce::Array<juce::Array <juce::String>> *guiCodeArray;
     juce::Button *runCodeButton;

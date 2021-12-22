@@ -24,6 +24,11 @@ guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::
     addAndMakeVisible(&addGUIComponent);
     addGUIComponent.addListener(this);
     
+    deleteSelectedComponents.setSize(150,50);
+    deleteSelectedComponents.setButtonText("Delete Selected Components");
+    addAndMakeVisible(&deleteSelectedComponents);
+    deleteSelectedComponents.addListener(this);
+    
     guiCodeArray=g;
     runCodeButton=b;
     
@@ -66,6 +71,7 @@ void guiCreator::resized()
     
     myTable->setBounds (0,0,getWidth(),getHeight()-150);
     addGUIComponent.setBounds(50, getHeight()-100, 150, 50);
+    deleteSelectedComponents.setBounds(250, getHeight()-100, 150, 50);
 
 }
 
@@ -95,5 +101,17 @@ void guiCreator::buttonClicked(juce::Button* button)
         
         
         DBG("Button Works 4Real");
+    }
+    else if(button == &deleteSelectedComponents)
+    {
+        for(int i=0;i<myTable->numRows;i++)
+        {
+            DBG(juce::String(i) + myTable->getSelection(i));
+            if(myTable->getSelection(i)=="ON")
+            {
+                guiCodeArray->remove(i);
+                myTable->updateContent();
+            }
+        }
     }
 }

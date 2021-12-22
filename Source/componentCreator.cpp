@@ -126,6 +126,7 @@ void componentCreator::updateToggleState (juce::Button* button, juce::String nam
             minValue.setEnabled(false);
             maxValue.setEnabled(false);
             intervalValue.setEnabled(false);
+            initValue.setEnabled(true);
             
         }
         else if(button->getName()=="Slider")
@@ -133,6 +134,7 @@ void componentCreator::updateToggleState (juce::Button* button, juce::String nam
             minValue.setEnabled(true);
             maxValue.setEnabled(true);
             intervalValue.setEnabled(true);
+            initValue.setEnabled(true);
             
         }
         else if(button->getName()=="Button")
@@ -140,6 +142,7 @@ void componentCreator::updateToggleState (juce::Button* button, juce::String nam
             minValue.setEnabled(false);
             maxValue.setEnabled(false);
             intervalValue.setEnabled(false);
+            initValue.setEnabled(false);
             
         }
     }
@@ -162,6 +165,7 @@ void componentCreator::buttonClicked(juce::Button* button)
             componentParameters.add("");
             componentParameters.add(initValue.getText());
             componentParameters.add("");
+            componentParameters.add("OFF");
         }
         else if (sliderComponent.getToggleState()==true)
         {
@@ -171,6 +175,7 @@ void componentCreator::buttonClicked(juce::Button* button)
             componentParameters.add(maxValue.getText());
             componentParameters.add(initValue.getText());
             componentParameters.add(intervalValue.getText());
+            componentParameters.add("OFF");
         }
         else if (buttonComponent.getToggleState()==true)
         {
@@ -180,6 +185,7 @@ void componentCreator::buttonClicked(juce::Button* button)
             componentParameters.add("");
             componentParameters.add("");
             componentParameters.add("");
+            componentParameters.add("OFF");
         }
         
         guiWindowCallback->guiCodeArray->add(componentParameters);

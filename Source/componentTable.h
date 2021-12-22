@@ -16,23 +16,23 @@ class componentTable    : public juce::Component,
 public:
     componentTable(juce::Array < juce::Array <juce::String>> *c)
     {
-        loadData();                                                                  // [1]
 
-        addAndMakeVisible (table);                                                  // [1]
+        addAndMakeVisible (table);
 
-        table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);      // [2]
+        table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);
         table.setOutlineThickness (1);
+        
+        table.getHeader().addColumn("Type", 0, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Name", 1, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Min", 2, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Max", 3, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Init", 4, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Interval", 5, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Select", 6, 50, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
 
-        table.getHeader().addColumn("Type", 0, 100);
-        table.getHeader().addColumn("Name", 1, 100);
-        table.getHeader().addColumn("Min", 2, 100);
-        table.getHeader().addColumn("Max", 3, 100);
-        table.getHeader().addColumn("Init", 4, 100);
-        table.getHeader().addColumn("Interval", 5, 100);
+        table.getHeader().setSortColumnId (1, true);
 
-        table.getHeader().setSortColumnId (1, true);                                // [3]
-
-        table.setMultipleSelectionEnabled (true);                                   // [4]
+        table.setMultipleSelectionEnabled (true);
         componentsArray=c;
         
         numRows=componentsArray->size();
@@ -56,7 +56,7 @@ public:
     void paintCell (juce::Graphics& g, int rowNumber, int columnId,
                     int width, int height, bool rowIsSelected) override
     {
-        g.setColour (rowIsSelected ? juce::Colours::darkblue : getLookAndFeel().findColour (juce::ListBox::textColourId));  // [5]
+        g.setColour (rowIsSelected ? juce::Colours::darkblue : getLookAndFeel().findColour (juce::ListBox::textColourId));
         g.setFont (font);
         
         if(componentsArray->getReference(rowNumber)[columnId] != "")
@@ -66,7 +66,7 @@ public:
         }
 
         g.setColour (getLookAndFeel().findColour (juce::ListBox::backgroundColourId));
-        g.fillRect (width - 1, 0, 1, height);                                                                               // [7]
+        g.fillRect (width - 1, 0, 1, height);
     }
     
     void updateContent ()
@@ -86,12 +86,12 @@ public:
 
             table.updateContent();
         }
-    }
+    }*/
 
     Component* refreshComponentForCell (int rowNumber, int columnId, bool,
                                         Component* existingComponentToUpdate) override
     {
-        if (columnId == 9)  // [8]
+        if (columnId == 6)
         {
             auto* selectionBox = static_cast<SelectionColumnCustomComponent*> (existingComponentToUpdate);
 
@@ -102,19 +102,8 @@ public:
             return selectionBox;
         }
 
-        if (columnId == 8)  // [9]
-        {
-            auto* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
-
-            if (textLabel == nullptr)
-                textLabel = new EditableTextCustomComponent (*this);
-
-            textLabel->setRowAndColumn (rowNumber, columnId);
-            return textLabel;
-        }
-
         jassert (existingComponentToUpdate == nullptr);
-        return nullptr;     // [10]
+        return nullptr;
     }
 
     int getColumnAutoSizeWidth (int columnId) override
@@ -137,14 +126,26 @@ public:
         return widest + 8;
     }
 
-    int getSelection (const int rowNumber) const
+    juce::String getSelection (const int rowNumber) const
     {
-        return dataList->getChildElement (rowNumber)->getIntAttribute ("Select");
+        return componentsArray->getReference(rowNumber)[6];
+        //return dataList->getChildElement (rowNumber)->getIntAttribute ("Select");
     }
 
-    void setSelection (const int rowNumber, const int newSelection)
+    void setSelection (const int rowNumber, const bool newSelection)
     {
-        dataList->getChildElement (rowNumber)->setAttribute ("Select", newSelection);
+        std::cout << std::boolalpha << newSelection;
+        if(newSelection==false)
+        {
+            componentsArray->getReference(rowNumber).set(6,"OFF");
+            DBG(componentsArray->getReference(rowNumber)[6]);
+        }
+        else if(newSelection==true)
+        {
+            componentsArray->getReference(rowNumber).set(6,"ON");
+            DBG(componentsArray->getReference(rowNumber)[6]);
+        }
+        //dataList->getChildElement (rowNumber)->setAttribute ("Select", newSelection);
     }
 
     juce::String getText (const int columnNumber, const int rowNumber) const
@@ -156,13 +157,15 @@ public:
     {
         const auto& columnName = table.getHeader().getColumnName (columnNumber);
         dataList->getChildElement (rowNumber)->setAttribute (columnName, newText);
-    }*/
+    }
 
     //==============================================================================
     void resized() override
     {
         table.setBoundsInset (juce::BorderSize<int> (8));
     }
+    
+    int numRows = 0;
 
 private:
     juce::TableListBox table  { {}, this };
@@ -171,44 +174,8 @@ private:
     std::unique_ptr<juce::XmlElement> tutorialData;
     juce::XmlElement* columnList = nullptr;
     juce::XmlElement* dataList = nullptr;
-    int numRows = 0;
     
     juce::Array <juce::Array <juce::String>> *componentsArray;
-
-    //==============================================================================
-    /*class EditableTextCustomComponent  : public juce::Label
-    {
-    public:
-        EditableTextCustomComponent (componentTable& td)
-            : owner (td)
-        {
-            setEditable (false, true, false);
-        }
-
-        void mouseDown (const juce::MouseEvent& event) override
-        {
-            owner.table.selectRowsBasedOnModifierKeys (row, event.mods, false);
-
-            Label::mouseDown (event);
-        }
-
-        void textWasEdited() override
-        {
-            owner.setText (columnId, row, getText());
-        }
-
-        void setRowAndColumn (const int newRow, const int newColumn)
-        {
-            row = newRow;
-            columnId = newColumn;
-            setText (owner.getText(columnId, row), juce::dontSendNotification);
-        }
-
-    private:
-        componentTable& owner;
-        int row, columnId;
-        juce::Colour textColour;
-    };
 
     //==============================================================================
     class SelectionColumnCustomComponent    : public Component
@@ -219,7 +186,11 @@ private:
         {
             addAndMakeVisible (toggleButton);
 
-            toggleButton.onClick = [this] { owner.setSelection (row, (int) toggleButton.getToggleState()); };
+            toggleButton.onClick = [this] {
+                owner.setSelection (row, toggleButton.getToggleState());
+            };
+            
+            //toggleButton.onClick = [this] { owner.componentsArray->remove(row); };
         }
 
         void resized() override
@@ -231,7 +202,7 @@ private:
         {
             row = newRow;
             columnId = newColumn;
-            toggleButton.setToggleState ((bool) owner.getSelection (row), juce::dontSendNotification);
+            toggleButton.setToggleState (owner.getSelection(row)=="ON", juce::dontSendNotification);
         }
 
     private:
@@ -241,7 +212,7 @@ private:
     };
 
     //==============================================================================
-    class TutorialDataSorter
+    /*class TutorialDataSorter
     {
     public:
         TutorialDataSorter (const juce::String& attributeToSortBy, bool forwards)
@@ -252,13 +223,13 @@ private:
         int compareElements (juce::XmlElement* first, juce::XmlElement* second) const
         {
             auto result = first->getStringAttribute (attributeToSort)
-                                .compareNatural (second->getStringAttribute (attributeToSort)); // [1]
+                                .compareNatural (second->getStringAttribute (attributeToSort));
 
             if (result == 0)
                 result = first->getStringAttribute ("ID")
-                               .compareNatural (second->getStringAttribute ("ID"));             // [2]
+                               .compareNatural (second->getStringAttribute ("ID"));
 
-            return direction * result;                                                          // [3]
+            return direction * result;
         }
 
     private:
@@ -266,28 +237,7 @@ private:
         int direction;
     };*/
 
-    //==============================================================================
-    void loadData()
-    {
-        auto dir = juce::File::getCurrentWorkingDirectory();
-
-        int numTries = 0;
-
-        while (! dir.getChildFile ("Resources").exists() && numTries++ < 15)
-            dir = dir.getParentDirectory();
-
-        auto tableFile = dir.getChildFile ("Resources").getChildFile ("TableData.xml");
-
-        if (tableFile.exists())
-        {
-            tutorialData = juce::XmlDocument::parse (tableFile);            // [3]
-
-            dataList   = tutorialData->getChildByName ("DATA");
-            columnList = tutorialData->getChildByName ("HEADERS");          // [4]
-
-            numRows = dataList->getNumChildElements();                      // [5]
-        }
-    }
+   
 
     juce::String getAttributeNameForColumnId (const int columnId) const
     {

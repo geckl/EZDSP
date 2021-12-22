@@ -107,6 +107,7 @@ public:
         initialComponentParameters.add("10.0");
         initialComponentParameters.add("0.0");
         initialComponentParameters.add("0.1");
+        initialComponentParameters.add("OFF");
         
         guiArray.add(initialComponentParameters);
         
@@ -509,7 +510,7 @@ public:
                     
                     if(owner.guiArray[i][0]== "BUTTON")
                     {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\"boolean, ]];\n";
+                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", boolean ]];\n";
                     }
                 }
                 
