@@ -103,10 +103,12 @@ public:
         
         initialComponentParameters.add("SLIDER");
         initialComponentParameters.add("GAIN");
+        initialComponentParameters.add("");
         initialComponentParameters.add("-60.0");
         initialComponentParameters.add("10.0");
         initialComponentParameters.add("0.0");
         initialComponentParameters.add("0.1");
+        initialComponentParameters.add("");
         initialComponentParameters.add("OFF");
         
         guiArray.add(initialComponentParameters);
@@ -500,15 +502,19 @@ public:
                 {
                     if(owner.guiArray[i][0]== "VARIABLE")
                     {
-                        tempGuiCode+= "float " + owner.guiArray[i][1] + " = " + owner.guiArray[i][4] + ";\n";
+                        tempGuiCode+= owner.guiArray[i][2] + " " + owner.guiArray[i][1] + " = " + owner.guiArray[i][5] + ";\n";
                     }
                     
                     else if(owner.guiArray[i][0]== "SLIDER")
                     {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", min: " + owner.guiArray[i][2] +", max: " + owner.guiArray[i][3] + ", init:  " + owner.guiArray[i][4] + ", step: " + owner.guiArray[i][5] + " ]];\n";
+                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", min: " + owner.guiArray[i][3] +", max: " + owner.guiArray[i][4] + ", init:  " + owner.guiArray[i][5] + ", step: " + owner.guiArray[i][6] + " ]];\n";
+                    }
+                    else if(owner.guiArray[i][0]== "BUFFER")
+                    {
+                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][1] + ";\n";
                     }
                     
-                    if(owner.guiArray[i][0]== "BUTTON")
+                    else if(owner.guiArray[i][0]== "BUTTON")
                     {
                         tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", boolean ]];\n";
                     }

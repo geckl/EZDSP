@@ -22,13 +22,15 @@ public:
         table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);
         table.setOutlineThickness (1);
         
-        table.getHeader().addColumn("Type", 0, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Component", 0, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
         table.getHeader().addColumn("Name", 1, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Min", 2, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Max", 3, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Init", 4, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Interval", 5, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Select", 6, 50, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Type", 2, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Min", 3, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Max", 4, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Init", 5, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Interval", 6, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Size", 7, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Select", 8, 50, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
 
         table.getHeader().setSortColumnId (1, true);
 
@@ -91,7 +93,7 @@ public:
     Component* refreshComponentForCell (int rowNumber, int columnId, bool,
                                         Component* existingComponentToUpdate) override
     {
-        if (columnId == 6)
+        if (columnId == 8)
         {
             auto* selectionBox = static_cast<SelectionColumnCustomComponent*> (existingComponentToUpdate);
 

@@ -39,18 +39,23 @@ public:
     
     juce::TextButton createComponent;
     
-    juce::Label typeLabel   { {}, "Component Type: "};
-    juce::Label rangeLabel  { {}, "Component Range: "};
+    juce::Label componentLabel   { {}, "Component Type: "};
+    juce::Label parametersLabel  { {}, "Component Parameters: "};
     juce::Label minLabel { {}, "Min Value: "};
     juce::Label maxLabel { {}, "Max Value: "};
     juce::Label initLabel { {}, "Initial Value: "};
     juce::Label intervalLabel { {}, "Step: "};
     juce::Label nameLabel { {}, "Variable Name: "};
+    juce::Label typeLabel { {}, "Data Type: " };
+    juce::Label sizeLabel { {}, "Size: " };
     juce::ToggleButton sliderComponent  { "Slider" },
                        buttonComponent  { "Button" },
-                       variableComponent{ "Variable" };
+                       variableComponent{ "Global Variable" },
+                       bufferComponent{ "Buffer"};
     
-    juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue;
+    juce::ComboBox typeValue;
+    
+    juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue, sizeValue;
     
     guiCreator *guiWindowCallback;
 
