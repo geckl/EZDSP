@@ -10,7 +10,6 @@
 
 #include <JuceHeader.h>
 #include "guiCreator.h"
-#include "componentCreator.h"
 
 //==============================================================================
 guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::String>> *g, juce::Button *b)
@@ -19,10 +18,18 @@ guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-    addGUIComponent.setSize(150,50);
-    addGUIComponent.setButtonText("Add New Component");
+    //addGUIComponent.setSize(150,50);
     addAndMakeVisible(&addGUIComponent);
-    addGUIComponent.addListener(this);
+    //addGUIComponent.addListener(this);
+    
+    addGUIComponent.addItem ("Variable",  1);
+    addGUIComponent.addItem ("Slider",   2);
+    addGUIComponent.addItem ("Buffer", 3);
+    addGUIComponent.addItem ("Button", 4);
+    addGUIComponent.setText("Add New Component", juce::NotificationType::dontSendNotification);
+    
+    addGUIComponent.onChange = [this] { styleMenuChanged(); };
+    //addGUIComponent.setSelectedId (1);
     
     deleteSelectedComponents.setSize(150,50);
     deleteSelectedComponents.setButtonText("Delete Selected Components");
@@ -57,11 +64,6 @@ void guiCreator::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
     
-    /*for(int i=0;i<guiCodeArray->size();i++)
-    {
-        g.drawText (guiCodeArray->getUnchecked(i)[0] + " : " + guiCodeArray->getUnchecked(i)[1],getWidth()/4,getHeight()/2-(i*25), getWidth()/2, getHeight()/8 ,
-                juce::Justification::centred, true);   // draw some placeholder text
-    }*/
 }
 
 void guiCreator::resized()
@@ -85,7 +87,7 @@ void guiCreator::closeButtonPressed()
 
 void guiCreator::buttonClicked(juce::Button* button)
 {
-    if (button == &addGUIComponent)
+    /*if (button == &addGUIComponent)
     {
         //createAComponentWindow = new juce::DialogWindow("Component Creator", juce::Colours::grey, true, false);
         
@@ -101,8 +103,8 @@ void guiCreator::buttonClicked(juce::Button* button)
         
         
         DBG("Button Works 4Real");
-    }
-    else if(button == &deleteSelectedComponents)
+    }*/
+    if(button == &deleteSelectedComponents)
     {
         for(int i=0;i<myTable->numRows;i++)
         {
@@ -115,3 +117,38 @@ void guiCreator::buttonClicked(juce::Button* button)
         }
     }
 }
+
+void guiCreator::styleMenuChanged()
+   {
+       if(addGUIComponent.getSelectedId()>0)
+       {
+           switch (addGUIComponent.getSelectedId())
+           {
+                   
+               case 1:
+                   createAComponentWindow= new variableCreator(this);
+                   addGUIComponent.setSelectedId(0);
+                   break;
+               case 2:
+                   createAComponentWindow= new sliderCreator(this);
+                   addGUIComponent.setSelectedId(0);
+                   break;
+               case 3:
+                   createAComponentWindow= new bufferCreator(this);
+                   addGUIComponent.setSelectedId(0);
+                   break;
+               case 4:
+                   createAComponentWindow= new buttonCreator(this);
+                   addGUIComponent.setSelectedId(0);
+                   break;
+               default:
+                   break;
+           }
+           
+           addGUIComponent.setText("Add New Component", juce::NotificationType::dontSendNotification);
+           juce::DialogWindow::LaunchOptions launchOptions;
+           launchOptions.content.setOwned(createAComponentWindow);
+           launchOptions.content->setSize(640, 480);
+           launchOptions.launchAsync();
+       }
+   }

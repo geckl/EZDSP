@@ -10,15 +10,15 @@
 
 #include <JuceHeader.h>
 #include "componentCreator.h"
-#include "guiCreator.h"
+//#include "guiCreator.h"
 
 //==============================================================================
-componentCreator::componentCreator(guiCreator* g)
+componentCreator::componentCreator(guiCreator* g, juce::String t)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
     
-    addAndMakeVisible(componentLabel);
+    /*addAndMakeVisible(componentLabel);
     addAndMakeVisible(variableComponent);
     addAndMakeVisible(sliderComponent);
     addAndMakeVisible(bufferComponent);
@@ -31,39 +31,71 @@ componentCreator::componentCreator(guiCreator* g)
     sliderComponent.onClick = [this] { updateToggleState (&sliderComponent, "Slider");};
     buttonComponent.onClick = [this] { updateToggleState (&buttonComponent, "Button");};
     bufferComponent.onClick = [this] { updateToggleState (&bufferComponent, "Buffer");};
-    
+     
     variableComponent.setRadioGroupId(typeButtons);
     sliderComponent.setRadioGroupId(typeButtons);
     bufferComponent.setRadioGroupId(typeButtons);
-    buttonComponent.setRadioGroupId(typeButtons);
-    
-    addAndMakeVisible(parametersLabel);
-    addAndMakeVisible(minLabel);
-    addAndMakeVisible(maxLabel);
-    addAndMakeVisible(initLabel);
-    addAndMakeVisible(intervalLabel);
-    addAndMakeVisible(nameLabel);
-    addAndMakeVisible (typeLabel);
-    
-    addAndMakeVisible(minValue);
-    addAndMakeVisible(maxValue);
-    addAndMakeVisible(initValue);
-    addAndMakeVisible(intervalValue);
-    addAndMakeVisible(nameValue);
+    buttonComponent.setRadioGroupId(typeButtons);*/
     
     typeValue.addItem ("int",  1);
     typeValue.addItem ("float",  2);
-    addAndMakeVisible(typeValue);
-    
-    addAndMakeVisible(sizeLabel);
-    addAndMakeVisible(sizeValue);
-    
     
     minValue.setInputRestrictions(0, "0123456789.-");
     maxValue.setInputRestrictions(0, "0123456789.-");
     initValue.setInputRestrictions(0, "0123456789.-");
     intervalValue.setInputRestrictions(0, "0123456789.-");
     sizeValue.setInputRestrictions(0,"0123456789");
+    
+    if(t=="VARIABLE")
+    {
+        addAndMakeVisible(parametersLabel);
+        addAndMakeVisible(initLabel);
+        addAndMakeVisible(nameLabel);
+        addAndMakeVisible(typeLabel);
+        
+        addAndMakeVisible(initValue);
+        addAndMakeVisible(nameValue);
+        addAndMakeVisible(typeValue);
+    }
+    else if(t=="SLIDER")
+    {
+        addAndMakeVisible(parametersLabel);
+        addAndMakeVisible(minLabel);
+        addAndMakeVisible(maxLabel);
+        addAndMakeVisible(initLabel);
+        addAndMakeVisible(intervalLabel);
+        addAndMakeVisible(nameLabel);
+        addAndMakeVisible(sizeLabel);
+        addAndMakeVisible (typeLabel);
+        
+        addAndMakeVisible(minValue);
+        addAndMakeVisible(maxValue);
+        addAndMakeVisible(initValue);
+        addAndMakeVisible(intervalValue);
+        addAndMakeVisible(nameValue);
+        addAndMakeVisible(sizeValue);
+        addAndMakeVisible(typeValue);
+    }
+    else if(t=="BUFFER")
+    {
+        addAndMakeVisible(parametersLabel);
+        addAndMakeVisible(nameLabel);
+        addAndMakeVisible(sizeLabel);
+        addAndMakeVisible (typeLabel);
+        
+        addAndMakeVisible(nameValue);
+        addAndMakeVisible(sizeValue);
+        addAndMakeVisible(typeValue);
+    }
+    else if(t=="BUTTON")
+    {
+        addAndMakeVisible(parametersLabel);
+        addAndMakeVisible(nameLabel);
+        
+        addAndMakeVisible(nameValue);
+    }
+    
+    
     
     
     createComponent.setSize(150,50);
@@ -103,28 +135,28 @@ void componentCreator::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-    componentLabel.setBounds (10, 10, getWidth() - 20, 20);
+    /*componentLabel.setBounds (10, 10, getWidth() - 20, 20);
     variableComponent.setBounds (20, 40, getWidth() - 30, 20);
     sliderComponent.setBounds (20, 70, getWidth() - 30, 20);
     bufferComponent.setBounds(20,100, getWidth() - 30, 20);
-    buttonComponent.setBounds (20, 130, getWidth() - 30, 20);
+    buttonComponent.setBounds (20, 130, getWidth() - 30, 20);*/
     
-    
-    parametersLabel.setBounds (10, 160, getWidth() - 20, 20);
-    minLabel.setBounds (0, 190, 120, 20);
-    minValue.setBounds (120, 190, 100, 20);
-    maxLabel.setBounds (0, 220, 120, 20);
-    maxValue.setBounds (120, 220, 100, 20);
-    initLabel.setBounds (0, 250, 120, 20);
-    initValue.setBounds (120, 250, 100, 20);
-    intervalLabel.setBounds (0, 280, 120, 20);
-    intervalValue.setBounds (120, 280, 100, 20);
-    nameLabel.setBounds(0, 310, 120, 20);
-    nameValue.setBounds(120, 310, 100, 20);
-    typeLabel.setBounds(0, 340, 120, 20);
-    typeValue.setBounds(120, 340, 100, 20);
-    sizeLabel.setBounds(0, 370, 120, 20);
-    sizeValue.setBounds(120, 370, 100, 20);
+    int i = 10;
+    parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
+    minLabel.setBounds (0, 40, 120, 20);
+    minValue.setBounds (120, 40, 100, 20);
+    maxLabel.setBounds (0, 70, 120, 20);
+    maxValue.setBounds (120, 70, 100, 20);
+    initLabel.setBounds (0, 100, 120, 20);
+    initValue.setBounds (120, 100, 100, 20);
+    intervalLabel.setBounds (0, 130, 120, 20);
+    intervalValue.setBounds (120, 130, 100, 20);
+    nameLabel.setBounds(0, 150, 120, 20);
+    nameValue.setBounds(120, 150, 100, 20);
+    typeLabel.setBounds(0, 180, 120, 20);
+    typeValue.setBounds(120, 180, 100, 20);
+    sizeLabel.setBounds(0, 210, 120, 20);
+    sizeValue.setBounds(120, 210, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }

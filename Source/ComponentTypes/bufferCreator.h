@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    componentCreator.h
-    Created: 9 Dec 2021 9:31:59pm
+    bufferCreator.h
+    Created: 25 Dec 2021 7:36:10pm
     Author:  Garrett Eckl
 
   ==============================================================================
@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "guiCreator.h"
+#include "../guiCreator.h"
 
 //==============================================================================
 /*
@@ -19,17 +19,16 @@
 
 class guiCreator;
 
-class componentCreator  : public juce::Component,
-                           private juce::Button::Listener
+class bufferCreator  : public juce::Component,
+                       private juce::Button::Listener
 {
 public:
-    componentCreator(guiCreator* g);
-    ~componentCreator() override;
+    bufferCreator(guiCreator* g);
+    ~bufferCreator() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void updateToggleState (juce::Button* button, juce::String name);
     void buttonClicked(juce::Button* button) override;
     
     enum RadioButtonIds
@@ -48,18 +47,14 @@ public:
     juce::Label nameLabel { {}, "Variable Name: "};
     juce::Label typeLabel { {}, "Data Type: " };
     juce::Label sizeLabel { {}, "Size: " };
-    juce::ToggleButton sliderComponent  { "Slider" },
-                       buttonComponent  { "Button" },
-                       variableComponent{ "Global Variable" },
-                       bufferComponent{ "Buffer"};
     
     juce::ComboBox typeValue;
     
-    juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue, sizeValue;
+    juce::TextEditor nameValue, sizeValue;
     
     guiCreator *guiWindowCallback;
 
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (componentCreator)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (bufferCreator)
 };
