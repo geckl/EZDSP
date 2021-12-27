@@ -82,11 +82,6 @@ public:
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
   
          
-         /*DBG(tempCode.getFile().loadFileAsString());
-         DBG(tempCode.getFile().getFullPathName());*/
-        
-
-        
         //Write .soul patch into codeWindow for user to edit
         /*if (input->openedOk())
         {
@@ -117,6 +112,24 @@ public:
         state = juce::ValueTree (ids.SOULPatchPlugin);
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
         state.setProperty(ids.patchCode, fullCode.getAllContent(), nullptr);
+        
+        juce::Array<juce::var> componentsStorage;
+        
+        for(int i=0;i<guiArray.size();i++)
+        {
+            juce::Array<juce::var> parametersStorage;
+            for(int j=0;j<guiArray[i].size();j++)
+            {
+                DBG("String Array Size: ");
+                DBG(guiArray[i].size());
+                parametersStorage.add(guiArray[i][j]);
+            }
+            componentsStorage.add(parametersStorage);
+        }
+        
+        juce::var tempStorage= componentsStorage;
+        state.setProperty(ids.patchComponents, tempStorage, nullptr);
+        
         updatePatchState();
         
     }
@@ -291,10 +304,28 @@ public:
             
             //write preset's code into CodeWindow
             //dspCode.replaceAllContent(s.getProperty(ids.patchCode).toString().toStdString());
+            
             loadCode();
             
             state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
         }
+        
+        juce::Array<juce::Array<juce::String>> componentsStorage;
+        
+        for(int i=0;i<s.getProperty(ids.patchComponents).getArray()->size();i++)
+        {
+            juce::Array<juce::String> parametersStorage;
+            for(int j=0;j<s.getProperty(ids.patchComponents)[i].getArray()->size();j++)
+            {
+                DBG("Var Array Size: ");
+                DBG(s.getProperty(ids.patchComponents)[i].getArray()->size());
+                parametersStorage.add(s.getProperty(ids.patchComponents)[i].getArray()->getReference(j));
+            }
+            componentsStorage.add(parametersStorage);
+        }
+        
+        guiArray=componentsStorage;
+        //state.setProperty(ids.patchComponents, componentsStorage, nullptr);
 
         if (s.hasType (ids.SOULPatchPlugin))
         {
@@ -453,7 +484,7 @@ public:
                 auto message = owner.patchLibrary.getErrorMessage();
 
                 if (message.empty())
-                    message = "Drag-and-drop a .soulpatch file here to load it biatch";
+                    message = "Something has gone wrong. Please remove EZDSP and reload";
 
                 g.setColour (backgroundColour.contrasting());
                 g.setFont (juce::Font (19.0f, juce::Font::bold));
@@ -532,7 +563,25 @@ public:
                 
                 //owner.content=owner.fullCode.getAllContent();
                 owner.state.setProperty(owner.ids.patchCode, owner.fullCode.getAllContent(), nullptr);
+                //owner.state.setProperty(owner.ids.patchComponents, owner.guiArray, nullptr);
                 
+                
+                juce::Array<juce::var> componentsStorage;
+                
+                for(int i=0;i<owner.guiArray.size();i++)
+                {
+                    juce::Array<juce::var> parametersStorage;
+                    for(int j=0;j<owner.guiArray[i].size();j++)
+                    {
+                        DBG("String Array Size: ");
+                        DBG(owner.guiArray[i].size());
+                        parametersStorage.add(owner.guiArray[i][j]);
+                    }
+                    componentsStorage.add(parametersStorage);
+                }
+                
+                juce::var tempStorage= componentsStorage;
+                owner.state.setProperty(owner.ids.patchComponents, tempStorage, nullptr);
                 //owner.updatePatchState();
                 
                 DBG("Button Works");
@@ -612,7 +661,8 @@ private:
         const juce::Identifier SOULPatchPlugin   { "SOULPatchPlugin" },
                                patchURL          { "patchURL" },
                                patchID           { "patchID" },
-                               patchCode         {"patchCode"};
+                               patchCode         {"patchCode"},
+                               patchComponents   {"patchComponents"};
     };
 
     IDs ids;
