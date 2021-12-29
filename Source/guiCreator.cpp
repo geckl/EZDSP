@@ -79,7 +79,7 @@ void guiCreator::resized()
 
 void guiCreator::closeButtonPressed()
 {
-    DBG(guiCodeArray->size());
+    //DBG(guiCodeArray->size());
     runCodeButton->triggerClick();
     this->getTopLevelComponent()->exitModalState(0);
     delete this;
@@ -106,15 +106,15 @@ void guiCreator::buttonClicked(juce::Button* button)
     }*/
     if(button == &deleteSelectedComponents)
     {
-        for(int i=0;i<myTable->numRows;i++)
+        for(int i=myTable->numRows-1;i>=0;i--)
         {
             DBG(juce::String(i) + myTable->getSelection(i));
             if(myTable->getSelection(i)=="ON")
             {
                 guiCodeArray->remove(i);
-                myTable->updateContent();
             }
         }
+        myTable->updateContent();
     }
 }
 

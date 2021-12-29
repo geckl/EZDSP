@@ -19,6 +19,8 @@ sliderCreator::sliderCreator(guiCreator* g)
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
     
+    //typeValue.addItem ("int",  1);
+    //typeValue.addItem ("float",  2);
     
     minValue.setInputRestrictions(0, "0123456789.-");
     maxValue.setInputRestrictions(0, "0123456789.-");
@@ -32,12 +34,14 @@ sliderCreator::sliderCreator(guiCreator* g)
     addAndMakeVisible(initLabel);
     addAndMakeVisible(intervalLabel);
     addAndMakeVisible(nameLabel);
+    //addAndMakeVisible(typeLabel);
     
     addAndMakeVisible(minValue);
     addAndMakeVisible(maxValue);
     addAndMakeVisible(initValue);
     addAndMakeVisible(intervalValue);
     addAndMakeVisible(nameValue);
+    //addAndMakeVisible(typeValue);
    
 
     createComponent.setSize(150,50);
@@ -88,6 +92,8 @@ void sliderCreator::resized()
     intervalValue.setBounds (120, 130, 100, 20);
     nameLabel.setBounds(0, 160, 120, 20);
     nameValue.setBounds(120, 160, 100, 20);
+    //typeLabel.setBounds(0, 180, 120, 20);
+    //typeValue.setBounds(120, 180, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }
@@ -103,6 +109,7 @@ void sliderCreator::buttonClicked(juce::Button* button)
         
         componentParameters.add("SLIDER");
         componentParameters.add(nameValue.getText());
+        //componentParameters.add(typeValue.getText());
         componentParameters.add("");
         componentParameters.add(minValue.getText());
         componentParameters.add(maxValue.getText());

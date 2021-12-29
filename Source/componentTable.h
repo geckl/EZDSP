@@ -130,7 +130,7 @@ public:
 
     juce::String getSelection (const int rowNumber) const
     {
-        return componentsArray->getReference(rowNumber)[6];
+        return componentsArray->getReference(rowNumber)[8];
         //return dataList->getChildElement (rowNumber)->getIntAttribute ("Select");
     }
 
@@ -139,13 +139,13 @@ public:
         std::cout << std::boolalpha << newSelection;
         if(newSelection==false)
         {
-            componentsArray->getReference(rowNumber).set(6,"OFF");
-            DBG(componentsArray->getReference(rowNumber)[6]);
+            componentsArray->getReference(rowNumber).set(8,"OFF");
+            //DBG(componentsArray->getReference(rowNumber)[8]);
         }
         else if(newSelection==true)
         {
-            componentsArray->getReference(rowNumber).set(6,"ON");
-            DBG(componentsArray->getReference(rowNumber)[6]);
+            componentsArray->getReference(rowNumber).set(8,"ON");
+            //DBG(componentsArray->getReference(rowNumber)[8]);
         }
         //dataList->getChildElement (rowNumber)->setAttribute ("Select", newSelection);
     }

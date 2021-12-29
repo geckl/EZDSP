@@ -48,6 +48,7 @@ public:
     juce::Label typeLabel { {}, "Data Type: " };
     juce::Label sizeLabel { {}, "Size: " };
     
+    //juce::ComboBox typeValue;
     
     juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue;
     
