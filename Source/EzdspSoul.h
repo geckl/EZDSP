@@ -481,11 +481,11 @@ public:
         {
             setLookAndFeel (&lookAndFeel);
             //setSize(800, 600);
+            //setResizable(true,true);
             refreshContent();
             juce::Font::setDefaultMinimumHorizontalScaleFactor (1.0f);
             
-            
-            codeWindow.setSize(400,300);
+            codeWindow.setSize(400,500);
             addAndMakeVisible(codeWindow);
             
             runCode.setSize(50,50);
@@ -618,7 +618,7 @@ public:
                     }
                     else if(owner.guiArray[i][0]== "BUFFER")
                     {
-                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][1] + ";\n";
+                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][3] + ";\n" + "wrap<" + owner.guiArray[i][7] + "> " + owner.guiArray[i][3] + "Index;\n";
                     }
                     
                     else if(owner.guiArray[i][0]== "BUTTON")

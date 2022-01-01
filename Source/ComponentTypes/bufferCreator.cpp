@@ -91,9 +91,9 @@ void bufferCreator::buttonClicked(juce::Button* button)
         
         
         componentParameters.add("BUFFER");
-        componentParameters.add(nameValue.getText());
+        componentParameters.add(nameValue.getText()+"[" + nameValue.getText() + "Index]");
         componentParameters.add(typeValue.getText());
-        componentParameters.add("");
+        componentParameters.add(nameValue.getText());
         componentParameters.add("");
         componentParameters.add("");
         componentParameters.add("");
