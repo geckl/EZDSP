@@ -87,23 +87,7 @@ void guiCreator::closeButtonPressed()
 
 void guiCreator::buttonClicked(juce::Button* button)
 {
-    /*if (button == &addGUIComponent)
-    {
-        //createAComponentWindow = new juce::DialogWindow("Component Creator", juce::Colours::grey, true, false);
-        
-        createAComponentWindow= new componentCreator(this);
-        
-        //createAComponentWindow->createComponent.addListener(this);
-        
-        juce::DialogWindow::LaunchOptions launchOptions;
-        
-        launchOptions.content.setOwned(createAComponentWindow);
-        launchOptions.content->setSize(640, 480);
-        launchOptions.launchAsync();
-        
-        
-        DBG("Button Works 4Real");
-    }*/
+
     if(button == &deleteSelectedComponents)
     {
         for(int i=myTable->numRows-1;i>=0;i--)
@@ -146,7 +130,9 @@ void guiCreator::styleMenuChanged()
            }
            
            addGUIComponent.setText("Add New Component", juce::NotificationType::dontSendNotification);
+           
            juce::DialogWindow::LaunchOptions launchOptions;
+           launchOptions.resizable = false;
            launchOptions.content.setOwned(createAComponentWindow);
            launchOptions.content->setSize(640, 480);
            launchOptions.launchAsync();

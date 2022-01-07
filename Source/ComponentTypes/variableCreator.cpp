@@ -63,8 +63,8 @@ void variableCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("variableCreator", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.drawFittedText ("A global variable stores a single value that can be accessed from anywhere in your code. Use it to store values that may need to change throughout duration of your signal processing.", getLocalBounds().reduced(100, 50),
+                juce::Justification::centred, 8);   // Explain component
 }
 
 void variableCreator::resized()
@@ -73,12 +73,12 @@ void variableCreator::resized()
     // components that your component contains..
     
     parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    initLabel.setBounds (0, 100, 120, 20);
-    initValue.setBounds (120, 100, 100, 20);
-    nameLabel.setBounds(0, 150, 120, 20);
-    nameValue.setBounds(120, 150, 100, 20);
-    typeLabel.setBounds(0, 180, 120, 20);
-    typeValue.setBounds(120, 180, 100, 20);
+    initLabel.setBounds (0, 40, 120, 20);
+    initValue.setBounds (120, 40, 100, 20);
+    nameLabel.setBounds(0, 70, 120, 20);
+    nameValue.setBounds(120, 70, 100, 20);
+    typeLabel.setBounds(0, 100, 120, 20);
+    typeValue.setBounds(120, 100, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }

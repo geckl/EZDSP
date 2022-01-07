@@ -72,8 +72,8 @@ void sliderCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("sliderCreator", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.drawFittedText ("A slider component is an input stream, meaning the slider's value is constantly being updated. Use this component to graphically control certain signal processing parameters.", getLocalBounds().reduced(100, 50),
+                juce::Justification::centred, 8);   // Explain component
 }
 
 void sliderCreator::resized()
@@ -92,8 +92,8 @@ void sliderCreator::resized()
     intervalValue.setBounds (120, 130, 100, 20);
     nameLabel.setBounds(0, 160, 120, 20);
     nameValue.setBounds(120, 160, 100, 20);
-    //typeLabel.setBounds(0, 180, 120, 20);
-    //typeValue.setBounds(120, 180, 100, 20);
+    //typeLabel.setBounds(0, 190, 120, 20);
+    //typeValue.setBounds(120, 190, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }

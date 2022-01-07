@@ -54,8 +54,8 @@ void buttonCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("buttonCreator", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.drawFittedText ("A button component is a simple binary switch (On=1, Off=0). Buttons are great for controlling the flow of your signal processing, use them to turn certain features on and off.", getLocalBounds().reduced(100, 50),
+                juce::Justification::centred, 8);   // Explain component
 }
 
 void buttonCreator::resized()
@@ -64,8 +64,8 @@ void buttonCreator::resized()
     // components that your component contains..
     
     parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    nameLabel.setBounds(0, 150, 120, 20);
-    nameValue.setBounds(120, 150, 100, 20);
+    nameLabel.setBounds(0, 40, 120, 20);
+    nameValue.setBounds(120, 40, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }

@@ -61,8 +61,8 @@ void bufferCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("bufferCreator", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.drawFittedText ("A buffer component is an array that can be used to store data (usually audio samples). Each buffer comes with an indexer that is initialized to zero. This index is memory safe, meaning that any values outside the buffer range loop back around to the start of the buffer.", getLocalBounds().reduced(100, 50),
+                juce::Justification::centred, 8);   // Explain component
 }
 
 void bufferCreator::resized()
@@ -71,12 +71,12 @@ void bufferCreator::resized()
     // components that your component contains..
     
     parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    nameLabel.setBounds(0, 150, 120, 20);
-    nameValue.setBounds(120, 150, 100, 20);
-    typeLabel.setBounds(0, 180, 120, 20);
-    typeValue.setBounds(120, 180, 100, 20);
-    sizeLabel.setBounds(0, 210, 120, 20);
-    sizeValue.setBounds(120, 210, 100, 20);
+    nameLabel.setBounds(0, 40, 120, 20);
+    nameValue.setBounds(120, 40, 100, 20);
+    typeLabel.setBounds(0, 70, 120, 20);
+    typeValue.setBounds(120, 70, 100, 20);
+    sizeLabel.setBounds(0, 100, 120, 20);
+    sizeValue.setBounds(120, 100, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }
