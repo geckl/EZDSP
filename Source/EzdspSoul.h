@@ -29,6 +29,7 @@
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
 
 #include "guiCreator.h"
+#include "Utils/EzdspCodeTokenizer.h"
 
 
 namespace soul
@@ -381,7 +382,6 @@ public:
             output->flush();
             
             //write preset's code into CodeWindow
-            //dspCode.replaceAllContent(s.getProperty(ids.patchCode).toString().toStdString());
             loadCode();
             
             state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
@@ -486,6 +486,8 @@ public:
             juce::Font::setDefaultMinimumHorizontalScaleFactor (1.0f);
             
             codeWindow.setSize(400,500);
+            codeWindow.setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colours::white);
+            codeWindow.setColour(juce::CodeEditorComponent::ColourIds::lineNumberTextId, juce::Colours::black);
             addAndMakeVisible(codeWindow);
             
             runCode.setSize(50,50);
@@ -678,8 +680,8 @@ public:
         juce::LookAndFeel_V4 lookAndFeel;
         bool isDragOver = false;
         
-        
-        juce::CodeEditorComponent codeWindow{ owner.dspCode, nullptr };
+        juce::EzdspTokeniser ezdspTokenizer;
+        juce::CodeEditorComponent codeWindow{owner.dspCode, &ezdspTokenizer };
         juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
         juce::TextButton runCode,addGUI;
         
