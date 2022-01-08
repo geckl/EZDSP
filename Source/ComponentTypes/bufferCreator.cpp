@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "bufferCreator.h"
+#include "../Utils/Vectors.h"
 //#include "guiCreator.h"
 
 //==============================================================================
@@ -86,33 +87,39 @@ void bufferCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
-        
-        juce::Array<juce::String> componentParameters;
-        
-        
-        componentParameters.add("BUFFER");
-        componentParameters.add(nameValue.getText()+"[" + nameValue.getText() + "Index]");
-        componentParameters.add(typeValue.getText());
-        componentParameters.add(nameValue.getText());
-        componentParameters.add("");
-        componentParameters.add("");
-        componentParameters.add("");
-        componentParameters.add(sizeValue.getText());
-        componentParameters.add("OFF");
-        componentParameters.add("3");
-       
-        
-        guiWindowCallback->guiCodeArray->add(componentParameters);
-        
-        //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
-        std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),
-          [](const auto& lhs, const auto& rhs) { return lhs[9] < rhs[9]; });
-        
-        //update table
-        guiWindowCallback->myTable->updateContent();
-        
-        //close the component creator window
-        delete this->findParentComponentOfClass<juce::DialogWindow>();
+        if(std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end())
+        {
+            juce::Array<juce::String> componentParameters;
+            
+            
+            componentParameters.add("BUFFER");
+            componentParameters.add(nameValue.getText()+"[" + nameValue.getText() + "Index]");
+            componentParameters.add(typeValue.getText());
+            componentParameters.add(nameValue.getText());
+            componentParameters.add("");
+            componentParameters.add("");
+            componentParameters.add("");
+            componentParameters.add(sizeValue.getText());
+            componentParameters.add("OFF");
+            componentParameters.add("3");
+           
+            
+            guiWindowCallback->guiCodeArray->add(componentParameters);
+            
+            //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
+            std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),
+              [](const auto& lhs, const auto& rhs) { return lhs[9] < rhs[9]; });
+            
+            //update table
+            guiWindowCallback->myTable->updateContent();
+            
+            //close the component creator window
+            delete this->findParentComponentOfClass<juce::DialogWindow>();
+        }
+        else{
+            //juce::AlertWindow keywordError("Error", "One of the values you enterred is a reserved keyword", juce::MessageBoxIconType::WarningIcon);
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
+        }
     }
 }
 

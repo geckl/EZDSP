@@ -18,7 +18,6 @@ guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-    //addGUIComponent.setSize(150,50);
     addAndMakeVisible(&addGUIComponent);
     //addGUIComponent.addListener(this);
     
@@ -29,12 +28,14 @@ guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::
     addGUIComponent.setText("Add New Component", juce::NotificationType::dontSendNotification);
     
     addGUIComponent.onChange = [this] { styleMenuChanged(); };
-    //addGUIComponent.setSelectedId (1);
     
-    deleteSelectedComponents.setSize(150,50);
     deleteSelectedComponents.setButtonText("Delete Selected Components");
     addAndMakeVisible(&deleteSelectedComponents);
     deleteSelectedComponents.addListener(this);
+    
+    closeWindow.setButtonText("Close and Update");
+    addAndMakeVisible(&closeWindow);
+    closeWindow.addListener(this);
     
     guiCodeArray=g;
     runCodeButton=b;
@@ -72,8 +73,9 @@ void guiCreator::resized()
     // components that your component contains..
     
     myTable->setBounds (0,0,getWidth(),getHeight()-150);
-    addGUIComponent.setBounds(50, getHeight()-100, 150, 50);
-    deleteSelectedComponents.setBounds(250, getHeight()-100, 150, 50);
+    addGUIComponent.setBounds(25, getHeight()-100, 150, 50);
+    deleteSelectedComponents.setBounds(200, getHeight()-100, 150, 50);
+    closeWindow.setBounds(375, getHeight()-100, 150, 50);
 
 }
 
@@ -99,6 +101,10 @@ void guiCreator::buttonClicked(juce::Button* button)
             }
         }
         myTable->updateContent();
+    }
+    else if(button == &closeWindow)
+    {
+        closeButtonPressed();
     }
 }
 

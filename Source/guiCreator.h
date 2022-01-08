@@ -41,7 +41,7 @@ public:
     
     void styleMenuChanged();
     
-    juce::TextButton deleteSelectedComponents;
+    juce::TextButton deleteSelectedComponents, closeWindow;
     juce::ComboBox addGUIComponent;
     
     juce::Component::SafePointer<juce::Component> createAComponentWindow;

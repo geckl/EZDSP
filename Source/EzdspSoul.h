@@ -474,7 +474,6 @@ public:
 
     //==============================================================================
     struct Editor  : public juce::AudioProcessorEditor,
-                     public juce::FileDragAndDropTarget,
                      private juce::Button::Listener
     {
         Editor (EZDSPPlugin& p)  : juce::AudioProcessorEditor (p), owner (p)
@@ -485,16 +484,13 @@ public:
             refreshContent();
             juce::Font::setDefaultMinimumHorizontalScaleFactor (1.0f);
             
-            codeWindow.setSize(400,500);
             codeWindow.setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colours::white);
             codeWindow.setColour(juce::CodeEditorComponent::ColourIds::lineNumberTextId, juce::Colours::black);
             addAndMakeVisible(codeWindow);
             
-            runCode.setSize(50,50);
             runCode.setButtonText("Run");
             addAndMakeVisible(runCode);
             
-            addGUI.setSize(50,50);
             addGUI.setButtonText("Components");
             addAndMakeVisible(addGUI);
             
@@ -516,7 +512,7 @@ public:
 
         void clearContent()
         {
-            setDragOver (false);
+            //setDragOver (false);
             pluginEditor.reset();
             setSize (400, 300);
             repaint();
@@ -576,7 +572,7 @@ public:
                 g.fillAll (juce::Colours::lightgreen.withAlpha (0.3f));
         }
 
-        bool isInterestedInFileDrag (const juce::StringArray& files) override  { return files.size() == 1 && files[0].endsWith (soul::patch::getManifestSuffix()); }
+        /*bool isInterestedInFileDrag (const juce::StringArray& files) override  { return files.size() == 1 && files[0].endsWith (soul::patch::getManifestSuffix()); }
         void fileDragEnter (const juce::StringArray&, int, int) override       { setDragOver (true); }
         void fileDragExit (const juce::StringArray&) override                  { setDragOver (false); }
 
@@ -596,7 +592,7 @@ public:
                 isDragOver = b;
                 repaint();
             }
-        }
+        }*/
         
         void buttonClicked(juce::Button* button) override
         {

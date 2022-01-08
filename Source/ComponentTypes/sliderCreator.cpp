@@ -11,6 +11,7 @@
 
 #include <JuceHeader.h>
 #include "sliderCreator.h"
+#include "../Utils/Vectors.h"
 //#include "guiCreator.h"
 
 //==============================================================================
@@ -103,34 +104,41 @@ void sliderCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
+        if(std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end())
+        {
+            juce::Array<juce::String> componentParameters;
+            
+            
+            componentParameters.add("SLIDER");
+            componentParameters.add(nameValue.getText());
+            //componentParameters.add(typeValue.getText());
+            componentParameters.add("");
+            componentParameters.add(minValue.getText());
+            componentParameters.add(maxValue.getText());
+            componentParameters.add(initValue.getText());
+            componentParameters.add(intervalValue.getText());
+            componentParameters.add("");
+            componentParameters.add("OFF");
+            componentParameters.add("1");
+           
+            
+            guiWindowCallback->guiCodeArray->add(componentParameters);
+            
+            //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
+            std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),
+              [](const auto& lhs, const auto& rhs) { return lhs[9] < rhs[9]; });
+            
+            //update table
+            guiWindowCallback->myTable->updateContent();
+            
+            //close the component creator window
+            delete this->findParentComponentOfClass<juce::DialogWindow>();
+        }
         
-        juce::Array<juce::String> componentParameters;
-        
-        
-        componentParameters.add("SLIDER");
-        componentParameters.add(nameValue.getText());
-        //componentParameters.add(typeValue.getText());
-        componentParameters.add("");
-        componentParameters.add(minValue.getText());
-        componentParameters.add(maxValue.getText());
-        componentParameters.add(initValue.getText());
-        componentParameters.add(intervalValue.getText());
-        componentParameters.add("");
-        componentParameters.add("OFF");
-        componentParameters.add("1");
-       
-        
-        guiWindowCallback->guiCodeArray->add(componentParameters);
-        
-        //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
-        std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),
-          [](const auto& lhs, const auto& rhs) { return lhs[9] < rhs[9]; });
-        
-        //update table
-        guiWindowCallback->myTable->updateContent();
-        
-        //close the component creator window
-        delete this->findParentComponentOfClass<juce::DialogWindow>();
+        else{
+            //juce::AlertWindow keywordError("Error", "One of the values you enterred is a reserved keyword", juce::MessageBoxIconType::WarningIcon);
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
+        }
     }
 }
 
