@@ -6,12 +6,6 @@
     Author:  Garrett Eckl
 
   ==============================================================================
- 
- 
- #include "../../soul_patch.h"
- #include "soul_patch_AudioProcessor.h"
- #include "soul_patch_Utilities.h"
- #include "soul_patch_CompilerCacheFolder.h"
 
 */
 
@@ -244,8 +238,6 @@ public:
             guiArray.add(initialComponentParameters);
         }
         
-        recalculateBpmFlag=1;
-        
         if (plugin != nullptr)
             plugin->prepareToPlay (sampleRate, samplesPerBlock);
     }
@@ -263,70 +255,15 @@ public:
 
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
     {
-        /*if(recalculateBpmFlag==1)
-        {
-            juce::AudioPlayHead* playHead;
-            juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
-            double bpm;
-            
-            playHead = this->getPlayHead();
-            playHead->getCurrentPosition (currentPositionInfo);
-            bpm = currentPositionInfo.bpm;
-            
-            juce::Array<juce::String> initialComponentParameters;
-            
-            initialComponentParameters.add("VARIABLE");
-            initialComponentParameters.add("SAMPLES_PER_BEAT");
-            initialComponentParameters.add("float");
-            initialComponentParameters.add("");
-            initialComponentParameters.add("");
-            initialComponentParameters.add(juce::String((60/bpm)*getSampleRate()));
-            initialComponentParameters.add("");
-            initialComponentParameters.add("");
-            initialComponentParameters.add("OFF");
-            initialComponentParameters.add("4");
-            guiArray.add(initialComponentParameters);
-            
-            int flag=0;
-            for(int i=0;i<guiArray.size();i++)
-            {
-                if(guiArray.getReference(i)[1]=="SAMPLES_PER_BEAT")
-                {
-                    guiArray.set(i,initialComponentParameters);
-                    flag++;
-                    break;
-                }
-            }
-            
-            if(flag==0)
-            {
-                guiArray.add(initialComponentParameters);
-            }
-            
-            recalculateBpmFlag=0;
-            
-            
-        }*/
         
-        /*fullCode.replaceSection(guiEndPosition.getPosition(),guiEndPosition.getPosition()+,guiCode.getAllContent());
+        //juce::var bpm;
         
-        output->setPosition(0);
-        output->truncate();
-        //output->setNewLineString("\n");
-        output->writeText(fullCode.getAllContent(),false,false, nullptr);
-        output->flush();
-        
-        //owner.content=owner.fullCode.getAllContent();
-        state.setProperty(ids.patchCode, fullCode.getAllContent(), nullptr);*/
-        
-        juce::AudioPlayHead* playHead;
-        juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
-        double bpm;
-        
-        playHead = this->getPlayHead();
-        playHead->getCurrentPosition (currentPositionInfo);
-        bpm = currentPositionInfo.bpm;
-        std::cout << plugin->sendInputEvent("SAMPLES_PER_BEAT",(60/bpm)*getSampleRate());
+        currentPlayHead = this->getPlayHead();
+        plugin->setPlayHead(currentPlayHead);
+        //currentPlayHead->getCurrentPosition (currentPositionInfo);
+        //bpm = currentPositionInfo.bpm;
+        //std::cout << plugin->sendInputEvent("SAMPLES_PER_BEAT",(60/bpm)*getSampleRate());
+        //plugin->getPatchPlayer()->applyNewTempo(bpm);
         
         if (plugin != nullptr && ! isSuspended())
             return plugin->processBlock (audio, midi);
@@ -698,6 +635,9 @@ public:
     
     juce::CodeDocument fullCode ,guiCode, dspCode;
     juce::CodeDocument::Position dspStartPosition, dspEndPosition, guiStartPosition, guiEndPosition;
+    
+    juce::AudioPlayHead* currentPlayHead;
+    juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
 
 private:
     //==============================================================================
@@ -708,9 +648,6 @@ private:
     juce::ValueTree state;
     soul::patch::CompilerCache::Ptr compilerCache;
     juce::Array<juce::Array <juce::String>> guiArray;
-    
-    int recalculateBpmFlag=0;
-    
 
     struct IDs
     {
