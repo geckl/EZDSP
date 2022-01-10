@@ -1,0 +1,58 @@
+/**
+    This is an auto-generated SOUL patch template.
+    This example code simply performs a simple gain between its input
+    and output. Now it's your turn to build this up into a real effect!
+*/
+processor Test [[main]]
+{
+    input stream float audioIn;
+    input event soul::timeline::Tempo tempoIn;
+    input event soul::timeline::Position positionIn;
+    input event soul::timeline::TimeSignature timesignatureIn;
+    output stream float audioOut;
+
+
+//BEGINGUI
+
+    input stream float GAIN  [[ name: "GAIN", min: -60.0, max: 10.0, init: 0, step: 0.1, slewRate: 200.0 ]];
+
+//ENDGUI
+
+    event tempoIn (soul::timeline::Tempo t)
+    {
+    BPM = t.bpm;
+    }
+
+    event positionIn (soul::timeline::Position p)
+    {
+    CURRENTSAMPLE = p.currentFrame;
+    }
+
+    event timesignatureIn (soul::timeline::TimeSignature s)
+    {
+    NUMERATOR = s.numerator;
+    DENOMINATOR = s.denominator;
+    }
+
+    float BPM, SAMPLESPERBEAT;
+    int64 CURRENTSAMPLE, NUMERATOR, DENOMINATOR;
+
+    void run()
+    {
+        loop
+        {
+
+
+//BEGINDSP
+
+let masterGain = soul::dBtoGain (GAIN);
+
+audioOut << audioIn * masterGain;
+
+//ENDDSP
+
+
+            advance();
+        }
+    }
+}
