@@ -15,6 +15,7 @@ processor Test [[main]]
 //BEGINGUI
 
     input stream float GAIN  [[ name: "GAIN", min: -60.0, max: 10.0, init: 0, step: 0.1, slewRate: 200.0 ]];
+    int SAMPLERATE = 0;
 
 //ENDGUI
 
