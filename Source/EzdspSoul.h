@@ -85,6 +85,20 @@ public:
         initialComponentParameters.add("");
         initialComponentParameters.add("OFF");
         guiArray.add(initialComponentParameters);
+        
+        initialComponentParameters.clear();
+        
+        initialComponentParameters.add("VARIABLE");
+        initialComponentParameters.add("SAMPLERATE");
+        initialComponentParameters.add("int");
+        initialComponentParameters.add("");
+        initialComponentParameters.add("");
+        initialComponentParameters.add("0");
+        initialComponentParameters.add("");
+        initialComponentParameters.add("");
+        initialComponentParameters.add("OFF");
+        initialComponentParameters.add("4");
+        guiArray.add(initialComponentParameters);
 
         //Load soulpatch properties into ValueTree
         state = juce::ValueTree (ids.SOULPatchPlugin);
@@ -209,33 +223,14 @@ public:
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override
     {
-        juce::Array<juce::String> initialComponentParameters;
-        
-        initialComponentParameters.add("VARIABLE");
-        initialComponentParameters.add("SAMPLERATE");
-        initialComponentParameters.add("int");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("");
-        initialComponentParameters.add(juce::String(getSampleRate()));
-        initialComponentParameters.add("");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("OFF");
-        initialComponentParameters.add("4");
-        
-        int flag=0;
+        //update sample rate global variable
         for(int i=0;i<guiArray.size();i++)
         {
             if(guiArray.getReference(i)[1]=="SAMPLERATE")
             {
-                guiArray.set(i,initialComponentParameters);
-                flag++;
+                guiArray.getReference(i).set(5,juce::String(getSampleRate()));
                 break;
             }
-        }
-        
-        if(flag==0)
-        {
-            guiArray.add(initialComponentParameters);
         }
         
         if (plugin != nullptr)
