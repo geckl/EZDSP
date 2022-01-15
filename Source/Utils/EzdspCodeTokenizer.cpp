@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "ezdspCodeTokenizer.h"
+#include "EzdspCodeTokenizer.h"
 
 
 namespace juce

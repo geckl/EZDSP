@@ -23,6 +23,7 @@
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
 
 #include "guiCreator.h"
+#include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
 
 
@@ -422,23 +423,22 @@ public:
             
             runCode.setButtonText("Run");
             addAndMakeVisible(runCode);
+            runCode.addListener(this);
             
             addGUI.setButtonText("Components");
             addAndMakeVisible(addGUI);
-            
-
-            //Editor listens for "run" button to update SOUL file
-            runCode.addListener(this);
             addGUI.addListener(this);
-
-
             
+            getHelp.setButtonText("Help");
+            addAndMakeVisible(getHelp);
+            getHelp.addListener(this);
         }
 
         ~Editor() override
         {
             owner.editorBeingDeleted (this);
             if (guiWindow){delete guiWindow;}
+            if (helpWindow){delete helpWindow;}
             setLookAndFeel (nullptr);
         }
 
@@ -476,8 +476,8 @@ public:
                 codeWindow.setBounds(0, getHeight()-200, getWidth(), 150);
                 runCode.setBounds(50, getHeight()-40, 50, 30);
                 addGUI.setBounds(150, getHeight()-40, 150, 30);
+                getHelp.setBounds(350, getHeight()-40, 50, 30);
             }
-            
         }
 
         void paint (juce::Graphics& g) override
@@ -585,13 +585,12 @@ public:
                 //owner.updatePatchState();
             }
             
-            if (button == &addGUI)
+            else if (button == &addGUI)
             {
                 if(guiWindow == nullptr)
                 {
                     guiWindow = new guiCreator("guiComponents", &owner.guiArray, &runCode);
                     guiWindow->setUsingNativeTitleBar(true);
-                    //guiWindow->setContentOwned(new guiCreator("guiComponents"), true);
                     guiWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
                     guiWindow->setAlwaysOnTop(true);
                     guiWindow->setVisible(true);
@@ -600,6 +599,25 @@ public:
                 {
                     guiWindow->toFront(true);
                 }
+            }
+            
+            else if (button == &getHelp)
+            {
+                if(helpWindow == nullptr)
+                {
+                    DBG("Open Help Window");
+                    helpWindow = new EzdspHelp("EZDSP Help");
+                    helpWindow->setUsingNativeTitleBar(true);
+                    helpWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
+                    helpWindow->setAlwaysOnTop(true);
+                    helpWindow->setVisible(true);
+                    //helpWindow->goToURL("https://www.ezdsp.com/help");
+                }
+                else
+                {
+                    helpWindow->toFront(true);
+                }
+                
             }
         }
 
@@ -611,9 +629,8 @@ public:
         juce::EzdspTokeniser ezdspTokenizer;
         juce::CodeEditorComponent codeWindow{owner.dspCode, &ezdspTokenizer };
         juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
-        juce::TextButton runCode,addGUI;
-        
-
+        juce::Component::SafePointer<juce::TopLevelWindow> helpWindow;
+        juce::TextButton runCode,addGUI,getHelp;
     };
     
     //public: (audio processor public variables)
