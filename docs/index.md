@@ -1,12 +1,22 @@
-## Welcome to GitHub Pages
+## EZDSP Help
 
-You can use the [editor on GitHub](https://github.com/geckl/EZDSP/edit/beginner-mode/docs/index.md) to maintain and preview the content for your website in Markdown files.
+EZDSP overview goes here.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Keywords
 
-### Markdown
+Keyworks go here.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Types
+
+Types go here.
+
+### Operators
+
+Operators go here.
+
+### SOUL Functions
+
+Link to SOUL functions go here.
 
 ```markdown
 Syntax highlighted code block
