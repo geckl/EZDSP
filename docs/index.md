@@ -2,12 +2,12 @@
 
 ### What is EZDSP?
 
-EZDSP is an audio plug-in that allows users to edit the plug-in's DSP source code from directly within their favorite DAW.
+EZDSP is an audio plug-in that allows users to edit the plug-in's DSP source code from directly within their favorite DAW.  
 
 ### How does it work?
 
 
-The EZDSP interface consists of two main elements: The DSP Code Editor and the Components Window. Understanding how these elements interact is key to getting your first plug-in up and running
+The EZDSP interface consists of two main elements: The DSP Code Editor and the Components Window. Understanding how these elements interact is key to getting your first plug-in up and running.
 
 **The DSP Code Editor**
 
@@ -23,31 +23,31 @@ This is where you will add global variables that can be accessed from within you
 
 1) Slider - This will output a stream of values, which is constantly updated to reflect the current position of the slider. This is a visual component.
 
-  Parameters:
-  Min: The slider's minimum value
-  Max: The sliders maximum value
-  Init: The slider's initial value
-  Step: The interval between slider values
-  Name: The slider's label and the variable name used to access the slider's current value
+  Parameters:  
+  Min: The slider's minimum value  
+  Max: The sliders maximum value  
+  Init: The slider's initial value  
+  Step: The interval between slider values  
+  Name: The slider's label and the variable name used to access the slider's current value  
   
 2) Button - This will output a binary value (0=OFF,1=ON). This is a visual component.
 
-  Parameters:
-  Name: The button's label and the variable name used to access the button's current value
+  Parameters:  
+  Name: The button's label and the variable name used to access the button's current value  
   
 3) Buffer - This will store an array of values (most often an array of audio samples). Additionally, each Buffer created comes with a memory safe "indexer" variable that is initialized to zero. This indexer takes the name of the corresponding buffer, with "Index" appended.
 
-  Parameters:
-  Name: The variable name used to access a buffer value
-  Type: The value type that the buffer stores (integer or floating point numbers)
-  Size: The number of values to be stored in the buffer
+  Parameters:  
+  Name: The variable name used to access a buffer value  
+  Type: The value type that the buffer stores (integer or floating point numbers)  
+  Size: The number of values to be stored in the buffer  
   
 4) Global Variable - This will store a single value.
 
-  Parameters:
-  Init: The variable's initial value
-  Name: The variable name used to access the variable's current value
-  Type: The value type that the variable stores (integer or floating point numbers)
+  Parameters:  
+  Init: The variable's initial value  
+  Name: The variable name used to access the variable's current value  
+  Type: The value type that the variable stores (integer or floating point numbers)  
 
 ### Keywords
 
