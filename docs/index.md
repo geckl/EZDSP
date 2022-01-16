@@ -13,7 +13,7 @@ The EZDSP interface consists of two main elements: The DSP Code Editor and the C
 
 This is where you will write your DSP code. This code exists within a loop, meaning that it will be executed iteratively for each incoming sample of audio.
 
-The DSP Code Editor is powered by the SOUL language, and as such all SOUL functions and operators can be accessed from within the "soul::" namespace. More info on the SOUL language syntax can be found here: https://github.com/soul-lang/SOUL/blob/master/docs/SOUL_Language.md#array-types
+The DSP Code Editor is powered by the SOUL language, and as such all SOUL functions and operators can be accessed from within the "soul::" namespace. More info on the SOUL language syntax can be found here: [SOUL Documentation](https://github.com/soul-lang/SOUL/blob/master/docs/SOUL_Language.md)
 
 While variables can be declared from within the DSP Code Editor, it's important to remember that this code is executed iteratively, meaning that any variables declared from the DSP Code Editor will be reset to their initial value for each sample processed. 
 
@@ -21,6 +21,7 @@ While variables can be declared from within the DSP Code Editor, it's important 
 
 This is where you will add global variables that can be accessed from within your DSP Code. These variables can be standalone values, or they can be linked to a slider or button. A component's value can be accessed from your DSP Code via the component's given name. The four types of components are:
 
+```markdown
 1) Slider - This will output a stream of values, which is constantly updated to reflect the current position of the slider. This is a visual component.
 
   Parameters:  
@@ -48,6 +49,7 @@ This is where you will add global variables that can be accessed from within you
   Init: The variable's initial value  
   Name: The variable name used to access the variable's current value  
   Type: The value type that the variable stores (integer or floating point numbers)  
+```
 
 ### Keywords
 
