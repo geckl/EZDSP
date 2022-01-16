@@ -32,7 +32,10 @@ bufferCreator::bufferCreator(guiCreator* g)
     addAndMakeVisible(nameValue);
     addAndMakeVisible(sizeValue);
     addAndMakeVisible(typeValue);
-   
+    
+    nameValue.setTooltip("The variable name used to access a buffer value");
+    sizeValue.setTooltip("The number of values to be stored in the buffer");
+    typeValue.setTooltip("The value type that the buffer stores (integer or floating point numbers)");
 
     createComponent.setSize(150,50);
     createComponent.setButtonText("Create");
@@ -62,7 +65,7 @@ void bufferCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawFittedText ("A buffer component is an array that can be used to store data (usually audio samples). Each buffer comes with an indexer that is initialized to zero. This index is memory safe, meaning that any values outside the buffer range loop back around to the start of the buffer.", getLocalBounds().reduced(100, 50),
+    g.drawFittedText ("A buffer component is an array that can be used to store data (usually audio samples). Each buffer comes with an indexer that is initialized to zero and possesses the same name as the buffer with \"Index\" appended. This indexer is memory safe, meaning that any values outside the buffer range loop back around to the start of the buffer.", getLocalBounds().reduced(100, 50),
                 juce::Justification::centred, 8);   // Explain component
 }
 

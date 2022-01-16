@@ -25,6 +25,8 @@ buttonCreator::buttonCreator(guiCreator* g)
     addAndMakeVisible(nameLabel);
     
     addAndMakeVisible(nameValue);
+    
+    nameValue.setTooltip("The button's label and the variable name used to access the button's current value ");
    
 
     createComponent.setSize(150,50);

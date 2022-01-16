@@ -20,7 +20,7 @@
 class guiCreator;
 
 class variableCreator  : public juce::Component,
-                       private juce::Button::Listener
+                         private juce::Button::Listener
 {
 public:
     variableCreator(guiCreator* g);
@@ -51,6 +51,8 @@ public:
     juce::ComboBox typeValue;
     
     juce::TextEditor initValue, nameValue;
+    
+    juce::TooltipWindow variableTips {this};
     
     guiCreator *guiWindowCallback;
 

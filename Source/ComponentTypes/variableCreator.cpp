@@ -34,6 +34,11 @@ variableCreator::variableCreator(guiCreator* g)
     addAndMakeVisible(initValue);
     addAndMakeVisible(nameValue);
     addAndMakeVisible(typeValue);
+    
+    addAndMakeVisible(variableTips);
+    initValue.setTooltip("The variable's initial value ");
+    nameValue.setTooltip("The variable name used to access the variable's current value");
+    typeValue.setTooltip("The value type that the variable stores (integer or floating point numbers)");
    
 
     createComponent.setSize(150,50);
@@ -64,7 +69,7 @@ void variableCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawFittedText ("A global variable stores a single value that can be accessed from anywhere in your code. Use it to store values that may need to change throughout duration of your signal processing.", getLocalBounds().reduced(100, 50),
+    g.drawFittedText ("A global variable stores a single value that can be accessed from anywhere in your code. Use it to store values that may need to change throughout the duration of your signal processing.", getLocalBounds().reduced(100, 50),
                 juce::Justification::centred, 8);   // Explain component
 }
 

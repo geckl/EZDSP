@@ -52,6 +52,8 @@ public:
     
     juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue;
     
+    juce::TooltipWindow variableTips {this};
+    
     guiCreator *guiWindowCallback;
 
 

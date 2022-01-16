@@ -52,6 +52,8 @@ public:
     
     juce::TextEditor nameValue, sizeValue;
     
+    juce::TooltipWindow variableTips {this};
+    
     guiCreator *guiWindowCallback;
 
 

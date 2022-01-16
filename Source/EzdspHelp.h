@@ -39,7 +39,7 @@ public:
         
         helpText.setReadOnly(true);*/
         
-        helpSite.goToURL("https://www.garretteckl.com/SquatchSounds");
+        helpSite.goToURL("https://geckl.github.io/EZDSP/");
         addAndMakeVisible(&helpSite);
 
     }

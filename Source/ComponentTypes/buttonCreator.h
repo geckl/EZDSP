@@ -48,8 +48,9 @@ public:
     juce::Label typeLabel { {}, "Data Type: " };
     juce::Label sizeLabel { {}, "Size: " };
     
-    
     juce::TextEditor nameValue;
+    
+    juce::TooltipWindow variableTips {this};
     
     guiCreator *guiWindowCallback;
 

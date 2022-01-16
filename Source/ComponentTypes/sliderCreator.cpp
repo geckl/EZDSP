@@ -43,6 +43,12 @@ sliderCreator::sliderCreator(guiCreator* g)
     addAndMakeVisible(intervalValue);
     addAndMakeVisible(nameValue);
     //addAndMakeVisible(typeValue);
+    
+    minValue.setTooltip("The slider's minimum value");
+    maxValue.setTooltip("The sliders maximum value");
+    initValue.setTooltip("The slider's initial value");
+    intervalValue.setTooltip("The interval between slider values");
+    nameValue.setTooltip("The slider's label and the variable name used to access the slider's current value");
    
 
     createComponent.setSize(150,50);
@@ -73,7 +79,7 @@ void sliderCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawFittedText ("A slider component is an input stream, meaning the slider's value is constantly being updated. Use this component to graphically control certain signal processing parameters.", getLocalBounds().reduced(100, 50),
+    g.drawFittedText ("A slider component outputs a stream of values, meaning it's accompanying variable is constantly updated to reflect the slider's current position. Use this component to graphically control certain signal processing parameters.", getLocalBounds().reduced(100, 50),
                 juce::Justification::centred, 8);   // Explain component
 }
 
