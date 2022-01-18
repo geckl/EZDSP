@@ -57,6 +57,8 @@ These variables reflect important information about your current DAW Project
 - BPM - The current tempo in beats per minute
 - SAMPLERATE - The current sample rate in hertz
 - SAMPLESPERBEAT - The number of samples per quarter note, given the current tempo and sample rate
+- NUMERATOR - The current time signature numerator (the number of beats per measure)
+- DENOMINATOR - The current time signature denominator (the beat value)
 
 ## Why EZDSP?
 
