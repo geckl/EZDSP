@@ -137,7 +137,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         juce::StringArray errors;
 
         for (auto& m : player->getCompileMessages())
-            errors.add (m.fullMessage);
+            errors.add (m.description); //(std::string(m.fullMessage).substr(std::string(m.fullMessage).find("\n") + 1));
+            
 
         return errors.joinIntoString ("\n");
     }
@@ -308,7 +309,10 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         if (player != nullptr && player->isPlayable() && ! isSuspended())
         {
             if (auto playhead = getPlayHead())
+            {
+                DBG("Get playhead!");
                 playheadState.updateAndApply (*playhead, *player);
+            }
 
             soul::patch::PatchPlayer::RenderContext rc;
 
@@ -796,7 +800,6 @@ private:
         void updateAndApply (juce::AudioPlayHead& playhead, soul::patch::PatchPlayer& playerToUse)
         {
             juce::AudioPlayHead::CurrentPositionInfo info;
-
             if (playhead.getCurrentPosition (info))
             {
                 auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info.timeSigNumerator),
@@ -810,6 +813,7 @@ private:
 
                 auto newBPM = static_cast<float> (info.bpm);
 
+                DBG(newBPM);
                 if (newBPM != currentBPM)
                 {
                     currentBPM = newBPM;
@@ -1109,7 +1113,7 @@ private:
             auto patchFolder = patch.getManifestFile().getParentDirectory();
             goToFolderButton.setEnabled (patchFolder.isDirectory());
             goToFolderButton.onClick = [=] { patchFolder.startAsProcess(); };
-            addAndMakeVisible (goToFolderButton);
+            //addAndMakeVisible (goToFolderButton);
 
             setSize (700, 300);
             setResizeLimits (400, 150, 1000, 500);
@@ -1120,8 +1124,8 @@ private:
             juce::String error;
             auto manifestFile = patch.getManifestFile();
 
-            error << "Error compiling SOUL patch:\n\n"
-                  << (manifestFile != juce::File() ? manifestFile.getFullPathName() : "<unknown file>") << "\n\n"
+            error << "Error compiling EZDSP patch:\n\n"
+                  //<< (manifestFile != juce::File() ? manifestFile.getFullPathName() : "<unknown file>") << "\n\n"
                   << patch.getCompileError();
 
             return error;

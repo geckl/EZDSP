@@ -8,14 +8,54 @@
               projectLineFeed="&#10;" pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
               bundleIdentifier="dev.soul.SOUL_Plugin" displaySplashScreen="1">
   <MAINGROUP id="M2AbSF" name="EZDSP">
+    <GROUP id="{7824FD37-B861-64BB-2D25-47D6B8AB3175}" name="Presets">
+      <FILE id="VjXT7u" name="EZDelay.aupreset" compile="0" resource="0"
+            file="Presets/EZDelay.aupreset"/>
+      <FILE id="bkHlqC" name="EZSquareFilter.aupreset" compile="0" resource="0"
+            file="Presets/EZSquareFilter.aupreset"/>
+    </GROUP>
+    <GROUP id="{BDC432B5-7E6D-0BB5-D1EC-F12D0C268921}" name="SoulPatch">
+      <FILE id="lsmvs5" name="Default.soul" compile="0" resource="1" file="SoulPatch/Default.soul"
+            xcodeResource="0"/>
+      <FILE id="yXswPh" name="Default.soulpatch" compile="0" resource="1"
+            file="SoulPatch/Default.soulpatch" xcodeResource="0"/>
+    </GROUP>
     <GROUP id="{D613C43B-7197-5FCA-4372-AC3446E57C2B}" name="Source">
+      <FILE id="QGM6Ts" name="EzdspHelp.h" compile="0" resource="0" file="Source/EzdspHelp.h"/>
+      <GROUP id="{9ABBA60E-5A50-F38B-5CC3-734F0B497AC8}" name="Utils">
+        <FILE id="zOxtX7" name="EzdspCodeTokenizer.cpp" compile="1" resource="0"
+              file="Source/Utils/EzdspCodeTokenizer.cpp"/>
+        <FILE id="aOT0Qh" name="EzdspCodeTokenizer.h" compile="0" resource="0"
+              file="Source/Utils/EzdspCodeTokenizer.h"/>
+        <FILE id="xQgHje" name="Vectors.h" compile="0" resource="0" file="Source/Utils/Vectors.h"/>
+      </GROUP>
+      <GROUP id="{3FFB8025-A835-E444-C647-94B8850FA675}" name="ComponentTypes">
+        <FILE id="rJ85uk" name="bufferCreator.cpp" compile="1" resource="0"
+              file="Source/ComponentTypes/bufferCreator.cpp"/>
+        <FILE id="n7NtnI" name="bufferCreator.h" compile="0" resource="0" file="Source/ComponentTypes/bufferCreator.h"/>
+        <FILE id="OfX5bR" name="buttonCreator.cpp" compile="1" resource="0"
+              file="Source/ComponentTypes/buttonCreator.cpp"/>
+        <FILE id="bwdmcx" name="buttonCreator.h" compile="0" resource="0" file="Source/ComponentTypes/buttonCreator.h"/>
+        <FILE id="RFEOd2" name="componentCreator.cpp" compile="1" resource="0"
+              file="Source/ComponentTypes/componentCreator.cpp"/>
+        <FILE id="NSLCgs" name="componentCreator.h" compile="0" resource="0"
+              file="Source/ComponentTypes/componentCreator.h"/>
+        <FILE id="jRauZ9" name="sliderCreator.cpp" compile="1" resource="0"
+              file="Source/ComponentTypes/sliderCreator.cpp"/>
+        <FILE id="xQB14w" name="sliderCreator.h" compile="0" resource="0" file="Source/ComponentTypes/sliderCreator.h"/>
+        <FILE id="dMacCi" name="variableCreator.cpp" compile="1" resource="0"
+              file="Source/ComponentTypes/variableCreator.cpp"/>
+        <FILE id="DPTwCh" name="variableCreator.h" compile="0" resource="0"
+              file="Source/ComponentTypes/variableCreator.h"/>
+      </GROUP>
+      <FILE id="k4mcGc" name="guiCreator.cpp" compile="1" resource="0" file="Source/guiCreator.cpp"/>
+      <FILE id="ibTUFA" name="guiCreator.h" compile="0" resource="0" file="Source/guiCreator.h"/>
+      <FILE id="aKbYS6" name="componentTable.h" compile="0" resource="0"
+            file="Source/componentTable.h"/>
       <FILE id="pO8QGY" name="EzdspSoul.h" compile="0" resource="0" file="Source/EzdspSoul.h"/>
       <FILE id="iykRVr" name="guiCreator.h" compile="0" resource="0" file="Source/guiCreator.h"/>
-      <FILE id="lyuxff" name="componentCreator.h" compile="0" resource="0"
-            file="Source/componentCreator.h"/>
       <FILE id="UZ7i8I" name="PatchLoaderPlugin.cpp" compile="1" resource="0"
             file="Source/PatchLoaderPlugin.cpp"/>
-      <FILE id="xkezMp" name="compileCode.cpp" compile="1" resource="0" file="Source/compileCode.cpp"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
