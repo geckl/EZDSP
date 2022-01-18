@@ -6,14 +6,8 @@
               defines="JUCE_DISABLE_JUCE_VERSION_PRINTING=1&#10;JUCE_DISPLAY_SPLASH_SCREEN=0&#10;DONT_SET_USING_JUCE_NAMESPACE=1"
               companyName="Squatch Sounds" companyWebsite="www.garretteckl.com"
               projectLineFeed="&#10;" pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
-              bundleIdentifier="dev.soul.SOUL_Plugin" displaySplashScreen="1">
+              bundleIdentifier="dev.squatchsounds.EZDSP" displaySplashScreen="1">
   <MAINGROUP id="M2AbSF" name="EZDSP">
-    <GROUP id="{7824FD37-B861-64BB-2D25-47D6B8AB3175}" name="Presets">
-      <FILE id="VjXT7u" name="EZDelay.aupreset" compile="0" resource="0"
-            file="Presets/EZDelay.aupreset"/>
-      <FILE id="bkHlqC" name="EZSquareFilter.aupreset" compile="0" resource="0"
-            file="Presets/EZSquareFilter.aupreset"/>
-    </GROUP>
     <GROUP id="{BDC432B5-7E6D-0BB5-D1EC-F12D0C268921}" name="SoulPatch">
       <FILE id="lsmvs5" name="Default.soul" compile="0" resource="1" file="SoulPatch/Default.soul"
             xcodeResource="0"/>
@@ -63,8 +57,8 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" microphonePermissionNeeded="1">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="SOUL_Plugin" recommendedWarnings="LLVM"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="SOUL_Plugin" recommendedWarnings="LLVM"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="EZDSP_Plugin" recommendedWarnings="LLVM"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="EZDSP_Plugin" recommendedWarnings="LLVM"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics"/>
@@ -83,8 +77,8 @@
     </XCODE_MAC>
     <VS2019 targetFolder="Builds/VisualStudio2019">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="SOUL_Plugin"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="SOUL_Plugin"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="EZDSP_Plugin"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="EZDSP_Plugin"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics"/>

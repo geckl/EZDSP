@@ -22,6 +22,7 @@
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
 
+#include "../JuceLibraryCode/BinaryData.h"
 #include "guiCreator.h"
 #include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
@@ -57,9 +58,12 @@ public:
         checkForSiblingPatch();
 
         
-        presetCode.copyFileTo(tempCode.getFile());
-        presetPatch.copyFileTo(tempPatch.getFile());
+        //presetCode.copyFileTo(tempCode.getFile());
+        //presetPatch.copyFileTo(tempPatch.getFile());
         
+        //Load default EZDSP patch from binary data into temp files
+        tempCode.getFile().appendData(BinaryData::Default_soul, BinaryData::Default_soulSize);
+        tempPatch.getFile().appendData(BinaryData::Default_soulpatch, BinaryData::Default_soulpatchSize);
         
         //set input and output streams to SOUL file
         input= std::unique_ptr<juce::FileInputStream> (tempCode.getFile().createInputStream());
@@ -635,10 +639,13 @@ public:
     };
     
     //public: (audio processor public variables)
-    juce::File presetCode= juce::File ("/Library/Application Support/EZDSP/Default.soul");
+    /*juce::File presetCode= juce::File ("/Library/Application Support/EZDSP/Default.soul");
     juce::File presetPatch= juce::File("/Library/Application Support/EZDSP/Default.soulpatch");
     juce::TemporaryFile tempCode= juce::TemporaryFile (presetCode);
-    juce::TemporaryFile tempPatch= juce::TemporaryFile (presetPatch);
+    juce::TemporaryFile tempPatch= juce::TemporaryFile (presetPatch);*/
+    
+    juce::TemporaryFile tempCode = juce::TemporaryFile(".soul");
+    juce::TemporaryFile tempPatch = juce::TemporaryFile(".soulpatch");
     
     std::unique_ptr<juce::FileOutputStream> output;
     std::unique_ptr<juce::FileInputStream> input;
