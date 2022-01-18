@@ -314,7 +314,7 @@ public:
             output->writeText(s.getProperty(ids.patchCode).toString().toStdString(),false,false, nullptr);
             output->flush();
             
-            //write preset's code into CodeWindow
+            //write preset's DSP code into CodeWindow
             loadCode();
             
             state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
@@ -419,6 +419,7 @@ public:
             
             codeWindow.setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colours::white);
             codeWindow.setColour(juce::CodeEditorComponent::ColourIds::lineNumberTextId, juce::Colours::black);
+            codeWindow.setWantsKeyboardFocus(true);
             addAndMakeVisible(codeWindow);
             
             runCode.setButtonText("Run");
