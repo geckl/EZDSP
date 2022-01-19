@@ -16,11 +16,11 @@ static const unsigned char temp_binary_data_0[] =
 "*/\n"
 "processor Test [[main]]\n"
 "{\n"
-"    input stream float audioIn;\n"
+"    input stream float32 audioIn;\n"
 "    input event soul::timeline::Tempo tempoIn;\n"
 "    input event soul::timeline::Position positionIn;\n"
 "    input event soul::timeline::TimeSignature timesignatureIn;\n"
-"    output stream float audioOut;\n"
+"    output stream float32 audioOut;\n"
 "\n"
 "\n"
 "//BEGINGUI\n"
@@ -102,7 +102,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
     switch (hash)
     {
-        case 0xe308ed51:  numBytes = 1187; return Default_soul;
+        case 0xe308ed51:  numBytes = 1191; return Default_soul;
         case 0xbf13dd97:  numBytes = 372; return Default_soulpatch;
         default: break;
     }

@@ -5,11 +5,11 @@
 */
 processor Test [[main]]
 {
-    input stream float audioIn;
+    input stream float32 audioIn;
     input event soul::timeline::Tempo tempoIn;
     input event soul::timeline::Position positionIn;
     input event soul::timeline::TimeSignature timesignatureIn;
-    output stream float audioOut;
+    output stream float32 audioOut;
 
 
 //BEGINGUI

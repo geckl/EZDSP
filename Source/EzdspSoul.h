@@ -18,9 +18,9 @@
 
 
 #include "../SOUL-master/include/soul/soul_patch.h"
-#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_AudioProcessor.h"
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
+#include "../SOUL-overrides/soul_patch_AudioProcessor.h"
 
 #include "../JuceLibraryCode/BinaryData.h"
 #include "guiCreator.h"
@@ -110,7 +110,7 @@ public:
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
         state.setProperty(ids.patchCode, fullCode.getAllContent(), nullptr);
         
-        //store array of components in vars and add to ValueTree
+        //store array of components in vars and load into ValueTree
         juce::Array<juce::var> componentsStorage;
         for(int i=0;i<guiArray.size();i++)
         {
@@ -309,7 +309,7 @@ public:
         
         auto s = juce::ValueTree::readFromData (data, (size_t) size);
         
-        //write preset's code into soul file
+        //write preset's code into temp soul file
         if(output->openedOk())
         {
             output->setPosition(0);

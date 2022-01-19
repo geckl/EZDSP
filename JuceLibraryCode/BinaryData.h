@@ -9,7 +9,7 @@
 namespace BinaryData
 {
     extern const char*   Default_soul;
-    const int            Default_soulSize = 1187;
+    const int            Default_soulSize = 1191;
 
     extern const char*   Default_soulpatch;
     const int            Default_soulpatchSize = 372;

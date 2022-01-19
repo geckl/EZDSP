@@ -3,6 +3,7 @@
     |   __|     |  |  |  |
     |__   |  |  |  |  |  |__
     |_____|_____|_____|_____|
+
     Copyright (c) 2018 - ROLI Ltd.
 */
 
@@ -12,9 +13,9 @@
  #error "this header is designed to be included in JUCE projects that contain the juce_audio_processors module"
 #endif
 
-#include "../../soul_patch.h"
-#include "../../patch/helper_classes/soul_patch_Utilities.h"
-#include "../../common/soul_ProgramDefinitions.h"
+#include "../SOUL-master/include/soul/soul_patch.h"
+#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
+#include "../SOUL-master/include/soul/common/soul_ProgramDefinitions.h"
 
 namespace soul
 {
@@ -24,8 +25,10 @@ namespace patch
 //==============================================================================
 /**
     Wraps up a SOUL patch inside a juce::AudioPluginInstance.
+
     Just include this in a JUCE project and create an instance from your
     PatchInstance object.
+
     NOTE: Unlike a normal AudioProcessor, you also need to provide a callback
     function using the askHostToReinitialise parameter - the object will
     use its own background thread to recompile the SOUL code, and will use
@@ -37,6 +40,7 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                                     private juce::Timer
 {
     /** Creates a SOULPatchAudioProcessor from a PatchInstance.
+
         @param patchToLoad          the instance to load - this must not be null
         @param compilerCache        if non-null, this is a user-provided class that can store and reload
                                     cached binaries to avoid re-compiling the same code multiple times
@@ -80,11 +84,13 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
     /** This callback can be set by a host, and the processor will call it if the
         SOUL patch code has changed in a way that means the processor needs to be
         rebuilt.
+
         When your host gets this callback, it should stop the processor, and once
         no audio or parameter change functions are being called, it should call the
         reinitialise() method, which will cause the processor to refresh its bus layout,
         parameter list and other properties. After calling reinitialise(), the host
         can call prepareToPlay again and start playing the processor again.
+
         The processor has its own background thread that re-compiles new SOUL patch
         code behind the scenes while the plugin is still running, and once it has a
         new build ready, it triggers a call to this function from the message thread.
@@ -131,7 +137,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         juce::StringArray errors;
 
         for (auto& m : player->getCompileMessages())
-            errors.add (m.getFullMessage());
+            errors.add (m.description); //(std::string(m.fullMessage).substr(std::string(m.fullMessage).find("\n") + 1));
+            
 
         return errors.joinIntoString ("\n");
     }
@@ -148,21 +155,6 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         d = createPluginDescription (*patch);
     }
 
-    template <typename T>
-    static auto setUID (T& d, int value) -> decltype (T::uniqueId)
-    {
-        d.uniqueId = value;
-        d.deprecatedUid = value;
-        return 0;
-    }
-
-    template <typename T>
-    static auto setUID (T& d, int value) -> decltype (T::uid)
-    {
-        d.uid = value;
-        return 0;
-    }
-
     static juce::PluginDescription createPluginDescription (soul::patch::PatchInstance& instance)
     {
         juce::PluginDescription d;
@@ -177,9 +169,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         d.fileOrIdentifier    = String::Ptr (instance.getLocation()->getAbsolutePath());
         d.lastFileModTime     = juce::Time (instance.getLastModificationTime());
         d.lastInfoUpdateTime  = juce::Time::getCurrentTime();
+        d.uniqueId            = static_cast<int> (juce::String (desc->UID).hash());
         d.isInstrument        = desc->isInstrument;
-
-        setUID (d, static_cast<int> (juce::String (desc->UID).hash()));
 
         return d;
     }
@@ -305,20 +296,6 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
 
     using juce::AudioProcessor::processBlock;
 
-    static void splitMidiMessage (juce::MidiMessageMetadata& message, std::function<void (const choc::midi::ShortMessage&)> publish)
-    {
-        for (int i = 0; i < message.numBytes; i += 3)
-        {
-            auto availableBytes = message.numBytes - i;
-
-            auto m = choc::midi::ShortMessage (message.data[i],
-                                               availableBytes > 1 ? message.data[i + 1] : 0,
-                                               availableBytes > 2 ? message.data[i + 2] : 0);
-
-            publish (m);
-        }
-    }
-
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
     {
         auto numFrames = audio.getNumSamples();
@@ -331,8 +308,12 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
 
         if (player != nullptr && player->isPlayable() && ! isSuspended())
         {
+            //DBG("Suspended?: " << (isSuspended() ? "true" : "false"));
             if (auto playhead = getPlayHead())
+            {
+                //DBG("Get playhead!");
                 playheadState.updateAndApply (*playhead, *player);
+            }
 
             soul::patch::PatchPlayer::RenderContext rc;
 
@@ -368,11 +349,9 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                 {
                     auto message = *iter++;
 
-                    splitMidiMessage (message, [&] (const choc::midi::ShortMessage& m)
-                                      {
-                                          if (i < maxEvents)
-                                              messageSpaceIn[i++] = {static_cast<uint32_t> (message.samplePosition), m};
-                                      });
+                    if (message.numBytes < 4)
+                        messageSpaceIn[i++] = { static_cast<uint32_t> (message.samplePosition),
+                                                { message.data[0], message.data[1], message.data[2] } };
                 }
 
                 rc.numMIDIMessagesIn = (uint32_t) i;
@@ -822,9 +801,13 @@ private:
         void updateAndApply (juce::AudioPlayHead& playhead, soul::patch::PatchPlayer& playerToUse)
         {
             juce::AudioPlayHead::CurrentPositionInfo info;
-
             if (playhead.getCurrentPosition (info))
             {
+                if(! info.isPlaying)
+                {
+                    DBG("Not Playing!");
+                    playerToUse.reset();
+                }
                 auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info.timeSigNumerator),
                                                         static_cast<uint16_t> (info.timeSigDenominator) };
 
@@ -836,6 +819,7 @@ private:
 
                 auto newBPM = static_cast<float> (info.bpm);
 
+                //DBG(newBPM);
                 if (newBPM != currentBPM)
                 {
                     currentBPM = newBPM;
@@ -1135,7 +1119,7 @@ private:
             auto patchFolder = patch.getManifestFile().getParentDirectory();
             goToFolderButton.setEnabled (patchFolder.isDirectory());
             goToFolderButton.onClick = [=] { patchFolder.startAsProcess(); };
-            addAndMakeVisible (goToFolderButton);
+            //addAndMakeVisible (goToFolderButton);
 
             setSize (700, 300);
             setResizeLimits (400, 150, 1000, 500);
@@ -1146,8 +1130,8 @@ private:
             juce::String error;
             auto manifestFile = patch.getManifestFile();
 
-            error << "Error compiling SOUL patch:\n\n"
-                  << (manifestFile != juce::File() ? manifestFile.getFullPathName() : "<unknown file>") << "\n\n"
+            error << "Error compiling EZDSP patch:\n\n"
+                  //<< (manifestFile != juce::File() ? manifestFile.getFullPathName() : "<unknown file>") << "\n\n"
                   << patch.getCompileError();
 
             return error;
