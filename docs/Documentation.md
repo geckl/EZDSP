@@ -1,7 +1,9 @@
 ---
+
 layout: page
 title: "EZDSP Documentation"
 permalink: /Documentation/
+
 ---
 
 # EZDSP Help
