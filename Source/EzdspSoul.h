@@ -509,27 +509,21 @@ public:
                 g.fillAll (juce::Colours::lightgreen.withAlpha (0.3f));
         }
 
-        /*bool isInterestedInFileDrag (const juce::StringArray& files) override  { return files.size() == 1 && files[0].endsWith (soul::patch::getManifestSuffix()); }
-        void fileDragEnter (const juce::StringArray&, int, int) override       { setDragOver (true); }
-        void fileDragExit (const juce::StringArray&) override                  { setDragOver (false); }
-
-        void filesDropped (const juce::StringArray& files, int, int) override
+        /*void focusOfChildComponentChanged (FocusChangeType cause) override
         {
-            setDragOver (false);
-
-            if (files.size() == 1)
-                owner.setPatchURL (files[0].toStdString());
-                
-        }
-
-        void setDragOver (bool b)
-        {
-            if (isDragOver != b)
+            
+            if(helpWindow != nullptr && helpWindow->hasKeyboardFocus(false) == false && codeWindow.hasKeyboardFocus(false) == false)
             {
-                isDragOver = b;
-                repaint();
+                DBG("Window has focus!");
+                helpWindow -> setAlwaysOnTop(true);
+            }
+            else if(helpWindow != nullptr)
+            {
+                DBG("Focus lost!");
+                helpWindow -> setAlwaysOnTop(false);
             }
         }*/
+
         
         void buttonClicked(juce::Button* button) override
         {
@@ -553,7 +547,7 @@ public:
                     }
                     else if(owner.guiArray[i][0]== "BUFFER")
                     {
-                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][3] + ";\n" + "wrap<" + owner.guiArray[i][7] + "> " + owner.guiArray[i][3] + "Index;\n";
+                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][10] + ";\n" + "wrap<" + owner.guiArray[i][7] + "> " + owner.guiArray[i][10] + "Index;\n";
                     }
                     
                     else if(owner.guiArray[i][0]== "BUTTON")

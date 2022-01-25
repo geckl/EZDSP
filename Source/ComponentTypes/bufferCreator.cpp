@@ -98,13 +98,14 @@ void bufferCreator::buttonClicked(juce::Button* button)
             componentParameters.add("BUFFER");
             componentParameters.add(nameValue.getText()+"[" + nameValue.getText() + "Index]");
             componentParameters.add(typeValue.getText());
-            componentParameters.add(nameValue.getText());
+            componentParameters.add("");
             componentParameters.add("");
             componentParameters.add("");
             componentParameters.add("");
             componentParameters.add(sizeValue.getText());
             componentParameters.add("OFF");
             componentParameters.add("3");
+            componentParameters.add(nameValue.getText());
            
             
             guiWindowCallback->guiCodeArray->add(componentParameters);
