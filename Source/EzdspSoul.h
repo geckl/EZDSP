@@ -508,22 +508,6 @@ public:
             if (isDragOver)
                 g.fillAll (juce::Colours::lightgreen.withAlpha (0.3f));
         }
-
-        /*void focusOfChildComponentChanged (FocusChangeType cause) override
-        {
-            
-            if(helpWindow != nullptr && helpWindow->hasKeyboardFocus(false) == false && codeWindow.hasKeyboardFocus(false) == false)
-            {
-                DBG("Window has focus!");
-                helpWindow -> setAlwaysOnTop(true);
-            }
-            else if(helpWindow != nullptr)
-            {
-                DBG("Focus lost!");
-                helpWindow -> setAlwaysOnTop(false);
-            }
-        }*/
-
         
         void buttonClicked(juce::Button* button) override
         {

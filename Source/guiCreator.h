@@ -40,6 +40,7 @@ public:
     void buttonClicked(juce::Button* button) override;
     
     void styleMenuChanged();
+    void focusOfChildComponentChanged (FocusChangeType cause) override;
     
     juce::TextButton deleteSelectedComponents, closeWindow;
     juce::ComboBox addGUIComponent;

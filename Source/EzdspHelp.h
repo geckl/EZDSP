@@ -78,6 +78,19 @@ public:
         this->getTopLevelComponent()->exitModalState(0);
         delete this;
     }
+    
+    void focusOfChildComponentChanged (FocusChangeType cause) override
+    {
+        
+        if(juce::Process::isForegroundProcess())
+        {
+            setAlwaysOnTop(true);
+        }
+        else
+        {
+            setAlwaysOnTop(false);
+        }
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EzdspHelp)

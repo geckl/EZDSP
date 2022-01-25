@@ -144,3 +144,16 @@ void guiCreator::styleMenuChanged()
            launchOptions.launchAsync();
        }
    }
+
+void guiCreator::focusOfChildComponentChanged (FocusChangeType cause)
+{
+    
+    if(juce::Process::isForegroundProcess())
+    {
+        setAlwaysOnTop(true);
+    }
+    else
+    {
+        setAlwaysOnTop(false);
+    }
+}
