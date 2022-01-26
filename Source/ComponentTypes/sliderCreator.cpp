@@ -126,7 +126,7 @@ void sliderCreator::buttonClicked(juce::Button* button)
             componentParameters.add("");
             componentParameters.add("OFF");
             componentParameters.add("1");
-            componentParameters.add("");
+            componentParameters.add(nameValue.getText());
            
             
             guiWindowCallback->guiCodeArray->add(componentParameters);

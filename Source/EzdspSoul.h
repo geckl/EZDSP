@@ -90,6 +90,8 @@ public:
         initialComponentParameters.add("0.1");
         initialComponentParameters.add("");
         initialComponentParameters.add("OFF");
+        initialComponentParameters.add("1");
+        initialComponentParameters.add("GAIN");
         guiArray.add(initialComponentParameters);
         
         initialComponentParameters.clear();
@@ -104,6 +106,7 @@ public:
         initialComponentParameters.add("");
         initialComponentParameters.add("OFF");
         initialComponentParameters.add("4");
+        initialComponentParameters.add("SAMPLERATE");
         guiArray.add(initialComponentParameters);
 
         //Load soulpatch properties into ValueTree
@@ -523,12 +526,12 @@ public:
                 {
                     if(owner.guiArray[i][0]== "VARIABLE")
                     {
-                        tempGuiCode+= owner.guiArray[i][2] + " " + owner.guiArray[i][1] + " = " + owner.guiArray[i][5] + ";\n";
+                        tempGuiCode+= owner.guiArray[i][2] + " " + owner.guiArray[i][10] + " = " + owner.guiArray[i][5] + ";\n";
                     }
                     
                     else if(owner.guiArray[i][0]== "SLIDER")
                     {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", min: " + owner.guiArray[i][3] +", max: " + owner.guiArray[i][4] + ", init:  " + owner.guiArray[i][5] + ", step: " + owner.guiArray[i][6] + " ]];\n";
+                        tempGuiCode+= "input stream float " + owner.guiArray[i][10] + " [[ name: \"" +  owner.guiArray[i][10] + "\", min: " + owner.guiArray[i][3] +", max: " + owner.guiArray[i][4] + ", init:  " + owner.guiArray[i][5] + ", step: " + owner.guiArray[i][6] + " ]];\n";
                     }
                     else if(owner.guiArray[i][0]== "BUFFER")
                     {
@@ -537,7 +540,7 @@ public:
                     
                     else if(owner.guiArray[i][0]== "BUTTON")
                     {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][1] + " [[ name: \"" +  owner.guiArray[i][1] + "\", boolean ]];\n";
+                        tempGuiCode+= "input stream float " + owner.guiArray[i][10] + " [[ name: \"" +  owner.guiArray[i][10] + "\", boolean ]];\n";
                     }
                 }
                 
@@ -558,7 +561,7 @@ public:
                 for(int i=0;i<owner.guiArray.size();i++)
                 {
                     //add component names to vector of in-use variable names
-                    usedWords.push_back(owner.guiArray[i][1].toStdString());
+                    usedWords.push_back(owner.guiArray[i][10].toStdString());
                     
                     juce::Array<juce::var> parametersStorage;
                     for(int j=0;j<owner.guiArray[i].size();j++)

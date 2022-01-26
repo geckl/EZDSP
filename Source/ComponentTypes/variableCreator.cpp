@@ -109,7 +109,7 @@ void variableCreator::buttonClicked(juce::Button* button)
             componentParameters.add("");
             componentParameters.add("OFF");
             componentParameters.add("4");
-            componentParameters.add("");
+            componentParameters.add(nameValue.getText());
            
             
             guiWindowCallback->guiCodeArray->add(componentParameters);

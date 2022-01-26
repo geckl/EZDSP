@@ -10,6 +10,4 @@
 
 #include "Vectors.h"
 
-std::vector<std::string> usedWords = {
-    "SAMPLERATE"
-};
+std::vector<std::string> usedWords = {};
