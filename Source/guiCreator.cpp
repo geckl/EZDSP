@@ -33,7 +33,7 @@ guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::
     addAndMakeVisible(&deleteSelectedComponents);
     deleteSelectedComponents.addListener(this);
     
-    closeWindow.setButtonText("Close and Update");
+    closeWindow.setButtonText("Close");
     addAndMakeVisible(&closeWindow);
     closeWindow.addListener(this);
     
@@ -82,7 +82,7 @@ void guiCreator::resized()
 void guiCreator::closeButtonPressed()
 {
     //DBG(guiCodeArray->size());
-    runCodeButton->triggerClick();
+    //runCodeButton->triggerClick();
     this->getTopLevelComponent()->exitModalState(0);
     delete this;
 }
@@ -101,6 +101,7 @@ void guiCreator::buttonClicked(juce::Button* button)
             }
         }
         myTable->updateContent();
+        runCodeButton->triggerClick();
     }
     else if(button == &closeWindow)
     {

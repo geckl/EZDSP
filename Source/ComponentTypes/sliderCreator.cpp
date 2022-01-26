@@ -110,7 +110,7 @@ void sliderCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
-        if(std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end())
+        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
         {
             juce::Array<juce::String> componentParameters;
             
@@ -135,8 +135,9 @@ void sliderCreator::buttonClicked(juce::Button* button)
             std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),
               [](const auto& lhs, const auto& rhs) { return lhs[9] < rhs[9]; });
             
-            //update table
+            //update table and code
             guiWindowCallback->myTable->updateContent();
+            guiWindowCallback->runCodeButton->triggerClick();
             
             //close the component creator window
             delete this->findParentComponentOfClass<juce::DialogWindow>();

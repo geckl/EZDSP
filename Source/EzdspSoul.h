@@ -26,6 +26,7 @@
 #include "guiCreator.h"
 #include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
+#include "Utils/Vectors.h"
 
 
 namespace soul
@@ -549,10 +550,16 @@ public:
                 owner.output->flush();
                 owner.state.setProperty(owner.ids.patchCode, owner.fullCode.getAllContent(), nullptr);
                 
+               
+                usedWords.clear();
+                
                 //store array of components in vars and add to ValueTree
                 juce::Array<juce::var> componentsStorage;
                 for(int i=0;i<owner.guiArray.size();i++)
                 {
+                    //add component names to vector of in-use variable names
+                    usedWords.push_back(owner.guiArray[i][1].toStdString());
+                    
                     juce::Array<juce::var> parametersStorage;
                     for(int j=0;j<owner.guiArray[i].size();j++)
                     {
