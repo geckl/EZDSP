@@ -1,5 +1,5 @@
 # EZDSP
-##Easy Digital Signal Processing
+## Easy Digital Signal Processing
 
 ## What is EZDSP?
 
