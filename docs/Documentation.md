@@ -1,4 +1,4 @@
-# EZDSP Help
+# EZDSP Documentation
 
 ## What is EZDSP?
 
