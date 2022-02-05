@@ -21,7 +21,20 @@
 namespace soul
 {
 
+using UnicodeChar = uint32_t;
+
 bool isDigit (char);
+
+inline bool isWhitespace (choc::text::UTF8Pointer p) noexcept  { return p.data() != nullptr && choc::text::isWhitespace (*p.data()); }
+inline bool isDigit (choc::text::UTF8Pointer p) noexcept       { return p.data() != nullptr && soul::isDigit (*p.data()); }
+
+inline choc::text::UTF8Pointer findEndOfWhitespace (choc::text::UTF8Pointer p)
+{
+    while (isWhitespace (p))
+        ++p;
+
+    return p;
+}
 
 std::string repeatedCharacter (char, size_t num);
 std::string padded (const std::string&, int minSize);
@@ -36,23 +49,6 @@ std::string removeCharacter (std::string s, char charToRemove);
 
 // trim and coalesce whitespace into single spaces
 std::string simplifyWhitespace (std::string);
-
-template <typename StringArray>
-static std::string joinStrings (const StringArray& strings, const std::string& separator)
-{
-    if (strings.empty())
-        return {};
-
-    std::string s (strings.front());
-
-    for (size_t i = 1; i < strings.size(); ++i)
-    {
-        s += separator;
-        s += strings[i];
-    }
-
-    return s;
-}
 
 template <typename Array, typename StringifyFn>
 static std::string joinStrings (const Array& strings, const std::string& separator, StringifyFn&& stringify)
@@ -93,8 +89,6 @@ static std::string addSuffixToMakeUnique (const std::string& name, IsAlreadyUsed
     return nameToUse;
 }
 
-std::string getDescriptionOfTimeInSeconds (double numSeconds);
-std::string getReadableDescriptionOfByteSize (uint64_t bytes);
 std::string toCppStringLiteral (const std::string& text,
                                 int maxCharsOnLine, bool breakAtNewLines,
                                 bool replaceSingleQuotes, bool allowStringBreaks);
@@ -110,8 +104,6 @@ std::string quoteName (const std::string& name);
 std::string quoteName (const Identifier& name);
 
 bool sanityCheckString (const char* s, size_t maxLength = 8192);
-
-std::string toLowerCase (std::string);
 
 //==============================================================================
 /** Creates a table of strings, where each column gets padded out based on the longest
@@ -152,8 +144,9 @@ struct HashBuilder
 {
     HashBuilder& operator<< (char) noexcept;
     HashBuilder& operator<< (const std::string&) noexcept;
-    HashBuilder& operator<< (ArrayView<char>) noexcept;
+    HashBuilder& operator<< (choc::span<char>) noexcept;
 
+    /// Returns a 32 char hex number
     std::string toString() const;
 
 private:

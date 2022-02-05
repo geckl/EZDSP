@@ -187,7 +187,7 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                     treeBuilder.addParam (std::make_unique<PatchParameter> (p),
                                           String::Ptr (p->getProperty ("group")));
 
-        setParameterTree (std::move (treeBuilder.tree));
+        setHostedParameterTree (std::move (treeBuilder.tree));
     }
 
     void refreshInputEventList()
@@ -301,6 +301,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         auto numFrames = audio.getNumSamples();
 
         outputBuffer.setSize (juce::jmax (numPatchOutputChannels, getTotalNumOutputChannels()), numFrames, false, false, true);
+        //outputBuffer.setSize (getTotalNumOutputChannels(), numFrames, false, false, true);
+
         outputBuffer.clear();
 
         inputBuffer.setSize (juce::jmax (numPatchInputChannels, getTotalNumInputChannels()), numFrames, false, false, true);
@@ -805,7 +807,6 @@ private:
             {
                 if(! info.isPlaying)
                 {
-                    DBG("Not Playing!");
                     playerToUse.reset();
                 }
                 auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info.timeSigNumerator),

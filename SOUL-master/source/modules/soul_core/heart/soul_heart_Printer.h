@@ -211,26 +211,21 @@ private:
 
         void printStateVariables()
         {
-            heart::Utilities::VariableListByType list (module.stateVariables.get());
-
-            for (auto& type : list.types)
+            for (auto& v : module.stateVariables.get())
             {
-                for (auto& v : type.variables)
+                out << (v->isExternal() ? "let external " : (v->isConstant() ? "let " : "var "))
+                    << getTypeDescription (v->getType()) << ' ';
+
+                printVarWithPrefix (v->name);
+
+                if (v->initialValue != nullptr)
                 {
-                    out << (v->isExternal() ? "let external " : (v->isConstant() ? "let " : "var "))
-                        << getTypeDescription (type.type) << ' ';
-
-                    printVarWithPrefix (v->name);
-
-                    if (v->initialValue != nullptr)
-                    {
-                        out << " = ";
-                        printExpression (*v->initialValue);
-                    }
-
-                    printDescription (v->annotation);
-                    out << ';' << newLine;
+                    out << " = ";
+                    printExpression (*v->initialValue);
                 }
+
+                printDescription (v->annotation);
+                out << ';' << newLine;
             }
         }
 
@@ -246,7 +241,7 @@ private:
                 printFunction (f);
         }
 
-        void printParameters (ArrayView<pool_ref<Variable>> parameters)
+        void printParameters (choc::span<pool_ref<Variable>> parameters)
         {
             if (parameters.empty())
             {
@@ -278,7 +273,7 @@ private:
             auto labelIndent = out.createIndent (2);
             out << getBlockName (b);
 
-            if (!b.parameters.empty())
+            if (! b.parameters.empty())
                 printParameters (b.parameters);
 
             out << ":" << newLine;
@@ -298,6 +293,9 @@ private:
         void printFunction (heart::Function& f)
         {
             SOUL_ASSERT (f.name.isValid());
+
+            if (f.functionType.isIntrinsic())
+                f.annotation.set ("intrin", soul::getIntrinsicName (f.intrinsicType));
 
             out << (f.functionType.isEvent() ? "event " : "function ");
             out << getFunctionName (f);
@@ -433,22 +431,19 @@ private:
             if (auto arrayElement = cast<heart::ArrayElement> (e))
             {
                 printExpression (arrayElement->parent);
+                out << '[';
+
+                if (arrayElement->isRangeTrusted)
+                    out << "trusted ";
 
                 if (arrayElement->dynamicIndex != nullptr)
-                {
-                    out << '[';
                     printExpression (*arrayElement->dynamicIndex);
-                    out << ']';
-                    return;
-                }
+                else if (arrayElement->isSingleElement())
+                    out << arrayElement->fixedStartIndex;
+                else
+                    out << arrayElement->fixedStartIndex << ":" << arrayElement->fixedEndIndex;
 
-                if (arrayElement->isSingleElement())
-                {
-                    out << '[' << arrayElement->fixedStartIndex << ']';
-                    return;
-                }
-
-                out << '[' << arrayElement->fixedStartIndex << ":" << arrayElement->fixedEndIndex << ']';
+                out << ']';
                 return;
             }
 
@@ -487,7 +482,7 @@ private:
 
             if (auto fc = cast<heart::PureFunctionCall> (e))
             {
-                out << getFunctionName (fc->function);
+                out << "purecall " << getFunctionName (fc->function);
                 printArgList (fc->arguments);
                 return;
             }
@@ -500,6 +495,7 @@ private:
 
             if (auto list = cast<heart::AggregateInitialiserList> (e))
             {
+                out << "cast " << getTypeDescription (list->type);
                 printArgList (list->items);
                 return;
             }
@@ -510,16 +506,15 @@ private:
         void printVarWithPrefix (const std::string& name)
         {
             SOUL_ASSERT (! name.empty());
-
-            if (name[0] == '$')
-                out << name;
-            else
-                out << "$" << removeCharacter (name, '$');
+            out << "$" << name;
         }
 
-        std::string getTypeDescription (const Type& type) const
+        std::string getTypeDescription (Type type) const
         {
-            return module.program.getTypeDescriptionWithQualificationIfNeeded (module, type.removeConstIfPresent());
+            if (! type.isReference())
+                type = type.removeConstIfPresent();
+
+            return module.program.getTypeDescriptionWithQualificationIfNeeded (module, type);
         }
 
         static const char* getUnaryOpName (UnaryOp::Op o)
@@ -608,7 +603,7 @@ private:
             printExpression (a.source);
         }
 
-        void printArgList (const ArrayView<pool_ref<heart::Expression>>& args)
+        void printArgList (const choc::span<pool_ref<heart::Expression>>& args)
         {
             if (args.empty())
             {

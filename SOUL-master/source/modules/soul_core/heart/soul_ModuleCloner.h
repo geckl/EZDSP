@@ -162,7 +162,7 @@ struct ModuleCloner
         return cloneType (structMappings, t);
     }
 
-    std::vector<Type> cloneTypes (ArrayView<Type> types)
+    std::vector<Type> cloneTypes (choc::span<Type> types)
     {
         std::vector<Type> result;
         result.reserve (types.size());
@@ -283,7 +283,7 @@ struct ModuleCloner
 
     heart::AggregateInitialiserList& cloneInitialiserList (const heart::AggregateInitialiserList& old)
     {
-        auto& l = newModule.allocate<heart::AggregateInitialiserList> (old.location, old.type);
+        auto& l = newModule.allocate<heart::AggregateInitialiserList> (old.location, cloneType (old.type));
 
         for (auto& i : old.items)
             l.items.push_back (cloneExpression (i));

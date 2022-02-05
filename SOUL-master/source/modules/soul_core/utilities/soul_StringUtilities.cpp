@@ -143,7 +143,7 @@ std::string replaceLine (const std::string& text, size_t line, const std::string
 {
     auto lines = choc::text::splitIntoLines (text, true);
     lines[line] = replacementLine + (containsChar (lines[line], '\r') ? "\r\n" : "\n");
-    return joinStrings (lines, {});
+    return choc::text::joinStrings (lines, {});
 }
 
 std::string loadFileAsString (const char* filename)
@@ -193,28 +193,6 @@ std::string makeIdentifierRemovingColons (std::string s)
     return makeSafeIdentifierName (choc::text::replace (trimCharacterAtStart (s, ':'), "::", "_"));
 }
 
-std::string getDescriptionOfTimeInSeconds (double numSeconds)
-{
-    auto toStringWithDecPlaces = [] (double n, size_t numDecPlaces)
-    {
-        auto s = choc::text::floatToString (n, (int) numDecPlaces);
-        auto dot = s.find ('.');
-        return dot == std::string::npos ? s : s.substr (0, std::min (s.length(), dot + 1 + numDecPlaces));
-    };
-
-    return numSeconds < 1.0 ? (toStringWithDecPlaces (numSeconds * 1000.0, numSeconds < 0.1 ? 2 : 1) + " ms")
-                            : (toStringWithDecPlaces (numSeconds, 2) + " sec");
-}
-
-std::string getReadableDescriptionOfByteSize (uint64_t bytes)
-{
-    if (bytes == 1)                  return "1 byte";
-    if (bytes < 1024)                return std::to_string (bytes) + " bytes";
-    if (bytes < 1024 * 1024)         return choc::text::floatToString (double (bytes) / 1024.0, 1)                     + " KB";
-    if (bytes < 1024 * 1024 * 1024)  return choc::text::floatToString (double (bytes) / (1024.0 * 1024.0), 1)          + " MB";
-    else                             return choc::text::floatToString (double (bytes) / (1024.0 * 1024.0 * 1024.0), 1) + " GB";
-}
-
 std::string convertToString (const std::string& name)        { return name; }
 std::string convertToString (const Identifier& name)         { return name.toString(); }
 std::string convertToString (const IdentifierPath& name)     { return Program::stripRootNamespaceFromQualifiedPath (name.toString()); }
@@ -230,12 +208,6 @@ bool sanityCheckString (const char* s, size_t maxLength)
                 return choc::text::findInvalidUTF8Data (s, i) == nullptr;
 
     return false;
-}
-
-std::string toLowerCase (std::string s)
-{
-    std::transform (s.begin(), s.end(), s.begin(), [] (auto c) { return std::tolower (c); });
-    return s;
 }
 
 //==============================================================================
@@ -303,7 +275,7 @@ HashBuilder& HashBuilder::operator<< (const std::string& s) noexcept
     return *this;
 }
 
-HashBuilder& HashBuilder::operator<< (ArrayView<char> s) noexcept
+HashBuilder& HashBuilder::operator<< (choc::span<char> s) noexcept
 {
     for (auto c : s)
         *this << c;

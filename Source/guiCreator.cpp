@@ -13,7 +13,7 @@
 
 //==============================================================================
 guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::String>> *g, juce::Button *b)
-: DocumentWindow (name, juce::Colours::grey, juce::DocumentWindow::allButtons)
+: TopLevelWindow (name, true)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -79,13 +79,13 @@ void guiCreator::resized()
 
 }
 
-void guiCreator::closeButtonPressed()
+/*void guiCreator::closeButtonPressed()
 {
     //DBG(guiCodeArray->size());
     //runCodeButton->triggerClick();
     this->getTopLevelComponent()->exitModalState(0);
     delete this;
-}
+}*/
 
 void guiCreator::buttonClicked(juce::Button* button)
 {
@@ -105,7 +105,7 @@ void guiCreator::buttonClicked(juce::Button* button)
     }
     else if(button == &closeWindow)
     {
-        closeButtonPressed();
+        delete this;
     }
 }
 

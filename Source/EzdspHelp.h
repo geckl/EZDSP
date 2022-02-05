@@ -15,33 +15,21 @@
 //==============================================================================
 /*
 */
-class EzdspHelp  : public juce::DocumentWindow
+class EzdspHelp : public juce::DocumentWindow
 {
 public:
-    EzdspHelp(const juce::String& name) : DocumentWindow (name, juce::Colours::grey, juce::DocumentWindow::allButtons)
+    EzdspHelp(const juce::String& name, int hostWidth, int hostHeight)
+    : DocumentWindow (name, juce::Colours::grey, juce::DocumentWindow::allButtons)
     {
-        // In your constructor, you should add any child components, and
-        // initialise any special settings that your component needs.
+        setUsingNativeTitleBar(true);
+        centreWithSize(hostWidth, hostHeight);
+        setAlwaysOnTop(true);
         
-        //setSize (1000, 1000);
+        helpSite.goToURL("https://geckl.github.io/EZDSP/Documentation");
+        helpSite.setSize(getWidth(), getHeight());
+        setContentOwned(&helpSite, false);
         
-        /*helpText.setMultiLine(true);
-        helpText.setReturnKeyStartsNewLine(true);
-        
-        helpText.setJustification(juce::Justification::centredTop);
-        helpText.setFont(juce::Font(24));
-        helpText.setText("EZDSP Keywords\n\n");
-        
-        //helpText.setFont(juce::Font(14));
-        //helpText.moveCaretDown(true);
-        helpText.insertTextAtCaret("BPM: lorem ipsum\n SAMPLERATE: lorem ipsum\n SAMPLESPERBEAT: lorem ipsum\n");
-        addAndMakeVisible(&helpText);
-        
-        helpText.setReadOnly(true);*/
-        
-        helpSite.goToURL("https://geckl.github.io/EZDSP/");
-        addAndMakeVisible(&helpSite);
-
+        setVisible(true);
     }
 
     ~EzdspHelp() override
@@ -68,8 +56,7 @@ public:
         // This method is where you should set the bounds of any child
         // components that your component contains..
         
-        //helpText.setBounds(0, 40, getWidth(), getHeight()-40);
-        helpSite.setBounds(0, 0, getWidth(), getHeight());
+        //helpSite.setBounds(getLocalBounds());
 
     }
     
@@ -99,3 +86,6 @@ private:
     
     juce::WebBrowserComponent helpSite;
 };
+
+
+

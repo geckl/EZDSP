@@ -86,8 +86,8 @@ struct AudioPlayerVenue::Pimpl  : private AudioMIDISystem::Callback
         }
 
         //==============================================================================
-        ArrayView<const EndpointDetails> getInputEndpoints() override   { return session->getInputEndpoints(); }
-        ArrayView<const EndpointDetails> getOutputEndpoints() override  { return session->getOutputEndpoints(); }
+        choc::span<const EndpointDetails> getInputEndpoints() override   { return session->getInputEndpoints(); }
+        choc::span<const EndpointDetails> getOutputEndpoints() override  { return session->getOutputEndpoints(); }
 
         //==============================================================================
         EndpointHandle getEndpointHandle (const EndpointID& e) override   { return session->getEndpointHandle (e); }
@@ -157,7 +157,7 @@ struct AudioPlayerVenue::Pimpl  : private AudioMIDISystem::Callback
             return false;
         }
 
-        ArrayView<const ExternalVariable> getExternalVariables() override                       { return session->getExternalVariables(); }
+        choc::span<const ExternalVariable> getExternalVariables() override                      { return session->getExternalVariables(); }
         bool setExternalVariable (const char* name, const choc::value::ValueView& v) override   { return session->setExternalVariable (name, v); }
 
         void connectEndpoints()
@@ -333,8 +333,8 @@ struct AudioPlayerVenue::Pimpl  : private AudioMIDISystem::Callback
     };
 
     //==============================================================================
-    ArrayView<const EndpointDetails> getExternalInputEndpoints()  { return externalInputDetails; }
-    ArrayView<const EndpointDetails> getExternalOutputEndpoints() { return externalOutputDetails; }
+    choc::span<const EndpointDetails> getExternalInputEndpoints()  { return externalInputDetails; }
+    choc::span<const EndpointDetails> getExternalOutputEndpoints() { return externalOutputDetails; }
 
     //==============================================================================
     void renderStarting (double, uint32_t) override
@@ -428,7 +428,7 @@ struct AudioPlayerVenue::Pimpl  : private AudioMIDISystem::Callback
         return {};
     }
 
-    static const EndpointDetails* findInternalEndpoint (ArrayView<const EndpointDetails> list, const EndpointID& endpointID)
+    static const EndpointDetails* findInternalEndpoint (choc::span<const EndpointDetails> list, const EndpointID& endpointID)
     {
         for (auto& e : list)
             if (e.endpointID == endpointID)
@@ -448,15 +448,15 @@ AudioPlayerVenue::~AudioPlayerVenue() = default;
 
 bool AudioPlayerVenue::createSession (SessionReadyCallback callback)
 {
-    return pimpl->renderingVenue.createSession ([this, cb = std::move (callback)] (std::unique_ptr<Session> newSession)
+    return pimpl->renderingVenue.createSession ([this, cb = std::move (callback)] (std::unique_ptr<Session> newSession, const std::string& errorMessage)
                                                 {
                                                     SOUL_ASSERT (newSession != nullptr);
-                                                    cb (std::make_unique<Pimpl::AudioVenueSession> (std::move (newSession), *this));
+                                                    cb (std::make_unique<Pimpl::AudioVenueSession> (std::move (newSession), *this), errorMessage);
                                                 });
 }
 
-ArrayView<const EndpointDetails> AudioPlayerVenue::getExternalInputEndpoints()  { return pimpl->getExternalInputEndpoints(); }
-ArrayView<const EndpointDetails> AudioPlayerVenue::getExternalOutputEndpoints() { return pimpl->getExternalOutputEndpoints(); }
+choc::span<const EndpointDetails> AudioPlayerVenue::getExternalInputEndpoints()  { return pimpl->getExternalInputEndpoints(); }
+choc::span<const EndpointDetails> AudioPlayerVenue::getExternalOutputEndpoints() { return pimpl->getExternalOutputEndpoints(); }
 
 //==============================================================================
 void connectDefaultAudioInputEndpoints (Venue& venue, Venue::Session& session)

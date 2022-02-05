@@ -3,6 +3,7 @@
     |   __|     |  |  |  |
     |__   |  |  |  |  |  |__
     |_____|_____|_____|_____|
+
     Copyright (c) 2018 - ROLI Ltd.
 */
 
@@ -24,8 +25,10 @@ namespace patch
 //==============================================================================
 /**
     Wraps up a SOUL patch inside a juce::AudioPluginInstance.
+
     Just include this in a JUCE project and create an instance from your
     PatchInstance object.
+
     NOTE: Unlike a normal AudioProcessor, you also need to provide a callback
     function using the askHostToReinitialise parameter - the object will
     use its own background thread to recompile the SOUL code, and will use
@@ -37,6 +40,7 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                                     private juce::Timer
 {
     /** Creates a SOULPatchAudioProcessor from a PatchInstance.
+
         @param patchToLoad          the instance to load - this must not be null
         @param compilerCache        if non-null, this is a user-provided class that can store and reload
                                     cached binaries to avoid re-compiling the same code multiple times
@@ -80,11 +84,13 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
     /** This callback can be set by a host, and the processor will call it if the
         SOUL patch code has changed in a way that means the processor needs to be
         rebuilt.
+
         When your host gets this callback, it should stop the processor, and once
         no audio or parameter change functions are being called, it should call the
         reinitialise() method, which will cause the processor to refresh its bus layout,
         parameter list and other properties. After calling reinitialise(), the host
         can call prepareToPlay again and start playing the processor again.
+
         The processor has its own background thread that re-compiles new SOUL patch
         code behind the scenes while the plugin is still running, and once it has a
         new build ready, it triggers a call to this function from the message thread.
@@ -196,7 +202,7 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                     treeBuilder.addParam (std::make_unique<PatchParameter> (p),
                                           String::Ptr (p->getProperty ("group")));
 
-        setParameterTree (std::move (treeBuilder.tree));
+        setHostedParameterTree (std::move (treeBuilder.tree));
     }
 
     void refreshInputEventList()

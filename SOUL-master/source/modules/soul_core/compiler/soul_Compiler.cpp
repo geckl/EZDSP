@@ -113,7 +113,7 @@ static ArrayWithPreallocation<CodeLocation, 4> getHEARTFiles (const BuildBundle&
     {
         auto code = CodeLocation::createFromSourceFile (file);
 
-        if (code.location.findEndOfWhitespace().startsWith ("#SOUL"))
+        if (findEndOfWhitespace (code.location).startsWith ("#SOUL"))
             result.push_back (code);
     }
 
@@ -268,7 +268,7 @@ Program Compiler::link (CompileMessageList& messageList, const BuildSettings& se
 
         reset();
 
-        SOUL_LOG (program.getMainProcessor().originalFullName + ": linked HEART",
+        SOUL_LOG (program.getMainProcessor().getReadableName() + ": linked HEART",
                   [&] { return program.toHEART(); });
 
         heart::Checker::testHEARTRoundTrip (program);

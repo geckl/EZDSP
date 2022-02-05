@@ -112,47 +112,57 @@ CodeLocation SourceCodeUtilities::findNextOccurrence (CodeLocation start, char c
     }
 }
 
-pool_ptr<AST::ASTObject> SourceCodeUtilities::findASTObjectAt (ArrayView<pool_ref<AST::ModuleBase>> modulesToSearch,
-                                                               CodeLocation targetLocation)
+struct AllObjectVisitor  : public ASTVisitor
 {
-    struct FindLocationVisitor  : public ASTVisitor
+    void visitObject (AST::ASTObject& o) override    { ASTVisitor::visitObject (o); checkObject (o); }
+    void visitObject (AST::ModuleBase& m) override   { ASTVisitor::visitObject (m); checkObject (m); }
+    void visitObject (AST::Expression& e) override   { ASTVisitor::visitObject (e); checkObject (e); }
+    void visitObject (AST::Statement& s) override    { ASTVisitor::visitObject (s); checkObject (s); }
+
+    virtual void checkObject (AST::ASTObject&) = 0;
+};
+
+std::vector<pool_ref<AST::ASTObject>> SourceCodeUtilities::findASTObjectsAt (choc::span<pool_ref<AST::ModuleBase>> modulesToSearch,
+                                                                             CodeLocation targetLocation)
+{
+    struct FindLocationVisitor  : public AllObjectVisitor
     {
-        void visitObject (AST::ASTObject& o) override
+        void checkObject (AST::ASTObject& o) override
         {
-            ASTVisitor::visitObject (o);
+            if (target.location > o.context.location.location)
+                return;
 
-            auto distance = target - o.context.location.location.getAddress();
+            try
+            {
+                SimpleTokeniser tokeniser (o.context.location, false);
 
-            if (distance == 0
-                 || (distance > 0
-                      && result != nullptr
-                      && distance < target - result->context.location.location.getAddress()))
-                result = o;
+                if (! tokeniser.matches (Token::eof))
+                    tokeniser.skip();
+
+                if (target.location.data() < tokeniser.location.location.data())
+                    results.push_back (o);
+            }
+            catch (const AbortCompilationException&) {}
         }
 
-        const char* target = nullptr;
-        pool_ptr<AST::ASTObject> result;
+        CodeLocation target;
+        std::vector<pool_ref<AST::ASTObject>> results;
     };
 
     FindLocationVisitor v;
-    v.target = targetLocation.location.getAddress();
+    v.target = targetLocation;
 
     for (auto& m : modulesToSearch)
-    {
         v.ASTVisitor::visitObject (m.get());
 
-        if (v.result != nullptr)
-            break;
-    }
-
-    return v.result;
+    return v.results;
 }
 
 CodeLocationRange SourceCodeUtilities::findRangeOfASTObject (AST::ASTObject& object)
 {
-    struct FindLexicalRangeVisitor  : public ASTVisitor
+    struct FindLexicalRangeVisitor  : public AllObjectVisitor
     {
-        void visitObject (AST::ASTObject& o) override
+        void checkObject (AST::ASTObject& o) override
         {
             ASTVisitor::visitObject (o);
 
@@ -230,7 +240,7 @@ std::string SourceCodeUtilities::getFileSummaryTitle (const Comment& summary)
     {
         auto firstLine = choc::text::trim (summary.lines[0]);
 
-        if (choc::text::startsWith (toLowerCase (firstLine), "title:"))
+        if (choc::text::startsWith (choc::text::toLowerCase (firstLine), "title:"))
         {
             auto title = choc::text::trim (firstLine.substr (6));
 
@@ -250,7 +260,7 @@ std::string SourceCodeUtilities::getFileSummaryBody (const Comment& summary)
     {
         auto firstLine = choc::text::trim (summary.lines[0]);
 
-        if (choc::text::startsWith (toLowerCase (firstLine), "title:"))
+        if (choc::text::startsWith (choc::text::toLowerCase (firstLine), "title:"))
         {
             auto lines = summary.lines;
             lines.erase (lines.begin());
@@ -258,7 +268,7 @@ std::string SourceCodeUtilities::getFileSummaryBody (const Comment& summary)
             while (! lines.empty() && lines.front().empty())
                 lines.erase (lines.begin());
 
-            return joinStrings (lines, "\n");
+            return choc::text::joinStrings (lines, "\n");
         }
     }
 
@@ -291,7 +301,7 @@ CodeLocation SourceCodeUtilities::findStartOfPrecedingComment (CodeLocation loca
     {
         auto fileStart = prevLineStart.sourceCode->utf8;
         auto start = prevLineStart;
-        start.location += static_cast<int> (choc::text::trimEnd (prevLine).length() - 2);
+        start.location += choc::text::trimEnd (prevLine).length() - 2;
 
         if (start.location > fileStart + 1)
         {
@@ -320,10 +330,10 @@ SourceCodeUtilities::Comment SourceCodeUtilities::parseComment (CodeLocation pos
         return {};
 
     Comment result;
-    pos.location = pos.location.findEndOfWhitespace();
+    pos.location = findEndOfWhitespace (pos.location);
     result.range.start = pos;
 
-    if (pos.location.advanceIfStartsWith ("/*"))
+    if (pos.location.skipIfStartsWith ("/*"))
     {
         result.valid = true;
         result.isStarSlash = true;
@@ -334,7 +344,7 @@ SourceCodeUtilities::Comment SourceCodeUtilities::parseComment (CodeLocation pos
             ++(pos.location);
         }
     }
-    else if (pos.location.advanceIfStartsWith ("//"))
+    else if (pos.location.skipIfStartsWith ("//"))
     {
         result.valid = true;
         result.isStarSlash = false;
@@ -350,7 +360,7 @@ SourceCodeUtilities::Comment SourceCodeUtilities::parseComment (CodeLocation pos
         return {};
     }
 
-    if (pos.location.advanceIfStartsWith ("<"))
+    if (pos.location.skipIfStartsWith ("<"))
         result.isReferringBackwards = true;
 
     while (*pos.location == ' ')
@@ -360,14 +370,14 @@ SourceCodeUtilities::Comment SourceCodeUtilities::parseComment (CodeLocation pos
     {
         auto closeComment = pos.location.find ("*/");
 
-        if (closeComment.isEmpty())
+        if (closeComment.empty())
             return {};
 
-        result.lines = choc::text::splitIntoLines (std::string (pos.location.getAddress(),
-                                                                closeComment.getAddress()),
+        result.lines = choc::text::splitIntoLines (std::string (pos.location.data(),
+                                                                closeComment.data()),
                                                    false);
 
-        auto firstLineIndent = pos.location.getAddress() - pos.getStartOfLine().location.getAddress();
+        auto firstLineIndent = pos.location.data() - pos.getStartOfLine().location.data();
 
         for (auto& l : result.lines)
         {
@@ -481,8 +491,8 @@ void SourceCodeUtilities::iterateSyntaxTokens (CodeLocation start,
 
             if (newType != currentTokenType)
             {
-                std::string_view tokenText (currentSectionStart.getAddress(),
-                                            static_cast<size_t> (newPos.getAddress() - currentSectionStart.getAddress()));
+                std::string_view tokenText (currentSectionStart.data(),
+                                            static_cast<size_t> (newPos.data() - currentSectionStart.data()));
 
                 if (! tokenText.empty())
                     if (! handleToken (tokenText, currentTokenType))
@@ -497,9 +507,31 @@ void SourceCodeUtilities::iterateSyntaxTokens (CodeLocation start,
     }
     catch (const AbortCompilationException&) {}
 
-    if (currentSectionStart.isNotEmpty())
-        handleToken (currentSectionStart.getAddress(), currentTokenType);
+    if (! currentSectionStart.empty())
+        handleToken (currentSectionStart.data(), currentTokenType);
 }
 
+std::vector<std::string> SourceCodeUtilities::getCommonCodeCompletionStrings()
+{
+    std::vector<std::string> results;
+    results.reserve (128);
+
+   #define SOUL_GET_KEYWORD(name, str) results.push_back (str);
+    SOUL_KEYWORDS (SOUL_GET_KEYWORD)
+   #undef SOUL_GET_KEYWORD
+
+    appendVector (results, getListOfCallableIntrinsicsAndConstants());
+
+    std::sort (results.begin(), results.end(),
+               [] (const std::string& s1, const std::string& s2) -> bool
+               {
+                   if (s1.length() != s2.length())
+                       return s1.length() < s2.length();
+
+                   return choc::text::toLowerCase (s1) < choc::text::toLowerCase (s2);
+               });
+
+    return results;
+}
 
 } // namespace soul

@@ -43,7 +43,7 @@ namespace Keyword
 
     struct Matcher
     {
-        static TokenType match (int len, UTF8Reader p) noexcept
+        static TokenType match (int len, choc::text::UTF8Pointer p) noexcept
         {
             #define SOUL_COMPARE_KEYWORD(name, str) if (len == (int) sizeof (str) - 1 && p.startsWith (str)) return name;
             SOUL_KEYWORDS (SOUL_COMPARE_KEYWORD)
@@ -56,7 +56,7 @@ namespace Keyword
 //==============================================================================
 struct StandardOperatorMatcher
 {
-    static TokenType match (UTF8Reader& text) noexcept
+    static TokenType match (choc::text::UTF8Pointer& text) noexcept
     {
         auto p = text;
         #define SOUL_COMPARE_OPERATOR(name, str) if (p.startsWith (str)) { text = p + (sizeof (str) - 1); return Operator::name; }
@@ -128,11 +128,6 @@ private:
     AST::Allocator& allocator;
     pool_ptr<AST::ModuleBase> module;
     AST::Scope* currentScope;
-
-    // Bit of a bodge here as a simple way to parse things like float<2 + 2>, this
-    // just forces the parser to ignore any > tokens when parsing an expression. Could be
-    // done more elegantly in future...
-    int ignoreGreaterThanToken = 0;
 
     enum class ParseTypeContext
     {
@@ -1022,9 +1017,6 @@ private:
                                              Identifier name, const AST::Context& nameLocation,
                                              std::vector<pool_ref<AST::UnqualifiedName>> genericWildcards)
     {
-        if (AST::isResolvedAsType (returnType) && returnType.getConstness() == AST::Constness::definitelyConst)
-            throwError (Errors::functionReturnTypeCannotBeConst());
-
         auto& f = allocate<AST::Function> (context);
         ScopedScope scope (*this, f);
 
@@ -1174,6 +1166,15 @@ private:
     {
         pool_ptr<AST::Expression> result;
         catchParseErrors ([this, &result] { result = parseExpression(); });
+        return result;
+    }
+
+    pool_ptr<AST::Expression> tryToParseChvronExpressionIgnoringErrors()
+    {
+        pool_ptr<AST::Expression> result;
+
+        catchParseErrors ([this, &result] { result = parseShiftOperator(); });
+
         return result;
     }
 
@@ -1340,8 +1341,10 @@ private:
     {
         for (pool_ref<AST::Expression> a = parseShiftOperator();;)
         {
-            if (! (matchesAny (Operator::lessThan, Operator::lessThanOrEqual, Operator::greaterThanOrEqual)
-                    || (matches (Operator::greaterThan) && ignoreGreaterThanToken == 0)))
+            if (! matchesAny (Operator::lessThan,
+                              Operator::lessThanOrEqual,
+                              Operator::greaterThanOrEqual,
+                              Operator::greaterThan))
                 return a;
 
             auto context = getContext();
@@ -1700,9 +1703,7 @@ private:
         if (! matchIf (Operator::lessThan))
             return parseArrayTypeSuffixes (elementType, parseContext);
 
-        ++ignoreGreaterThanToken;
-        auto size = tryToParseExpressionIgnoringErrors();
-        --ignoreGreaterThanToken;
+        auto size = tryToParseChvronExpressionIgnoringErrors();
 
         if (size == nullptr || ! matchIf (Operator::greaterThan))
         {

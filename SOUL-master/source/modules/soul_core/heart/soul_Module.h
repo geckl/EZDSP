@@ -36,7 +36,7 @@ public:
         Functions (Module& m) : module (m) {}
 
         size_t size() const;
-        ArrayView<pool_ref<heart::Function>> get() const;
+        choc::span<pool_ref<heart::Function>> get() const;
         pool_ptr<heart::Function> findRunFunction() const;
         heart::Function& getRunFunction() const;
         heart::Function& get (std::string_view name) const;
@@ -63,10 +63,16 @@ public:
     {
     public:
         size_t size() const;
-        ArrayView<pool_ref<heart::Variable>> get() const;
+        choc::span<pool_ref<heart::Variable>> get() const;
         pool_ptr<heart::Variable> find (std::string_view name) const;
         void add (heart::Variable&);
         void clear();
+
+        template <typename Predicate>
+        inline bool removeIf (Predicate&& pred)
+        {
+            return soul::removeIf (stateVariables, pred);
+        }
 
     private:
         ArrayWithPreallocation<pool_ref<heart::Variable>, 32> stateVariables;
@@ -77,7 +83,7 @@ public:
     {
     public:
         size_t size() const;
-        ArrayView<StructurePtr> get() const;
+        choc::span<StructurePtr> get() const;
         Structure& add (std::string name);
         Structure& add (Structure&);
         Structure& addCopy (Structure&);
@@ -106,7 +112,9 @@ public:
 
     std::string shortName;          ///< The unqualified module name without a namespace
     std::string fullName;           ///< The fully-qualified name, with all namespace levels, including the root
-    std::string originalFullName;   ///< The fully-qualified name as a user would expect to see it, without a root or other manglings
+    std::string originalFullName;   ///< The fully-qualified name
+
+    std::string getReadableName() const;    ///< Returns a cleaned-up, user-readable version of this module's name
 
     std::vector<pool_ref<heart::InputDeclaration>> inputs;
     std::vector<pool_ref<heart::OutputDeclaration>> outputs;
@@ -164,7 +172,7 @@ private:
     Module (Program&, ModuleType);
     Module (Program&, const Module& toClone);
 
-    friend class PoolAllocator;
+    friend class choc::memory::Pool;
 
     static Module& createProcessor (Program&);
     static Module& createGraph     (Program&);

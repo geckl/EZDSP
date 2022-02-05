@@ -20,6 +20,7 @@
 #include "../SOUL-master/include/soul/soul_patch.h"
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
 #include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
+//#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_AudioProcessor.h"
 #include "../SOUL-overrides/soul_patch_AudioProcessor.h"
 
 #include "../JuceLibraryCode/BinaryData.h"
@@ -136,7 +137,6 @@ public:
 
     ~EZDSPPlugin() override
     {
-        //tempCode.get
         plugin.reset();
         patchInstance = nullptr;
     }
@@ -255,6 +255,15 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override
     {
         return plugin == nullptr || plugin->isBusesLayoutSupported (layouts);
+    }
+    
+    void processorLayoutsChanged() override
+    {
+        //DBG("Layouts changed!");
+        if(plugin != nullptr)
+        {
+            plugin->setBusesLayout(getBusesLayout());
+        }
     }
 
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
@@ -599,12 +608,7 @@ public:
                 if(helpWindow == nullptr)
                 {
                     DBG("Open Help Window");
-                    helpWindow = new EzdspHelp("EZDSP Help");
-                    helpWindow->setUsingNativeTitleBar(true);
-                    helpWindow->centreWithSize(pluginEditor->getWidth(), pluginEditor->getHeight());
-                    helpWindow->setAlwaysOnTop(true);
-                    helpWindow->setVisible(true);
-                    //helpWindow->goToURL("https://www.ezdsp.com/help");
+                    helpWindow = new EzdspHelp("EZDSP Help", getWidth(), getHeight());
                 }
                 else
                 {
@@ -622,7 +626,7 @@ public:
         juce::EzdspTokeniser ezdspTokenizer;
         juce::CodeEditorComponent codeWindow{owner.dspCode, &ezdspTokenizer };
         juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
-        juce::Component::SafePointer<juce::TopLevelWindow> helpWindow;
+        juce::Component::SafePointer<juce::DocumentWindow> helpWindow;
         juce::TextButton runCode,addGUI,getHelp;
     };
     

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="ZCSwuw" name="EZDSP" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginFormats="buildAU,buildStandalone,buildVST3"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginFormats="buildAU,buildVST3"
               pluginVSTCategory="kPlugCategUnknown" cppLanguageStandard="17"
-              defines="JUCE_DISABLE_JUCE_VERSION_PRINTING=1&#10;JUCE_DISPLAY_SPLASH_SCREEN=0&#10;DONT_SET_USING_JUCE_NAMESPACE=1"
+              defines="JUCE_DISABLE_JUCE_VERSION_PRINTING=1&#10;JUCE_DISPLAY_SPLASH_SCREEN=0&#10;DONT_SET_USING_JUCE_NAMESPACE=1&#10;JUCE_DISABLE_CAUTIOUS_PARAMETER_ID_CHECKING=1"
               companyName="Squatch Sounds" companyWebsite="www.garretteckl.com"
               projectLineFeed="&#10;" pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
               bundleIdentifier="dev.squatchsounds.EZDSP" displaySplashScreen="1">
@@ -21,6 +21,7 @@
               file="Source/Utils/EzdspCodeTokenizer.cpp"/>
         <FILE id="aOT0Qh" name="EzdspCodeTokenizer.h" compile="0" resource="0"
               file="Source/Utils/EzdspCodeTokenizer.h"/>
+        <FILE id="hHUleF" name="Vectors.cpp" compile="1" resource="0" file="Source/Utils/Vectors.cpp"/>
         <FILE id="xQgHje" name="Vectors.h" compile="0" resource="0" file="Source/Utils/Vectors.h"/>
       </GROUP>
       <GROUP id="{3FFB8025-A835-E444-C647-94B8850FA675}" name="ComponentTypes">

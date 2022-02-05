@@ -1,0 +1,168 @@
+/*
+    _____ _____ _____ __
+   |   __|     |  |  |  |      The SOUL language
+   |__   |  |  |  |  |  |__    Copyright (c) 2019 - ROLI Ltd.
+   |_____|_____|_____|_____|
+
+   The code in this file is provided under the terms of the ISC license:
+
+   Permission to use, copy, modify, and/or distribute this software for any purpose
+   with or without fee is hereby granted, provided that the above copyright notice and
+   this permission notice appear in all copies.
+
+   THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD
+   TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN
+   NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+   DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+   IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+   CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+
+## function
+
+bool near (float64 f1, float64 f2)
+{
+    return abs (f1 - f2) < 0.00000001;
+}
+
+bool check1 (const float64[12]& coefs, float64 c1, float64 c2, float64 c3, float64 c4, float64 c5, float64 c6)
+{
+    return  near (coefs[0], c1) &&
+            near (coefs[2], c2) &&
+            near (coefs[4], c3) &&
+            near (coefs[6], c4) &&
+            near (coefs[8], c5) &&
+            near (coefs[10], c6);
+}
+
+bool check2 (const float64[12]& coefs, float64 c1, float64 c2, float64 c3, float64 c4, float64 c5, float64 c6)
+{
+    return  near (coefs[1], c1) &&
+            near (coefs[3], c2) &&
+            near (coefs[5], c3) &&
+            near (coefs[7], c4) &&
+            near (coefs[9], c5) &&
+            near (coefs[11], c6);
+}
+
+bool test_11025()
+{
+    let transition = 2 * 20.0 / 11025.0;
+
+    let c = soul::filters::analytic::polyphase_iir_design::compute (transition);
+
+    return check1 (c.coeffs, 0.05300596123071753957, 0.36782134340288685781, 0.68077555669154810047, 0.86120132426594742103, 0.94496127698513132653, 0.98276350444409132923) &&
+           check2 (c.coeffs, 0.19122135220724853499, 0.53911002190709766957, 0.78676642779662142591, 0.91152890470922764976, 0.96727404497147118079, 0.99462141640869106141);
+}
+
+bool test_44100()
+{
+    let transition = 2 * 20.0 / 44100.0;
+
+    let c = soul::filters::analytic::polyphase_iir_design::compute (transition);
+
+    return check1 (c.coeffs, 0.07953597068282830529, 0.49166607647985011154, 0.80207540068172422654, 0.93332158760939576414, 0.97892197623921384242, 0.99441088105986041867) &&
+           check2 (c.coeffs, 0.27299246845856844912, 0.67385471864342094683, 0.88392180393340147315, 0.96223265392866863532, 0.98859401404889180043, 0.99832609558682605666);
+}
+
+
+## compile
+
+graph StereoTester [[ main ]]
+{
+    input stream float32 in;
+    output stream float32 out;
+    input filter.frequencyIn;
+
+    namespace OnePole = soul::filters (float32)::onepole;
+    let filter = OnePole::Processor;
+
+    connection
+    {
+        in -> filter.in;
+        filter.out -> out;
+    }
+}
+
+## compile
+
+graph StereoTester [[ main ]]
+{
+    input stream float32<2> in;
+    output stream float32<2> out;
+    input filter.frequencyIn;
+
+    namespace OnePole = soul::filters (float32<2>)::onepole;
+    let filter = OnePole::Processor;
+
+    connection
+    {
+        in -> filter.in;
+        filter.out -> out;
+    }
+}
+
+## compile
+
+namespace constants
+{
+    let coeffs = float32[6] (1, 2, 3, 4, 5, 6);
+}
+
+graph Test [[ main ]]
+{
+    output stream float32 out32;
+    output stream float64 out64;
+
+    let filter32_64 = FilterTest (float32, float64)::TestOutput;
+    let filter64_64 = FilterTest (float64, float64)::TestOutput;
+    let filter32_32 = FilterTest (float32, float32)::TestOutput;
+    let filter64_32 = FilterTest (float64, float32)::TestOutput;
+
+    connection
+    {
+        filter32_64.out -> out32;
+        filter64_64.out -> out64;
+        filter32_32.out -> out32;
+        filter64_32.out -> out64;
+    }
+}
+
+namespace FilterTest (using SampleType, using CoeffType)
+{
+    graph TestOutput
+    {
+        input stream SampleType in;
+        output stream SampleType out;
+
+        let dcBlocker           = soul::filters (SampleType, CoeffType)::dc_blocker::Processor;
+        let onePole             = soul::filters (SampleType, CoeffType)::onepole::Processor;
+        let rbjEq               = soul::filters (SampleType, CoeffType)::rbj_eq::Processor;
+        let sosCascade          = soul::filters (SampleType, CoeffType)::sos_cascade::Processor (constants::coeffs);
+        let butterworth         = soul::filters (SampleType, CoeffType)::butterworth::Processor (2);
+        let analytic            = soul::filters (SampleType, CoeffType)::analytic::Processor;
+        let complexResonator    = soul::filters (SampleType, CoeffType)::complex_resonator::Processor;
+        let tptOnepole          = soul::filters (SampleType, CoeffType)::tpt::onepole::Processor;
+        let tptSvf              = soul::filters (SampleType, CoeffType)::tpt::svf::Processor;
+        let tptButterworth      = soul::filters (SampleType, CoeffType)::tpt::butterworth::Processor (3);
+        let tptCrossover        = soul::filters (SampleType, CoeffType)::tpt::crossover::Processor;
+        let tptSimper           = soul::filters (SampleType, CoeffType)::tpt::simper_eq::Processor;
+
+        connection
+        {
+            in -> dcBlocker -> out;
+
+            onePole.out                 -> out;
+            rbjEq.out                   -> out;
+            sosCascade.out              -> out;
+            butterworth.out             -> out;
+            analytic.realOut            -> out;
+            complexResonator.realOut    -> out;
+            tptOnepole.out              -> out;
+            tptSvf.lowpassOut           -> out;
+            tptButterworth.out          -> out;
+            tptCrossover.lowOut         -> out;
+            tptSimper.out               -> out;
+        }
+    }
+}

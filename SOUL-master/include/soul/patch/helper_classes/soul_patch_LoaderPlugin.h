@@ -441,7 +441,9 @@ private:
         auto pluginSibling = pluginDLL.getSiblingFile (dllName);
 
         if (pluginSibling.exists())
+        {
             return pluginSibling.getFullPathName();
+        }
 
        #if JUCE_MAC
         auto insideBundle = pluginDLL.getChildFile ("Contents/Resources").getChildFile (dllName);
@@ -455,7 +457,7 @@ private:
 
         if (inAppData.exists())
             return inAppData.getFullPathName();
-
+        
         return dllName;
     }
 
@@ -470,7 +472,11 @@ private:
                 library = std::make_unique<soul::patch::SOULPatchLibrary> (patchLoaderLibraryPath.c_str());
 
                 if (library->loadedSuccessfully())
+                {
                     loadedPath = patchLoaderLibraryPath;
+                    DBG("Loaded Succesfully!");
+                }
+                    
                 else
                     library.reset();
             }

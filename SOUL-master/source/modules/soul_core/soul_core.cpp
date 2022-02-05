@@ -32,11 +32,15 @@
 #include <fstream>
 #include <cctype>
 #include <cwctype>
+#include <future>
 
 #include "soul_core.h"
 
 #include "../../../include/soul/3rdParty/choc/text/choc_JSON.h"
 #include "../../../include/soul/3rdParty/choc/text/choc_HTML.h"
+#include "../../../include/soul/3rdParty/choc/audio/choc_Oscillators.h"
+
+#include "../../../include/soul/patch/helper_classes/soul_patch_Utilities.h"
 
 #if SOUL_INTEL
  #include <xmmintrin.h>
@@ -60,9 +64,9 @@
 
 #include "utilities/soul_Tokeniser.h"
 #include "utilities/soul_StringUtilities.cpp"
-#include "utilities/soul_UTF8Reader.cpp"
 #include "utilities/soul_MiscUtilities.cpp"
 #include "utilities/soul_AudioDataGeneration.cpp"
+#include "utilities/soul_AudioFiles.cpp"
 #include "types/soul_Struct.cpp"
 #include "types/soul_StringDictionary.cpp"
 #include "types/soul_ConstantTable.cpp"
@@ -72,7 +76,7 @@
 #include "types/soul_EndpointType.cpp"
 #include "heart/soul_heart_Printer.h"
 #include "heart/soul_heart_Parser.h"
-#include "heart/soul_heart_Checker.h"
+#include "heart/soul_heart_Checker.cpp"
 #include "types/soul_Type.cpp"
 #include "compiler/soul_StandardLibrary.h"
 #include "compiler/soul_ASTVisitor.h"
@@ -93,11 +97,17 @@
 #include "diagnostics/soul_CompileMessageList.cpp"
 #include "diagnostics/soul_Timing.cpp"
 #include "venue/soul_Endpoints.cpp"
+#include "test/soul_TestFileParser.cpp"
 
 #include "documentation/soul_SourceCodeUtilities.cpp"
 #include "documentation/soul_SourceCodeOperations.cpp"
 #include "documentation/soul_SourceCodeModel.cpp"
 #include "documentation/soul_HTMLGeneration.cpp"
+
+#include "code_generation/soul_CPPGenerator_resources.h"
+#include "code_generation/soul_CPPGenerator.cpp"
+#include "code_generation/soul_JUCEProjectGenerator.cpp"
+#include "code_generation/soul_PatchGenerator.cpp"
 
 #ifdef __clang__
  #pragma clang diagnostic pop

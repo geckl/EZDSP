@@ -162,11 +162,11 @@ struct AST
 
         void clear()
         {
-            pool.clear();
+            pool.reset();
             identifiers.clear();
         }
 
-        PoolAllocator pool;
+        choc::memory::Pool pool;
         Identifier::Pool identifiers;
         StringDictionary stringDictionary;
     };
@@ -191,10 +191,9 @@ struct AST
                 {
                     if (f->originalCallLeadingToSpecialisation != nullptr)
                     {
-                        CompileMessage error { "Failed to instantiate generic function "
-                                                  + f->originalCallLeadingToSpecialisation->getDescription (f->originalGenericFunction->name),
-                                               f->originalCallLeadingToSpecialisation->context.location,
-                                               CompileMessage::Type::error };
+                        auto error = CompileMessage::createError ("Failed to instantiate generic function "
+                                                                    + f->originalCallLeadingToSpecialisation->getDescription (f->originalGenericFunction->name),
+                                                                  f->originalCallLeadingToSpecialisation->context.location);
 
                         if (location.sourceCode->isInternal)
                         {
@@ -205,11 +204,11 @@ struct AST
                             else
                                 error.description += ", error: " + message.description;
 
-                            messages.messages.push_back (error);
+                            messages.messages.push_back (std::move (error));
                         }
                         else
                         {
-                            messages.messages.insert (messages.messages.begin(), error);
+                            messages.messages.insert (messages.messages.begin(), std::move (error));
                         }
 
                         p = f->originalCallLeadingToSpecialisation->context.parentScope;
@@ -378,14 +377,14 @@ struct AST
             return {};
         }
 
-        virtual ArrayView<pool_ref<VariableDeclaration>>        getVariables() const            { return {}; }
-        virtual ArrayView<pool_ref<Function>>                   getFunctions() const            { return {}; }
-        virtual ArrayView<pool_ref<StructDeclaration>>          getStructDeclarations() const   { return {}; }
-        virtual ArrayView<pool_ref<UsingDeclaration>>           getUsingDeclarations() const    { return {}; }
-        virtual ArrayView<pool_ref<NamespaceAliasDeclaration>>  getNamespaceAliases() const     { return {}; }
-        virtual ArrayView<pool_ref<ModuleBase>>                 getSubModules() const           { return {}; }
-        virtual ArrayView<pool_ref<ProcessorAliasDeclaration>>  getProcessorAliases() const     { return {}; }
-        virtual ArrayView<pool_ref<ProcessorInstance>>          getProcessorInstances() const   { return {}; }
+        virtual choc::span<pool_ref<VariableDeclaration>>        getVariables() const            { return {}; }
+        virtual choc::span<pool_ref<Function>>                   getFunctions() const            { return {}; }
+        virtual choc::span<pool_ref<StructDeclaration>>          getStructDeclarations() const   { return {}; }
+        virtual choc::span<pool_ref<UsingDeclaration>>           getUsingDeclarations() const    { return {}; }
+        virtual choc::span<pool_ref<NamespaceAliasDeclaration>>  getNamespaceAliases() const     { return {}; }
+        virtual choc::span<pool_ref<ModuleBase>>                 getSubModules() const           { return {}; }
+        virtual choc::span<pool_ref<ProcessorAliasDeclaration>>  getProcessorAliases() const     { return {}; }
+        virtual choc::span<pool_ref<ProcessorInstance>>          getProcessorInstances() const   { return {}; }
 
         //==============================================================================
         struct NameSearch
@@ -596,10 +595,10 @@ struct AST
             return *processorNamespace;
         }
 
-        virtual ArrayView<pool_ref<ASTObject>>                 getSpecialisationParameters() const   { return specialisationParams; }
-        virtual ArrayView<pool_ref<EndpointDeclaration>>       getEndpoints() const                  { return {}; }
-        ArrayView<pool_ref<UsingDeclaration>>                  getUsingDeclarations() const override { return usings; }
-        ArrayView<pool_ref<NamespaceAliasDeclaration>>         getNamespaceAliases() const override  { return namespaceAliases; }
+        virtual choc::span<pool_ref<ASTObject>>                getSpecialisationParameters() const   { return specialisationParams; }
+        virtual choc::span<pool_ref<EndpointDeclaration>>      getEndpoints() const                  { return {}; }
+        choc::span<pool_ref<UsingDeclaration>>                 getUsingDeclarations() const override { return usings; }
+        choc::span<pool_ref<NamespaceAliasDeclaration>>        getNamespaceAliases() const override  { return namespaceAliases; }
 
         virtual std::vector<pool_ref<VariableDeclaration>>&    getStateVariableList() = 0;
         virtual std::vector<pool_ref<Function>>*               getFunctionList() = 0;
@@ -719,7 +718,7 @@ struct AST
 
         ProcessorBase* getAsProcessor() override        { return this; }
 
-        ArrayView<pool_ref<EndpointDeclaration>>  getEndpoints() const override                   { return endpoints; }
+        choc::span<pool_ref<EndpointDeclaration>>  getEndpoints() const override        { return endpoints; }
 
         template <typename StringType>
         pool_ptr<EndpointDeclaration> findEndpoint (const StringType& nameToFind, bool isInput) const
@@ -766,9 +765,9 @@ struct AST
 
         bool isProcessor() const override   { return true; }
 
-        ArrayView<pool_ref<VariableDeclaration>>     getVariables() const override           { return stateVariables; }
-        ArrayView<pool_ref<Function>>                getFunctions() const override           { return functions; }
-        ArrayView<pool_ref<StructDeclaration>>       getStructDeclarations() const override  { return structures; }
+        choc::span<pool_ref<VariableDeclaration>>    getVariables() const override           { return stateVariables; }
+        choc::span<pool_ref<Function>>               getFunctions() const override           { return functions; }
+        choc::span<pool_ref<StructDeclaration>>      getStructDeclarations() const override  { return structures; }
 
         std::vector<pool_ref<VariableDeclaration>>&  getStateVariableList() override         { return stateVariables; }
         std::vector<pool_ref<Function>>*             getFunctionList() override              { return &functions; }
@@ -818,12 +817,12 @@ struct AST
 
         bool isGraph() const override                                                           { return true; }
 
-        ArrayView<pool_ref<ProcessorAliasDeclaration>> getProcessorAliases() const override     { return processorAliases; }
-        ArrayView<pool_ref<VariableDeclaration>>       getVariables() const override            { return constants; }
-        ArrayView<pool_ref<ProcessorInstance>>         getProcessorInstances() const override   { return processorInstances; }
+        choc::span<pool_ref<ProcessorAliasDeclaration>> getProcessorAliases() const override     { return processorAliases; }
+        choc::span<pool_ref<VariableDeclaration>>       getVariables() const override            { return constants; }
+        choc::span<pool_ref<ProcessorInstance>>         getProcessorInstances() const override   { return processorInstances; }
 
-        std::vector<pool_ref<VariableDeclaration>>&    getStateVariableList() override          { return constants; }
-        std::vector<pool_ref<Function>>*               getFunctionList() override               { return {}; }
+        std::vector<pool_ref<VariableDeclaration>>&     getStateVariableList() override          { return constants; }
+        std::vector<pool_ref<Function>>*                getFunctionList() override               { return {}; }
 
         std::vector<pool_ref<ProcessorInstance>> processorInstances;
         std::vector<pool_ref<Connection>> connections;
@@ -891,13 +890,13 @@ struct AST
         bool isNamespace() const override                                              { return true; }
         Namespace* getAsNamespace() override                                           { return this; }
 
-        ArrayView<pool_ref<VariableDeclaration>> getVariables() const override         { return constants; }
-        ArrayView<pool_ref<Function>> getFunctions() const override                    { return functions; }
-        ArrayView<pool_ref<StructDeclaration>> getStructDeclarations() const override  { return structures; }
-        ArrayView<pool_ref<ModuleBase>> getSubModules() const override                 { return subModules; }
+        choc::span<pool_ref<VariableDeclaration>> getVariables() const override         { return constants; }
+        choc::span<pool_ref<Function>> getFunctions() const override                    { return functions; }
+        choc::span<pool_ref<StructDeclaration>> getStructDeclarations() const override  { return structures; }
+        choc::span<pool_ref<ModuleBase>> getSubModules() const override                 { return subModules; }
 
-        std::vector<pool_ref<Function>>* getFunctionList() override                    { return &functions; }
-        std::vector<pool_ref<VariableDeclaration>>& getStateVariableList() override    { return constants; }
+        std::vector<pool_ref<Function>>* getFunctionList() override                     { return &functions; }
+        std::vector<pool_ref<VariableDeclaration>>& getStateVariableList() override     { return constants; }
 
         ImportsList importsList;
         std::vector<pool_ref<Function>> functions;
@@ -1199,7 +1198,7 @@ struct AST
 
             for (auto& e : p.getEndpoints())
             {
-                if (!e->isConsoleEndpoint && e->isInput == wantInput)
+                if (! e->isConsoleEndpoint && e->isInput == wantInput)
                 {
                     if (found != nullptr)
                         errorContext.throwError (Errors::mustBeOnlyOneEndpoint());
@@ -1326,8 +1325,8 @@ struct AST
             return types;
         }
 
-        Scope* getParentScope() const override                                       { return ASTObject::getParentScope(); }
-        ArrayView<pool_ref<UsingDeclaration>> getUsingDeclarations() const override  { return genericSpecialisations; }
+        Scope* getParentScope() const override                                        { return ASTObject::getParentScope(); }
+        choc::span<pool_ref<UsingDeclaration>> getUsingDeclarations() const override  { return genericSpecialisations; }
 
         void performLocalNameSearch (NameSearch& search, const Statement*) const override
         {
@@ -1385,7 +1384,7 @@ struct AST
             Context nameLocation;
         };
 
-        ArrayView<Member> getMembers() const     { return members; }
+        choc::span<Member> getMembers() const     { return members; }
 
         void addMember (Expression& type, const Context& nameLocation, Identifier memberName)
         {
@@ -2195,7 +2194,7 @@ struct AST
                 SOUL_ASSERT (! argTypes.empty());
 
                 return TokenisedPathString::join (argTypes.front().getDescription(), name)
-                        + heart::Utilities::getDescriptionOfTypeList (ArrayView<Type> (argTypes).tail(), true);
+                        + heart::Utilities::getDescriptionOfTypeList (choc::span<Type> (argTypes).tail(), true);
             }
 
             return name + heart::Utilities::getDescriptionOfTypeList (argTypes, true);
@@ -2422,7 +2421,7 @@ struct AST
         {
             if (object->getResultType().isUnsizedArray())
                 return false;
-            
+
             return object->isAssignable();
         }
 

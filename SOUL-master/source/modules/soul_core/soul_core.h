@@ -70,6 +70,7 @@
 
 #define CHOC_ASSERT(x)  SOUL_ASSERT(x)
 
+#include "../../../include/soul/3rdParty/choc/containers/choc_Span.h"
 #include "../../../include/soul/3rdParty/choc/containers/choc_Value.h"
 #include "../../../include/soul/3rdParty/choc/text/choc_StringUtilities.h"
 #include "../../../include/soul/3rdParty/choc/text/choc_JSON.h"
@@ -78,6 +79,7 @@
 #include "../../../include/soul/3rdParty/choc/text/choc_CodePrinter.h"
 #include "../../../include/soul/3rdParty/choc/containers/choc_DirtyList.h"
 #include "../../../include/soul/3rdParty/choc/containers/choc_VariableSizeFIFO.h"
+#include "../../../include/soul/3rdParty/choc/containers/choc_PoolAllocator.h"
 #include "../../../include/soul/common/soul_ProgramDefinitions.h"
 #include "../../../include/soul/common/soul_DumpConstant.h"
 
@@ -86,7 +88,7 @@
 //==============================================================================
 namespace soul
 {
-    static inline constexpr Version getLibraryVersion()                   { return { 0, 9, 0 }; }
+    static inline constexpr Version getLibraryVersion()                   { return { 1, 0, 0 }; }
     static inline constexpr int64_t getHEARTFormatVersion()               { return 1; }
     static inline constexpr const char* getHEARTFormatVersionPrefix()     { return "SOUL"; }
 
@@ -105,12 +107,9 @@ namespace soul
 #include "utilities/soul_RefCountedObject.h"
 #include "utilities/soul_ArrayWithPreallocation.h"
 #include "utilities/soul_StringUtilities.h"
-#include "utilities/soul_UTF8Reader.h"
 #include "utilities/soul_Identifier.h"
 #include "utilities/soul_ObjectHandleList.h"
 #include "utilities/soul_PoolAllocator.h"
-#include "utilities/soul_FIFO.h"
-#include "utilities/soul_ChannelSetFIFO.h"
 #include "utilities/soul_Resampler.h"
 #include "utilities/soul_AccessCount.h"
 
@@ -136,11 +135,13 @@ namespace soul
 #include "heart/soul_heart_AST.h"
 #include "heart/soul_Program.h"
 #include "heart/soul_Module.h"
+#include "heart/soul_heart_Checker.h"
 #include "heart/soul_heart_Utilities.h"
 #include "heart/soul_heart_FunctionBuilder.h"
 #include "heart/soul_heart_CallFlowGraph.h"
 #include "heart/soul_heart_Optimisations.h"
 #include "heart/soul_heart_DelayCompensation.h"
+#include "heart/soul_heart_FunctionNames.h"
 
 #include "compiler/soul_AST.h"
 #include "compiler/soul_Compiler.h"
@@ -150,12 +151,17 @@ namespace soul
 #include "venue/soul_Venue.h"
 #include "venue/soul_RenderingVenue.h"
 
-#include "utilities/soul_EventQueue.h"
 #include "utilities/soul_MultiEndpointFIFO.h"
 #include "utilities/soul_AudioDataGeneration.h"
 #include "utilities/soul_AudioMIDIWrapper.h"
+#include "utilities/soul_AudioFiles.h"
+
+#include "test/soul_TestFileParser.h"
 
 #include "documentation/soul_SourceCodeUtilities.h"
 #include "documentation/soul_SourceCodeOperations.h"
 #include "documentation/soul_SourceCodeModel.h"
 #include "documentation/soul_HTMLGeneration.h"
+
+#include "code_generation/soul_CPPGenerator.h"
+#include "code_generation/soul_PatchGenerator.h"

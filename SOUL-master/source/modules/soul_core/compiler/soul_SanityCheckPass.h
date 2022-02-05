@@ -169,7 +169,7 @@ struct SanityCheckPass  final
         }
     }
 
-    static void expectSilentCastPossible (const AST::Context& context, ArrayView<Type> targetTypes, AST::Expression& source)
+    static void expectSilentCastPossible (const AST::Context& context, choc::span<Type> targetTypes, AST::Expression& source)
     {
         auto sourceType = source.getResultType();
 
@@ -270,7 +270,7 @@ struct SanityCheckPass  final
         latency.context.throwError (Errors::latencyMustBeConstInteger());
     }
 
-    static void checkForDuplicateFunctions (ArrayView<pool_ref<AST::Function>> functions)
+    static void checkForDuplicateFunctions (choc::span<pool_ref<AST::Function>> functions)
     {
         std::vector<std::string> functionSigs;
         functionSigs.reserve (functions.size());
@@ -304,12 +304,18 @@ struct SanityCheckPass  final
         SOUL_ASSERT (types.size() != 0 && resolvedTypes.size() == types.size());
         auto dataType = resolvedTypes.front();
 
+        if (dataType.isVoid())
+            types.front()->context.throwError (Errors::voidCannotBeUsedForEndpoint());
+
         if (isStream (details.endpointType))
         {
             SOUL_ASSERT (types.size() == 1);
 
             if (! (dataType.isPrimitive() || dataType.isVector()))
                 types.front()->context.throwError (Errors::illegalTypeForEndpoint());
+
+            if (dataType.isBool())
+                types.front()->context.throwError (Errors::boolCannotBeUsedForStreamEndpoint());
         }
         else
         {
@@ -597,6 +603,10 @@ private:
                     if (auto v = cast<AST::VariableDeclaration> (s))
                         duplicateNameChecker.check (v->name, v->context);
             }
+
+            if (f.originalGenericFunction == nullptr && AST::isResolvedAsType (f.returnType))
+                if (f.returnType->getConstness() == AST::Constness::definitelyConst)
+                    f.returnType->context.throwError (Errors::functionReturnTypeCannotBeConst());
         }
 
         void visit (AST::StructDeclaration& s) override

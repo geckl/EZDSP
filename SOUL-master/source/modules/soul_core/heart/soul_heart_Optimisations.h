@@ -41,7 +41,7 @@ struct Optimisations
         }
         while (objectsRemoved);
     }
-    
+
     static void removeUnusedVariables (Program& program)
     {
         for (auto& m : program.getModules())
@@ -505,8 +505,8 @@ private:
             b->statements.removeMatches ([] (heart::Statement& s)
             {
                 if (auto a = cast<heart::AssignFromValue> (s))
-                    if (auto target = cast<heart::Variable> (a->target))
-                        return target->readWriteCount.numReads == 0 && target->isFunctionLocal() && ! a->source->mayHaveSideEffects();
+                    if (auto rootVariable = a->target->getRootVariable())
+                        return rootVariable->readWriteCount.numReads == 0 && rootVariable->isFunctionLocal() && ! a->source->mayHaveSideEffects();
 
                 return false;
             });

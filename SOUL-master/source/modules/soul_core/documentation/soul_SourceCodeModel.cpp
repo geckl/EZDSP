@@ -360,7 +360,7 @@ static void buildEndpoints (AST::ModuleBase& module, SourceCodeModel::Module& m,
             for (auto& type : e->details->dataTypes)
                 desc.dataTypes.push_back (ExpressionHelpers::create (type, dictionary));
         }
-        
+
         if (e->isInput)
             m.inputs.push_back (std::move (desc));
         else
@@ -545,7 +545,7 @@ static void recurseFindingModules (AST::ModuleBase& m, SourceCodeModel::File& de
         recurseFindingModules (sub, desc, dictionary);
 }
 
-bool SourceCodeModel::rebuild (CompileMessageList& errors, ArrayView<SourceCodeText::Ptr> filesToLoad)
+bool SourceCodeModel::rebuild (CompileMessageList& errors, choc::span<SourceCodeText::Ptr> filesToLoad)
 {
     files.clear();
     AST::Allocator allocator;
@@ -589,7 +589,7 @@ bool SourceCodeModel::rebuild (CompileMessageList& errors, ArrayView<SourceCodeT
 
 //==============================================================================
 static SourceCodeModel::TableOfContentsNode& findOrCreateNode (SourceCodeModel::TableOfContentsNode& node,
-                                                               ArrayView<std::string> path)
+                                                               choc::span<std::string> path)
 {
     if (path.empty())
         return node;

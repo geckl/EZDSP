@@ -123,6 +123,7 @@ namespace soul
     X(illegalTypeForEndpoint,               "Only primitives or vectors supported by this endpoint type") \
     X(illegalTypeForEndpointArray,          "Endpoint arrays do not support array data types") \
     X(voidCannotBeUsedForEndpoint,          "void is not a valid endpoint type") \
+    X(boolCannotBeUsedForStreamEndpoint,    "bool is not a valid type for stream endpoints") \
     X(noMultipleTypesOnEndpoint,            "Multiple data types not supported by this endpoint type") \
     X(endpointHasMultipleTypes,             "This endpoint has more than one type") \
     X(incompatibleRatesOnEndpoints,         "Endpoints have incompatible sample rates: $0$ and $1$") \
@@ -309,6 +310,7 @@ namespace soul
     X(emptyFunction,                        "Function $0$ is empty") \
     X(tooManyNamespaceInstances,            "Exceeded the maximum number of specialised namespace instances ($0$) - possible namespace recursion") \
     X(circularNamespaceAlias,               "Circular reference in namespace alias definition $Q0$") \
+    X(cannotReturnReferenceType,            "Cannot return reference type") \
 
 #define SOUL_ERRORS_LIMITS(X) \
     X(programStateTooLarge,                 "Program state requires $0$, maximum allowed is $1$") \
@@ -325,7 +327,9 @@ namespace soul
     X(cannotOverwriteFile,                  "Cannot overwrite existing file $Q0$") \
     X(cannotCreateOutputFile,               "Cannot create output file $Q0$") \
     X(cannotCreateFolder,                   "Cannot create folder $Q0$") \
+    X(unsupportedAudioFileType,             "Unknown file type $Q0$") \
     X(cannotReadFile,                       "Failed to read from file $Q0$") \
+    X(cannotWriteFile,                      "Failed to write to file $Q0$") \
     X(cannotLoadLibrary,                    "Cannot load library $Q0$") \
     X(processTookTooLong,                   "Processing took too long") \
 
@@ -382,13 +386,13 @@ public:
     static CompileMessage createMessage (CompileMessage::Category category, CodeLocation location,
                                          CompileMessage::Type type, const char* text, Args&&... args)
     {
-        std::string result (text);
+        std::string description (text);
         std::vector<std::string> stringArgs { convertToString (args)... };
 
         for (size_t i = 0; i < stringArgs.size(); ++i)
-            result = replaceArgument (result, i, stringArgs[i]);
+            description = replaceArgument (description, i, stringArgs[i]);
 
-        return CompileMessage { choc::text::trim (result), location, type, category };
+        return CompileMessage::create (choc::text::trim (description), std::move (location), type, category);
     }
 
     template <typename... Args>

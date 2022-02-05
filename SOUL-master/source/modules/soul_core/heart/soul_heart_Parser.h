@@ -29,7 +29,7 @@ namespace Operator
 //==============================================================================
 struct DummyKeywordMatcher
 {
-    static TokenType match (int, UTF8Reader) noexcept  { return {}; }
+    static TokenType match (int, choc::text::UTF8Pointer) noexcept  { return {}; }
 };
 
 //==============================================================================
@@ -87,9 +87,9 @@ namespace HEARTOperator
 
     struct Matcher
     {
-        static TokenType match (UTF8Reader& text) noexcept
+        static TokenType match (choc::text::UTF8Pointer& text) noexcept
         {
-            #define SOUL_COMPARE_OPERATOR(name, str) if (text.advanceIfStartsWith (str)) return name;
+            #define SOUL_COMPARE_OPERATOR(name, str) if (text.skipIfStartsWith (str)) return name;
             SOUL_HEART_OPERATORS (SOUL_COMPARE_OPERATOR)
             #undef SOUL_COMPARE_OPERATOR
             return {};
@@ -106,7 +106,7 @@ struct FunctionParseState
     struct BlockCode
     {
         heart::Block& block;
-        UTF8Reader code;
+        choc::text::UTF8Pointer code;
     };
 
     void setCurrentBlock (BlockCode& b)
@@ -116,7 +116,7 @@ struct FunctionParseState
 
     heart::Function& function;
     std::vector<BlockCode> blocks;
-    std::vector<pool_ref<heart::Variable>> variables;
+    std::vector<pool_ptr<heart::Variable>> variables;
     BlockCode* currentBlock = nullptr;
 
 };
@@ -150,8 +150,8 @@ private:
         ScannedTopLevelItem (Module& m) : module (m) {}
 
         Module& module;
-        UTF8Reader moduleStartPos;
-        std::vector<UTF8Reader> functionParamCode, functionBodyCode, structBodyCode, inputDecls, outputDecls, stateVariableDecls;
+        choc::text::UTF8Pointer moduleStartPos;
+        std::vector<choc::text::UTF8Pointer> functionParamCode, functionBodyCode, structBodyCode, inputDecls, outputDecls, stateVariableDecls;
     };
 
     Program program;
@@ -285,18 +285,17 @@ private:
         {
             if (matchIf ("node"))        return parseNode();
             if (matchIf ("connection"))  return parseConnection();
+            if (matchIf ("processor"))   return parseLatency();
         }
-        else
-        {
-            if (matchIf ("struct"))      return scanStruct (item);
-            if (matchIf ("function"))    return scanFunction (item, false);
-            if (matchIf ("var"))         return scanStateVariable (item, false);
 
-            if (module->isProcessor())
-            {
-                if (matchIf ("event"))       return scanFunction (item, true);
-                if (matchIf ("processor"))   return parseLatency();
-            }
+        if (matchIf ("struct"))      return scanStruct (item);
+        if (matchIf ("function"))    return scanFunction (item, false);
+        if (matchIf ("var"))         return scanStateVariable (item, false);
+
+        if (module->isProcessor())
+        {
+            if (matchIf ("event"))       return scanFunction (item, true);
+            if (matchIf ("processor"))   return parseLatency();
         }
 
         if (matchIf ("let"))
@@ -323,7 +322,7 @@ private:
 
         for (size_t i = 0; i < item.functionBodyCode.size(); ++i)
         {
-            if (item.functionBodyCode[i] != UTF8Reader())
+            if (item.functionBodyCode[i] != choc::text::UTF8Pointer())
             {
                 resetPosition (item.functionBodyCode[i]);
                 parseFunctionBody (module->functions.at (i));
@@ -705,7 +704,7 @@ private:
         if (! f.functionType.isEvent())
         {
             expect (HEARTOperator::rightArrow);
-            f.returnType = readValueType();
+            f.returnType = readValueOrRefType();
         }
 
         parseAnnotation (f.annotation);
@@ -727,24 +726,61 @@ private:
         FunctionBuilder builder (*module);
         FunctionParseState state (f);
 
-        if (! matchIf (HEARTOperator::closeBrace))
-            scanBlocks (state, builder);
+        if (matchIf (HEARTOperator::closeBrace))
+            f.location.throwError (Errors::emptyFunction (f.name));
+
+        scanBlocks (state, builder);
 
         builder.beginFunction (f);
 
-        for (auto& b : state.blocks)
+        while (true)
         {
-            resetPosition (b.code);
-            builder.beginBlock (b.block);
-            state.setCurrentBlock (b);
+            int blocksProcessed = 0;
+            int errors = 0;
 
-            while (! parseTerminator (state, builder))
-                if (! parseStatement (state, builder))
-                    throwError (Errors::expectedStatement());
+            CompileMessageGroup firstError;
+
+            {
+                CompileMessageHandler handler ([&] (const CompileMessageGroup& message)
+                                               {
+                                                   if (firstError.messages.empty())
+                                                       firstError = message;
+                                               });
+
+                for (auto& b : state.blocks)
+                {
+                    if (b.block.processed)
+                        continue;
+
+                    resetPosition (b.code);
+                    builder.beginBlock (b.block);
+                    auto variableCount = state.variables.size();
+                    state.setCurrentBlock (b);
+
+                    try
+                    {
+                        while (! parseTerminator (state, builder))
+                            if (! parseStatement (state, builder))
+                                throwError (Errors::expectedStatement());
+
+                        blocksProcessed++;
+                        b.block.processed = true;
+                    }
+                    catch (const AbortCompilationException& message)
+                    {
+                        b.block.statements.clear();
+                        state.variables.resize (variableCount);
+                        errors++;
+                    }
+                }
+            }
+
+            if (errors == 0)
+                break;
+
+            if (blocksProcessed == 0)
+                soul::throwError (firstError);
         }
-
-        if (f.blocks.empty())
-            f.location.throwError (Errors::emptyFunction (f.name));
 
         builder.endFunction();
     }
@@ -918,6 +954,26 @@ private:
         }
     }
 
+    heart::Expression& parsePureFunctionCall (const FunctionParseState& state)
+    {
+        auto errorLocation = location;
+        auto name = readQualifiedGeneralIdentifier();
+
+        ArrayWithPreallocation<Type, 8> argTypes;
+        heart::FunctionCall::ArgListType args;
+        parseFunctionArguments (state, argTypes, args);
+
+        if (auto fn = findFunction (name, argTypes))
+        {
+            auto& f =  module->allocate<heart::PureFunctionCall> (errorLocation, *fn);
+            f.arguments = args;
+
+            return f;
+        }
+
+        errorLocation.throwError (Errors::unknownFunction (name));
+    }
+
     void parseFunctionCall (FunctionParseState& state, FunctionBuilder& builder, const AssignmentTarget& target)
     {
         auto errorLocation = location;
@@ -935,7 +991,7 @@ private:
         errorLocation.throwError (Errors::unknownFunction (name));
     }
 
-    static bool functionArgTypesMatch (const heart::Function& fn, ArrayView<Type> argTypes)
+    static bool functionArgTypesMatch (const heart::Function& fn, choc::span<Type> argTypes)
     {
         auto numParams = fn.parameters.size();
 
@@ -949,7 +1005,7 @@ private:
         return true;
     }
 
-    pool_ptr<heart::Function> findFunction (const std::string& name, ArrayView<Type> argTypes)
+    pool_ptr<heart::Function> findFunction (const std::string& name, choc::span<Type> argTypes)
     {
         if (! containsChar (name, ':'))
         {
@@ -1118,10 +1174,9 @@ private:
     {
         if (containsChar (name, ':'))
         {
-            SOUL_ASSERT (name[0] == '$');
-            TokenisedPathString path (name.substr (1));
+            TokenisedPathString path (name);
             auto variableName = path.getLastPart();
-            return program.findVariableWithName (TokenisedPathString::join (path.getParentPath(), "$" + variableName));
+            return program.findVariableWithName (TokenisedPathString::join (path.getParentPath(), variableName));
         }
 
         for (auto& v : state.variables)
@@ -1145,7 +1200,8 @@ private:
         return program.findVariableWithName (name);
     }
 
-    heart::Expression& parseArraySlice (const FunctionParseState& state, heart::Expression& lhs, int64_t start, int64_t end)
+    heart::Expression& parseArraySlice (const FunctionParseState& state, heart::Expression& lhs,
+                                        int64_t start, int64_t end, bool isRangeTrusted)
     {
         if (! lhs.getType().isArrayOrVector())
             throwError (Errors::targetIsNotAnArray());
@@ -1154,6 +1210,7 @@ private:
             throwError (Errors::illegalSliceSize());
 
         auto& s = module->allocate<heart::ArrayElement> (location, lhs, (size_t) start, (size_t) end);
+        s.isRangeTrusted = isRangeTrusted;
         return parseSuffixOperators (state, s);
     }
 
@@ -1176,11 +1233,14 @@ private:
 
         if (matchIf (HEARTOperator::openBracket))
         {
+            bool isRangeTrusted = matchIf ("trusted");
+            auto pos = location;
+
             if (matchIf (HEARTOperator::colon))
             {
                 auto endIndex = parseInt32();
                 expect (HEARTOperator::closeBracket);
-                return parseArraySlice (state, lhs, 0, endIndex);
+                return parseArraySlice (state, lhs, 0, endIndex, isRangeTrusted);
             }
 
             const auto& arrayOrVectorType = lhs.getType();
@@ -1196,7 +1256,7 @@ private:
 
                 if (matchIf (HEARTOperator::closeBracket))
                     return parseArraySlice (state, lhs, constStart.getAsInt64(),
-                                            (int64_t) arrayOrVectorType.getArrayOrVectorSize());
+                                            (int64_t) arrayOrVectorType.getArrayOrVectorSize(), isRangeTrusted);
 
                 auto& endIndex = parseExpression (state);
                 expect (HEARTOperator::closeBracket);
@@ -1206,21 +1266,27 @@ private:
                 if (! constEnd.getType().isPrimitiveInteger())
                     throwError (Errors::nonConstArraySize());
 
-                return parseArraySlice (state, lhs, constStart.getAsInt64(), constEnd.getAsInt64());
+                return parseArraySlice (state, lhs, constStart.getAsInt64(), constEnd.getAsInt64(), isRangeTrusted);
             }
 
             if (! (startIndex.getType().isPrimitiveInteger() || startIndex.getType().isBoundedInt()))
                 throwError (Errors::nonIntegerArrayIndex());
 
             if (matchAndReplaceIf (HEARTOperator::closeDoubleBracket, HEARTOperator::closeBracket))
-                return parseSuffixOperators (state, module->allocate<heart::ArrayElement> (location, lhs, startIndex));
+            {
+                auto& element = module->allocate<heart::ArrayElement> (pos, lhs, startIndex);
+                element.isRangeTrusted = isRangeTrusted;
+                return parseSuffixOperators (state, element);
+            }
 
             expect (HEARTOperator::closeBracket);
 
             if (! lhs.getType().isArrayOrVector())
                 location.throwError (Errors::expectedArrayOrVector());
 
-            return parseSuffixOperators (state, module->allocate<heart::ArrayElement> (location, lhs, startIndex));
+            auto& element = module->allocate<heart::ArrayElement> (pos, lhs, startIndex);
+            element.isRangeTrusted = isRangeTrusted;
+            return parseSuffixOperators (state, element);
         }
 
         return lhs;
@@ -1249,7 +1315,7 @@ private:
         expect (HEARTOperator::closeParen);
         const auto& lhsType = lhs.getType();
 
-        if (! lhsType.isEqual (rhs.getType(), Type::ignoreReferences))
+        if (! lhsType.isEqual (rhs.getType(), Type::ignoreReferences | Type::ignoreConst))
             pos.throwError (Errors::illegalTypesForBinaryOperator (BinaryOp::getSymbol (opType),
                                                                    lhs.getType().getDescription(),
                                                                    rhs.getType().getDescription()));
@@ -1257,7 +1323,7 @@ private:
         const auto& operandType = lhsType;
         auto binOpTypes = BinaryOp::getTypes (opType, operandType, operandType);
 
-        if (! binOpTypes.operandType.isEqual (operandType, Type::ignoreReferences))
+        if (! binOpTypes.operandType.isEqual (operandType, Type::ignoreReferences | Type::ignoreConst))
             pos.throwError (Errors::illegalTypesForBinaryOperator (BinaryOp::getSymbol (opType),
                                                                    lhs.getType().getDescription(),
                                                                    rhs.getType().getDescription()));
@@ -1268,7 +1334,7 @@ private:
     heart::TypeCast& parseCast (const FunctionParseState& state)
     {
         auto pos = location;
-        auto destType = readValueType();
+        auto destType = readValueOrRefType();
         expect (HEARTOperator::openParen);
         auto& source = parseExpression (state);
         expect (HEARTOperator::closeParen);
@@ -1293,6 +1359,9 @@ private:
             auto errorPos = location;
             auto name = readQualifiedVariableIdentifier();
 
+            if (name == "tmpVar")
+                findVariable (state, name);
+            
             if (auto v = findVariable (state, name))
                 return parseSuffixOperators (state, *v);
 
@@ -1311,6 +1380,9 @@ private:
 
             if (matchIf ("processor"))
                 return parseProcessorProperty();
+
+            if (matchIf ("purecall"))
+                return parsePureFunctionCall (state);
         }
 
         if (matches (Token::literalInt32))       return parseConstantAsExpression (state, PrimitiveType::int32);
@@ -1358,7 +1430,7 @@ private:
     {
         if (matches (Token::variableIdentifier))
         {
-            if (auto v = findVariable (state, currentStringValue))
+            if (auto v = findVariable (state, getIdentifierAsVariableName()))
             {
                 skip();
                 return parseSuffixOperators (state, *v);
@@ -1651,17 +1723,22 @@ private:
 
     std::string readVariableIdentifier()
     {
-        auto name = currentStringValue;
-
-        if (matchesAnyIdentifier() && ! matches (Token::variableIdentifier))
-            throwError (Errors::invalidVariableName (name));
-
-        if (name.length() < 2)
-            throwError (Errors::invalidVariableName (name));
-
+        auto name = getIdentifierAsVariableName();
         expect (Token::variableIdentifier);
 
         return name;
+    }
+
+    std::string getIdentifierAsVariableName()
+    {
+        if (matchesAnyIdentifier() && ! matches (Token::variableIdentifier))
+            throwError (Errors::invalidVariableName (currentStringValue));
+
+        if (currentStringValue.length() < 2 || currentStringValue[0] != '$')
+            throwError (Errors::invalidVariableName (currentStringValue));
+
+        // Strip leading $
+        return currentStringValue.substr(1);
     }
 
     std::string readGeneralIdentifier()
@@ -1769,11 +1846,22 @@ private:
 
     Type readValueOrRefType()
     {
+        auto errorPos = location;
+        bool isConst = matchIf ("const");
+
         auto t = readValueType();
 
         if (matchIf (HEARTOperator::bitwiseAnd))
-            return t.createReference();
+        {
+            if (isConst)
+                t = t.createConst();
 
+            return t.createReference();
+        }
+
+        if (isConst)
+            errorPos.throwError (Errors::notYetImplemented ("const"));
+        
         return t;
     }
 

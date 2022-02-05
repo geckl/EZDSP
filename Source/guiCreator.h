@@ -26,7 +26,7 @@ class sliderCreator;
 class bufferCreator;
 class buttonCreator;
 
-class guiCreator  : public juce::DocumentWindow,
+class guiCreator  : public juce::TopLevelWindow,
                     private juce::Button::Listener
 {
 public:
@@ -36,7 +36,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void closeButtonPressed() override;
+    //void closeButtonPressed() override;
     void buttonClicked(juce::Button* button) override;
     
     void styleMenuChanged();

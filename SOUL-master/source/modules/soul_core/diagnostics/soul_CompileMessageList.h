@@ -24,21 +24,6 @@ namespace soul
 //==============================================================================
 struct CompileMessage  final
 {
-    bool isWarning() const;
-    bool isError() const;
-    bool isInternalCompilerError() const;
-
-    std::string getFullDescription() const;
-    std::string getFullDescriptionWithoutFilename() const;
-
-    bool hasPosition() const;
-    std::string getPositionString() const;
-
-    std::string getSeverity() const;
-    std::string getAnnotatedSourceLine() const;
-
-    CompileMessage withLocation (CodeLocation) const;
-
     enum class Type
     {
         error,
@@ -55,8 +40,25 @@ struct CompileMessage  final
         runtimeProblem
     };
 
-    std::string description;
-    CodeLocation location;
+    bool isWarning() const;
+    bool isError() const;
+    bool isInternalCompilerError() const;
+
+    std::string getFullDescription() const;
+    std::string getFullDescriptionWithoutFilename() const;
+
+    bool hasPosition() const;
+    std::string getPositionString() const;
+
+    std::string getSeverity() const;
+    std::string getAnnotatedSourceLine() const;
+
+    CompileMessage withLocation (CodeLocation) const;
+    static CompileMessage create (std::string description, CodeLocation, Type, Category);
+    static CompileMessage createError (std::string description, CodeLocation);
+
+    std::string description, filename, sourceLine;
+    uint32_t line = 0, column = 0;
     Type type = Type::error;
     Category category = Category::none;
 };
@@ -141,6 +143,23 @@ void emitMessage (const CompileMessageGroup&);
 [[noreturn]] void throwError (CompileMessage);
 /** Sends a set of error messages to the current message handler and throws an AbortCompilationException. */
 [[noreturn]] void throwError (const CompileMessageGroup&);
+
+
+/// Given a soul::patch::CompilationMessage as its argument, converts it to a CompileMessage
+template <typename PatchCompileMessage>
+CompileMessage createCompileMessageFromPatchMessage (const PatchCompileMessage& m)
+{
+    CompileMessage result;
+    result.description = m.description.template toString<std::string>();
+    result.filename = m.filename.template toString<std::string>();
+    result.sourceLine = m.sourceLine.template toString<std::string>();
+    result.line = m.line;
+    result.column = m.column;
+    result.type = m.isError ? CompileMessage::Type::error : CompileMessage::Type::warning;
+    result.category = CompileMessage::Category::syntax;
+    return result;
+}
+
 
 
 } // namespace soul
