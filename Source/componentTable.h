@@ -22,15 +22,15 @@ public:
         table.setColour (juce::ListBox::outlineColourId, juce::Colours::grey);
         table.setOutlineThickness (1);
         
-        table.getHeader().addColumn("Component", 0, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Name", 1, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Type", 2, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Min", 3, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Max", 4, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Init", 5, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Interval", 6, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Size", 7, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
-        table.getHeader().addColumn("Select", 8, 50, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Component", 1, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Name", 2, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Type", 3, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Min", 4, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Max", 5, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Init", 6, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Interval", 7, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Size", 8, 100, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
+        table.getHeader().addColumn("Select", 9, 50, 30, -1, juce::TableHeaderComponent::ColumnPropertyFlags::notSortable);
 
         table.getHeader().setSortColumnId (1, true);
 
@@ -61,9 +61,9 @@ public:
         g.setColour (rowIsSelected ? juce::Colours::darkblue : getLookAndFeel().findColour (juce::ListBox::textColourId));
         g.setFont (font);
         
-        if(componentsArray->getReference(rowNumber)[columnId] != "")
+        if(componentsArray->getReference(rowNumber)[columnId-1] != "")
         {
-            auto text = componentsArray->getReference(rowNumber)[columnId];
+            auto text = componentsArray->getReference(rowNumber)[columnId-1];
             g.drawText (text, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
         }
 
@@ -93,7 +93,7 @@ public:
     Component* refreshComponentForCell (int rowNumber, int columnId, bool,
                                         Component* existingComponentToUpdate) override
     {
-        if (columnId == 8)
+        if (columnId == 9)
         {
             auto* selectionBox = static_cast<SelectionColumnCustomComponent*> (existingComponentToUpdate);
 
@@ -110,7 +110,7 @@ public:
 
     int getColumnAutoSizeWidth (int columnId) override
     {
-        if (columnId == 9)
+        if (columnId == 10)
             return 50;
 
         int widest = 32;
