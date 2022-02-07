@@ -24,6 +24,8 @@ buttonCreator::buttonCreator(guiCreator* g)
     addAndMakeVisible(parametersLabel);
     addAndMakeVisible(nameLabel);
     
+    nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
+    
     addAndMakeVisible(nameValue);
     
     nameValue.setTooltip("The button's label and the variable name used to access the button's current value ");

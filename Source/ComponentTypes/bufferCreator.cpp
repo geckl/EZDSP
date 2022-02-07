@@ -23,6 +23,7 @@ bufferCreator::bufferCreator(guiCreator* g)
     typeValue.addItem ("float",  2);
     
     sizeValue.setInputRestrictions(0,"0123456789");
+    nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
     
     addAndMakeVisible(parametersLabel);
     addAndMakeVisible(nameLabel);

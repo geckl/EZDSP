@@ -437,6 +437,7 @@ public:
             codeWindow.setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colours::white);
             codeWindow.setColour(juce::CodeEditorComponent::ColourIds::lineNumberTextId, juce::Colours::black);
             codeWindow.setWantsKeyboardFocus(true);
+            codeWindow.setOpaque(true);
             addAndMakeVisible(codeWindow);
             
             runCode.setButtonText("Run");
@@ -446,6 +447,10 @@ public:
             addGUI.setButtonText("Components");
             addAndMakeVisible(addGUI);
             addGUI.addListener(this);
+            
+            expandText.setButtonText("Text Editor");
+            addAndMakeVisible(expandText);
+            expandText.addListener(this);
             
             getHelp.setButtonText("Help");
             addAndMakeVisible(getHelp);
@@ -493,8 +498,10 @@ public:
                 
                 codeWindow.setBounds(0, getHeight()-200, getWidth(), 150);
                 runCode.setBounds(50, getHeight()-40, 50, 30);
-                addGUI.setBounds(150, getHeight()-40, 150, 30);
-                getHelp.setBounds(350, getHeight()-40, 50, 30);
+                addGUI.setBounds(125, getHeight()-40, 150, 30);
+                expandText.setBounds(325, getHeight()-40, 150, 30);
+                getHelp.setBounds(500, getHeight()-40, 50, 30);
+                
             }
         }
 
@@ -616,6 +623,21 @@ public:
                 }
                 
             }
+            
+            else if(button == &expandText)
+            {
+                if(codeWindow.isOnDesktop())
+                {
+                    codeWindow.removeFromDesktop();
+                    addAndMakeVisible(codeWindow);
+                    childBoundsChanged(&codeWindow);
+                }
+                else
+                {
+                    codeWindow.addToDesktop(juce::ComponentPeer::StyleFlags::windowIsResizable | juce::ComponentPeer::StyleFlags::windowHasTitleBar);
+                    codeWindow.setAlwaysOnTop(true);
+                }
+            }
         }
 
         EZDSPPlugin& owner;
@@ -627,7 +649,7 @@ public:
         juce::CodeEditorComponent codeWindow{owner.dspCode, &ezdspTokenizer };
         juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
         juce::Component::SafePointer<juce::DocumentWindow> helpWindow;
-        juce::TextButton runCode,addGUI,getHelp;
+        juce::TextButton runCode,addGUI,getHelp, expandText;
     };
     
     //public: (audio processor public variables)

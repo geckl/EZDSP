@@ -24,6 +24,7 @@ variableCreator::variableCreator(guiCreator* g)
     
     
     initValue.setInputRestrictions(0, "0123456789.-");
+    nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
     
    
     addAndMakeVisible(parametersLabel);

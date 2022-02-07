@@ -73,10 +73,9 @@ public:
     
     void updateContent ()
     {
-        DBG("Update Content!!!");
+        //DBG("Update Content!!!");
         numRows=componentsArray->size();
         table.updateContent();
-        //table.repaint();
     }
 
     /*void sortOrderChanged (int newSortColumnId, bool isForwards) override
