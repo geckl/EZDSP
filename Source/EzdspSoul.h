@@ -462,6 +462,19 @@ public:
             getHelp.setButtonText("Help");
             addAndMakeVisible(getHelp);
             getHelp.addListener(this);
+            
+            auto logo= juce::ImageCache::getFromMemory(BinaryData::EZDSPLogo_png, BinaryData::EZDSPLogo_pngSize);
+                
+            if(! logo.isNull())
+            {
+                logoComponent.setImage(logo,64);
+            }
+            else
+            {
+                jassert(! logo.isNull());
+            }
+                
+                addAndMakeVisible(logoComponent);
         }
 
         ~Editor() override
@@ -498,16 +511,23 @@ public:
         {
             if (pluginEditor != nullptr)
             {
+                juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea;
+                //int x = r.getWidth();
+                int y = r.getHeight();
+                
+                pluginEditor->setSize(600, int(y*.5));
+                
                 setSize (pluginEditor->getWidth(),
-                         pluginEditor->getHeight()+200);
+                         pluginEditor->getHeight()+250);
                 
                 //setSize (300,300);
                 
-                codeWindow.setBounds(0, getHeight()-200, getWidth(), 150);
-                runCode.setBounds(50, getHeight()-40, 50, 30);
-                addGUI.setBounds(125, getHeight()-40, 150, 30);
-                expandText.setBounds(325, getHeight()-40, 150, 30);
-                getHelp.setBounds(500, getHeight()-40, 50, 30);
+                codeWindow.setBounds(0, getHeight()-250, getWidth(), 150);
+                runCode.setBounds(15, getHeight()-75, 50, 30);
+                addGUI.setBounds(80, getHeight()-75, 125, 30);
+                expandText.setBounds(395, getHeight()-75, 125, 30);
+                getHelp.setBounds(535, getHeight()-75, 50, 30);
+                logoComponent.setBounds(220, getHeight()-95, 160, 90);
                 
             }
         }
@@ -657,6 +677,7 @@ public:
         juce::Component::SafePointer<juce::TopLevelWindow> guiWindow;
         juce::Component::SafePointer<juce::DocumentWindow> helpWindow;
         juce::TextButton runCode,addGUI,getHelp, expandText;
+        juce::ImageComponent logoComponent;
     };
     
     //public: (audio processor public variables)

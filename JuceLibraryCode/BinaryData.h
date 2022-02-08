@@ -14,8 +14,11 @@ namespace BinaryData
     extern const char*   Default_soulpatch;
     const int            Default_soulpatchSize = 372;
 
+    extern const char*   EZDSPLogo_png;
+    const int            EZDSPLogo_pngSize = 34703;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 2;
+    const int namedResourceListSize = 3;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

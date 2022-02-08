@@ -14,6 +14,11 @@
       <FILE id="yXswPh" name="Default.soulpatch" compile="0" resource="1"
             file="SoulPatch/Default.soulpatch" xcodeResource="0"/>
     </GROUP>
+    <GROUP id="{CFE38797-7990-D114-EB0F-734B0A01194C}" name="Resources">
+      <FILE id="BvzPiV" name="EZDSPLogo.png" compile="0" resource="1" file="../../../Downloads/EZDSPLogo.png"/>
+      <FILE id="Jo0CMh" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
+            file="Resources/SOUL_PatchLoader.dylib"/>
+    </GROUP>
     <GROUP id="{D613C43B-7197-5FCA-4372-AC3446E57C2B}" name="Source">
       <FILE id="QGM6Ts" name="EzdspHelp.h" compile="0" resource="0" file="Source/EzdspHelp.h"/>
       <GROUP id="{9ABBA60E-5A50-F38B-5CC3-734F0B497AC8}" name="Utils">
