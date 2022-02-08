@@ -8,14 +8,14 @@
 
 namespace BinaryData
 {
-    extern const char*   EZDSPLogo_png;
-    const int            EZDSPLogo_pngSize = 34703;
-
     extern const char*   Default_soul;
     const int            Default_soulSize = 1191;
 
     extern const char*   Default_soulpatch;
     const int            Default_soulpatchSize = 372;
+
+    extern const char*   EZDSPLogo_png;
+    const int            EZDSPLogo_pngSize = 34703;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 3;

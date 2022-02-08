@@ -8,15 +8,12 @@
               projectLineFeed="&#10;" pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
               bundleIdentifier="dev.squatchsounds.EZDSP" displaySplashScreen="1">
   <MAINGROUP id="M2AbSF" name="EZDSP">
-    <GROUP id="{BDC432B5-7E6D-0BB5-D1EC-F12D0C268921}" name="BinaryResources">
-      <FILE id="BvzPiV" name="EZDSPLogo.png" compile="0" resource="1" file="../../../Downloads/EZDSPLogo.png"/>
-      <FILE id="lsmvs5" name="Default.soul" compile="0" resource="1" file="SoulPatch/Default.soul"
-            xcodeResource="0"/>
-      <FILE id="yXswPh" name="Default.soulpatch" compile="0" resource="1"
-            file="SoulPatch/Default.soulpatch" xcodeResource="0"/>
-    </GROUP>
-    <GROUP id="{CFE38797-7990-D114-EB0F-734B0A01194C}" name="Resources">
-      <FILE id="Jo0CMh" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
+    <GROUP id="{A1282000-9ED7-6217-E188-340D7A20691E}" name="Resources">
+      <FILE id="FhGBgL" name="Default.soul" compile="0" resource="1" file="Resources/Default.soul"/>
+      <FILE id="Qu1G0C" name="Default.soulpatch" compile="0" resource="1"
+            file="Resources/Default.soulpatch"/>
+      <FILE id="CUYLIc" name="EZDSPLogo.png" compile="0" resource="1" file="Resources/EZDSPLogo.png"/>
+      <FILE id="mhx4pS" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
             file="Resources/SOUL_PatchLoader.dylib"/>
     </GROUP>
     <GROUP id="{D613C43B-7197-5FCA-4372-AC3446E57C2B}" name="Source">
