@@ -97,7 +97,7 @@ public:
         
         initialComponentParameters.clear();
         
-        initialComponentParameters.add("VARIABLE");
+        initialComponentParameters.add("NUMBER");
         initialComponentParameters.add("SAMPLERATE");
         initialComponentParameters.add("int");
         initialComponentParameters.add("");
@@ -228,19 +228,24 @@ public:
         guiStartPosition.setPositionMaintained(true);
         
     }
-
-    //==============================================================================
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override
+    
+    void updateSampleRateVariable(double sampleRate)
     {
         //update sample rate global variable
         for(int i=0;i<guiArray.size();i++)
         {
             if(guiArray.getReference(i)[1]=="SAMPLERATE")
             {
-                guiArray.getReference(i).set(5,juce::String(getSampleRate()));
+                guiArray.getReference(i).set(5,juce::String(sampleRate));
                 break;
             }
         }
+    }
+
+    //==============================================================================
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override
+    {
+        updateSampleRateVariable(sampleRate);
         
         if (plugin != nullptr)
             plugin->prepareToPlay (sampleRate, samplesPerBlock);
@@ -352,6 +357,8 @@ public:
         }
         
         guiArray=componentsStorage;
+        
+        updateSampleRateVariable(getSampleRate());
 
         if (s.hasType (ids.SOULPatchPlugin))
         {
@@ -540,7 +547,7 @@ public:
                 
                 for(int i=0; i< owner.guiArray.size();i++)
                 {
-                    if(owner.guiArray[i][0]== "VARIABLE")
+                    if(owner.guiArray[i][0]== "NUMBER")
                     {
                         tempGuiCode+= owner.guiArray[i][2] + " " + owner.guiArray[i][10] + " = " + owner.guiArray[i][5] + ";\n";
                     }
@@ -653,10 +660,6 @@ public:
     };
     
     //public: (audio processor public variables)
-    /*juce::File presetCode= juce::File ("/Library/Application Support/EZDSP/Default.soul");
-    juce::File presetPatch= juce::File("/Library/Application Support/EZDSP/Default.soulpatch");
-    juce::TemporaryFile tempCode= juce::TemporaryFile (presetCode);
-    juce::TemporaryFile tempPatch= juce::TemporaryFile (presetPatch);*/
     
     juce::TemporaryFile tempCode = juce::TemporaryFile(".soul");
     juce::TemporaryFile tempPatch = juce::TemporaryFile(".soulpatch");

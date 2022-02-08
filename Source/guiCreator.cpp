@@ -21,7 +21,7 @@ guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::
     addAndMakeVisible(&addGUIComponent);
     //addGUIComponent.addListener(this);
     
-    addGUIComponent.addItem ("Variable",  1);
+    addGUIComponent.addItem ("Number",  1);
     addGUIComponent.addItem ("Slider",   2);
     addGUIComponent.addItem ("Buffer", 3);
     addGUIComponent.addItem ("Button", 4);
@@ -117,7 +117,7 @@ void guiCreator::styleMenuChanged()
            {
                    
                case 1:
-                   createAComponentWindow= new variableCreator(this);
+                   createAComponentWindow= new numberCreator(this);
                    addGUIComponent.setSelectedId(0);
                    break;
                case 2:

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "ComponentTypes/variableCreator.h"
+#include "ComponentTypes/numberCreator.h"
 #include "ComponentTypes/sliderCreator.h"
 #include "ComponentTypes/bufferCreator.h"
 #include "ComponentTypes/buttonCreator.h"
@@ -21,7 +21,7 @@
 /*
 */
 
-class variableCreator;
+class numberCreator;
 class sliderCreator;
 class bufferCreator;
 class buttonCreator;

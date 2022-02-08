@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    variableCreator.cpp
+    numberCreator.cpp
     Created: 25 Dec 2021 7:35:52pm
     Author:  Garrett Eckl
 
@@ -9,12 +9,12 @@
 */
 
 #include <JuceHeader.h>
-#include "variableCreator.h"
+#include "numberCreator.h"
 #include "../Utils/Vectors.h"
 //#include "guiCreator.h"
 
 //==============================================================================
-variableCreator::variableCreator(guiCreator* g)
+numberCreator::numberCreator(guiCreator* g)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -37,9 +37,9 @@ variableCreator::variableCreator(guiCreator* g)
     addAndMakeVisible(typeValue);
     
     addAndMakeVisible(variableTips);
-    initValue.setTooltip("The variable's initial value ");
-    nameValue.setTooltip("The variable name used to access the variable's current value");
-    typeValue.setTooltip("The value type that the variable stores (integer or floating point numbers)");
+    initValue.setTooltip("The number's initial value ");
+    nameValue.setTooltip("The variable name used to access the number's current value");
+    typeValue.setTooltip("The value type that the number stores (integer or floating-point)");
    
 
     createComponent.setSize(150,50);
@@ -50,11 +50,11 @@ variableCreator::variableCreator(guiCreator* g)
     guiWindowCallback= g;
 }
 
-variableCreator::~variableCreator()
+numberCreator::~numberCreator()
 {
 }
 
-void variableCreator::paint (juce::Graphics& g)
+void numberCreator::paint (juce::Graphics& g)
 {
     /* This demo code just fills the component's background and
        draws some placeholder text to get you started.
@@ -70,11 +70,11 @@ void variableCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawFittedText ("A global variable stores a single value that can be accessed from anywhere in your code. Use it to store values that may need to change throughout the duration of your signal processing.", getLocalBounds().reduced(100, 50),
+    g.drawFittedText ("A number stores a single real value that can be accessed from anywhere in your code. Use it to store numbers that may need to change throughout the duration of your signal processing.", getLocalBounds().reduced(100, 50),
                 juce::Justification::centred, 8);   // Explain component
 }
 
-void variableCreator::resized()
+void numberCreator::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
@@ -90,7 +90,7 @@ void variableCreator::resized()
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }
 
-void variableCreator::buttonClicked(juce::Button* button)
+void numberCreator::buttonClicked(juce::Button* button)
 {
     //create array of component parameters and append to array of components
     if (button == &createComponent)
@@ -100,7 +100,7 @@ void variableCreator::buttonClicked(juce::Button* button)
             juce::Array<juce::String> componentParameters;
             
             
-            componentParameters.add("VARIABLE");
+            componentParameters.add("NUMBER");
             componentParameters.add(nameValue.getText());
             componentParameters.add(typeValue.getText());
             componentParameters.add("");

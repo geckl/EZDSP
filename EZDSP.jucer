@@ -38,10 +38,9 @@
         <FILE id="jRauZ9" name="sliderCreator.cpp" compile="1" resource="0"
               file="Source/ComponentTypes/sliderCreator.cpp"/>
         <FILE id="xQB14w" name="sliderCreator.h" compile="0" resource="0" file="Source/ComponentTypes/sliderCreator.h"/>
-        <FILE id="dMacCi" name="variableCreator.cpp" compile="1" resource="0"
-              file="Source/ComponentTypes/variableCreator.cpp"/>
-        <FILE id="DPTwCh" name="variableCreator.h" compile="0" resource="0"
-              file="Source/ComponentTypes/variableCreator.h"/>
+        <FILE id="dMacCi" name="numberCreator.cpp" compile="1" resource="0"
+              file="Source/ComponentTypes/numberCreator.cpp"/>
+        <FILE id="DPTwCh" name="numberCreator.h" compile="0" resource="0" file="Source/ComponentTypes/numberCreator.h"/>
       </GROUP>
       <FILE id="k4mcGc" name="guiCreator.cpp" compile="1" resource="0" file="Source/guiCreator.cpp"/>
       <FILE id="ibTUFA" name="guiCreator.h" compile="0" resource="0" file="Source/guiCreator.h"/>
