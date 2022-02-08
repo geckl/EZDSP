@@ -7,91 +7,8 @@
 namespace BinaryData
 {
 
-//================== Default.soul ==================
-static const unsigned char temp_binary_data_0[] =
-"/**\n"
-"    This is an auto-generated SOUL patch template.\n"
-"    This example code simply performs a simple gain between its input\n"
-"    and output. Now it's your turn to build this up into a real effect!\n"
-"*/\n"
-"processor Test [[main]]\n"
-"{\n"
-"    input stream float32 audioIn;\n"
-"    input event soul::timeline::Tempo tempoIn;\n"
-"    input event soul::timeline::Position positionIn;\n"
-"    input event soul::timeline::TimeSignature timesignatureIn;\n"
-"    output stream float32 audioOut;\n"
-"\n"
-"\n"
-"//BEGINGUI\n"
-"\n"
-"    input stream float GAIN  [[ name: \"GAIN\", min: -60.0, max: 10.0, init: 0, step: 0.1, slewRate: 200.0 ]];\n"
-"    int SAMPLERATE = 0;\n"
-"\n"
-"//ENDGUI\n"
-"\n"
-"    event tempoIn (soul::timeline::Tempo t)\n"
-"    {\n"
-"    BPM = t.bpm;\n"
-"    }\n"
-"\n"
-"    event positionIn (soul::timeline::Position p)\n"
-"    {\n"
-"    CURRENTSAMPLE = p.currentFrame;\n"
-"    }\n"
-"\n"
-"    event timesignatureIn (soul::timeline::TimeSignature s)\n"
-"    {\n"
-"    NUMERATOR = s.numerator;\n"
-"    DENOMINATOR = s.denominator;\n"
-"    }\n"
-"\n"
-"    float BPM, SAMPLESPERBEAT;\n"
-"    int64 CURRENTSAMPLE, NUMERATOR, DENOMINATOR;\n"
-"\n"
-"    void run()\n"
-"    {\n"
-"        loop\n"
-"        {\n"
-"\n"
-"\n"
-"//BEGINDSP\n"
-"\n"
-"let masterGain = soul::dBtoGain (GAIN);\n"
-"\n"
-"audioOut << audioIn * masterGain;\n"
-"\n"
-"//ENDDSP\n"
-"\n"
-"\n"
-"            advance();\n"
-"        }\n"
-"    }\n"
-"}";
-
-const char* Default_soul = (const char*) temp_binary_data_0;
-
-//================== Default.soulpatch ==================
-static const unsigned char temp_binary_data_1[] =
-"{\n"
-"    \"soulPatchV1\":\n"
-"    {\n"
-"        \"ID\":               \"ezdsp.default\",\n"
-"        \"version\":          \"1.0\",\n"
-"        \"name\":             \"Default\",\n"
-"        \"description\":      \"EZDSP Default PAtch\",\n"
-"        \"category\":         \"fx\",\n"
-"        \"manufacturer\":     \"Squatch Sounds\",\n"
-"        \"isInstrument\":     false,\n"
-"        \n"
-"        \"source\":           \"Default.soul\"\n"
-"    }\n"
-"}\n";
-
-const char* Default_soulpatch = (const char*) temp_binary_data_1;
-
 //================== EZDSPLogo.png ==================
-static const unsigned char temp_binary_data_2[] =
+static const unsigned char temp_binary_data_0[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,5,0,0,0,2,208,8,6,0,0,0,207,125,221,86,0,0,32,0,73,68,65,84,120,156,236,221,7,180,85,213,181,48,224,137,20,145,38,130,40,2,130,136,189,119,212,216,162,198,88,147,88,176,68,5,13,162,70,64,99,141,216,163,
 198,94,98,111,168,104,44,137,18,131,13,43,86,236,38,81,177,16,123,7,177,96,196,130,40,248,143,181,255,75,158,81,58,183,236,242,125,99,236,1,242,242,14,107,207,117,206,225,158,121,230,154,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -576,7 +493,90 @@ static const unsigned char temp_binary_data_2[] =
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,90,69,68,252,255,211,51,107,170,0,73,51,105,0,0,0,0,73,69,78,68,
 174,66,96,130,0,0 };
 
-const char* EZDSPLogo_png = (const char*) temp_binary_data_2;
+const char* EZDSPLogo_png = (const char*) temp_binary_data_0;
+
+//================== Default.soul ==================
+static const unsigned char temp_binary_data_1[] =
+"/**\n"
+"    This is an auto-generated SOUL patch template.\n"
+"    This example code simply performs a simple gain between its input\n"
+"    and output. Now it's your turn to build this up into a real effect!\n"
+"*/\n"
+"processor Test [[main]]\n"
+"{\n"
+"    input stream float32 audioIn;\n"
+"    input event soul::timeline::Tempo tempoIn;\n"
+"    input event soul::timeline::Position positionIn;\n"
+"    input event soul::timeline::TimeSignature timesignatureIn;\n"
+"    output stream float32 audioOut;\n"
+"\n"
+"\n"
+"//BEGINGUI\n"
+"\n"
+"    input stream float GAIN  [[ name: \"GAIN\", min: -60.0, max: 10.0, init: 0, step: 0.1, slewRate: 200.0 ]];\n"
+"    int SAMPLERATE = 0;\n"
+"\n"
+"//ENDGUI\n"
+"\n"
+"    event tempoIn (soul::timeline::Tempo t)\n"
+"    {\n"
+"    BPM = t.bpm;\n"
+"    }\n"
+"\n"
+"    event positionIn (soul::timeline::Position p)\n"
+"    {\n"
+"    CURRENTSAMPLE = p.currentFrame;\n"
+"    }\n"
+"\n"
+"    event timesignatureIn (soul::timeline::TimeSignature s)\n"
+"    {\n"
+"    NUMERATOR = s.numerator;\n"
+"    DENOMINATOR = s.denominator;\n"
+"    }\n"
+"\n"
+"    float BPM, SAMPLESPERBEAT;\n"
+"    int64 CURRENTSAMPLE, NUMERATOR, DENOMINATOR;\n"
+"\n"
+"    void run()\n"
+"    {\n"
+"        loop\n"
+"        {\n"
+"\n"
+"\n"
+"//BEGINDSP\n"
+"\n"
+"let masterGain = soul::dBtoGain (GAIN);\n"
+"\n"
+"audioOut << audioIn * masterGain;\n"
+"\n"
+"//ENDDSP\n"
+"\n"
+"\n"
+"            advance();\n"
+"        }\n"
+"    }\n"
+"}";
+
+const char* Default_soul = (const char*) temp_binary_data_1;
+
+//================== Default.soulpatch ==================
+static const unsigned char temp_binary_data_2[] =
+"{\n"
+"    \"soulPatchV1\":\n"
+"    {\n"
+"        \"ID\":               \"ezdsp.default\",\n"
+"        \"version\":          \"1.0\",\n"
+"        \"name\":             \"Default\",\n"
+"        \"description\":      \"EZDSP Default PAtch\",\n"
+"        \"category\":         \"fx\",\n"
+"        \"manufacturer\":     \"Squatch Sounds\",\n"
+"        \"isInstrument\":     false,\n"
+"        \n"
+"        \"source\":           \"Default.soul\"\n"
+"    }\n"
+"}\n";
+
+const char* Default_soulpatch = (const char*) temp_binary_data_2;
 
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes);
@@ -590,9 +590,9 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
     switch (hash)
     {
+        case 0x906ffa81:  numBytes = 34703; return EZDSPLogo_png;
         case 0xe308ed51:  numBytes = 1191; return Default_soul;
         case 0xbf13dd97:  numBytes = 372; return Default_soulpatch;
-        case 0x906ffa81:  numBytes = 34703; return EZDSPLogo_png;
         default: break;
     }
 
@@ -602,16 +602,16 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
 const char* namedResourceList[] =
 {
+    "EZDSPLogo_png",
     "Default_soul",
-    "Default_soulpatch",
-    "EZDSPLogo_png"
+    "Default_soulpatch"
 };
 
 const char* originalFilenames[] =
 {
+    "EZDSPLogo.png",
     "Default.soul",
-    "Default.soulpatch",
-    "EZDSPLogo.png"
+    "Default.soulpatch"
 };
 
 const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8);
