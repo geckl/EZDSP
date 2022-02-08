@@ -42,12 +42,12 @@ This is where you will add global variables that can be accessed from within you
   Type: The value type that the buffer stores (integer or floating point numbers)  
   Size: The number of values to be stored in the buffer  
 ``` 
-4) **Global Variable** - This will store a single value.
+4) **Number** - This will store a single numeric value.
 ```markdown
   Parameters:  
   Init: The variable's initial value  
   Name: The variable name used to access the variable's current value  
-  Type: The value type that the variable stores (integer or floating point numbers)  
+  Type: The value type that the variable stores (integer or floating point number)  
 ```
 
 ### Keywords
