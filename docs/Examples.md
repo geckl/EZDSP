@@ -26,10 +26,10 @@ audioOut << DelayBuffer[DelayBufferIndex-int(Delay)] + audioIn; // [3]
 
 Here's what each line of code does:
 
-\[1\]: Multiply a delayed audio sample by a feedback scale factor and store it in a variable
-\[2\]: Add the current audio sample to the delayed audio sample and store in the current position of the delay buffer
-\[3\]: Output current audio sample and a delayed audio sample from the delay buffer
-\[4\]: Increase the current position of the delay buffer by one sample
+\[1\]: Multiply a delayed audio sample by a feedback scale factor and store it in a variable<br>
+\[2\]: Add the current audio sample to the delayed audio sample and store in the current position of the delay buffer<br>
+\[3\]: Output current audio sample and a delayed audio sample from the delay buffer<br>
+\[4\]: Increase the current position of the delay buffer by one sample<br>
 
 ##EZ Distortion
 
