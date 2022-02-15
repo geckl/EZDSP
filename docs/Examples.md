@@ -31,9 +31,9 @@ Here's what each line of code does:
 \[3\]: Output current audio sample and a delayed audio sample from the delay buffer<br>
 \[4\]: Increase the current position of the delay buffer by one sample<br>
 
-##EZ Distortion
+## EZ Distortion
 
 
 
 
-##EZ Filter
+## EZ Filter
