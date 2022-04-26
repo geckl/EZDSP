@@ -2,6 +2,8 @@
 
 ## Prebuilt Binaries
 
-Mac: [EZDSPInstaller.dmg](./assets/EZDSPInstaller.dmg)
+Mac (AU): [EZDSPInstaller.dmg](./assets/EZDSPInstaller.dmg)
 
-Windows: Coming Soon!
+Mac (VST3): Coming Soon!
+
+Windows (VST3): Coming Soon!
