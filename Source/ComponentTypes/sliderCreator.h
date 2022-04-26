@@ -49,9 +49,7 @@ public:
     juce::Label sizeLabel { {}, "Size: " };
     
     //juce::ComboBox typeValue;
-    
     juce::TextEditor minValue, maxValue, initValue, intervalValue, nameValue;
-    
     juce::TooltipWindow variableTips {this};
     
     guiCreator *guiWindowCallback;
