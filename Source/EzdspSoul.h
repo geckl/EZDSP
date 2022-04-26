@@ -277,7 +277,10 @@ public:
         //juce::var bpm;
         
         currentPlayHead = this->getPlayHead();
-        plugin->setPlayHead(currentPlayHead);
+        if (plugin != nullptr)
+        {
+            plugin->setPlayHead(currentPlayHead);
+        }
         //currentPlayHead->getCurrentPosition (currentPositionInfo);
         //bpm = currentPositionInfo.bpm;
         //std::cout << plugin->sendInputEvent("SAMPLES_PER_BEAT",(60/bpm)*getSampleRate());

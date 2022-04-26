@@ -9,10 +9,10 @@
 namespace BinaryData
 {
     extern const char*   Default_soul;
-    const int            Default_soulSize = 1191;
+    const int            Default_soulSize = 1249;
 
     extern const char*   Default_soulpatch;
-    const int            Default_soulpatchSize = 372;
+    const int            Default_soulpatchSize = 386;
 
     extern const char*   EZDSPLogo_png;
     const int            EZDSPLogo_pngSize = 34703;
