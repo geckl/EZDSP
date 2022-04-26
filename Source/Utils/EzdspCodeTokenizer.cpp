@@ -22,7 +22,7 @@ struct EzdspTokeniserFunctions
             { "do", "if", nullptr };
 
         static const char* const keywords3Char[] =
-            { "for", "int", "let", "var", nullptr };
+            { "BPM", "for", "int", "let", "var", nullptr };
 
         static const char* const keywords4Char[] =
             { "bool", "else", "loop", "true", "void", "wrap", nullptr };
@@ -34,7 +34,7 @@ struct EzdspTokeniserFunctions
             { "output", "return", "string", "struct", nullptr};
 
         static const char* const keywordsOther[] =
-            { "connection", "continue", "external", "float32", "float64", "namespace", "processor", "BPM", "CURRENTSAMPLE", "DENOMINATOR", "NUMERATOR", "SAMPLESPERBEAT", nullptr };
+            { "connection", "continue", "external", "float32", "float64", "namespace", "processor", "CURRENTSAMPLE", "DENOMINATOR", "NUMERATOR", "SAMPLESPERBEAT", nullptr };
 
         const char* const* k;
 
