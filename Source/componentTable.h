@@ -10,11 +10,13 @@
 
 #pragma once
 
+#include "ComponentTypes/Types.h"
+
 class componentTable    : public juce::Component,
                           public juce::TableListBoxModel
 {
 public:
-    componentTable(juce::Array < juce::Array <juce::String>> *c)
+    componentTable(juce::Array < EZDSPComponent> *c)
     {
 
         addAndMakeVisible (table);
@@ -176,7 +178,7 @@ private:
     juce::XmlElement* columnList = nullptr;
     juce::XmlElement* dataList = nullptr;
     
-    juce::Array <juce::Array <juce::String>> *componentsArray;
+    juce::Array <EZDSPComponent> *componentsArray;
 
     //==============================================================================
     class SelectionColumnCustomComponent    : public Component

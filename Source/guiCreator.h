@@ -15,6 +15,7 @@
 #include "ComponentTypes/sliderCreator.h"
 #include "ComponentTypes/bufferCreator.h"
 #include "ComponentTypes/buttonCreator.h"
+#include "ComponentTypes/Types.h"
 #include "componentTable.h"
 
 //==============================================================================
@@ -30,7 +31,7 @@ class guiCreator  : public juce::TopLevelWindow,
                     private juce::Button::Listener
 {
 public:
-    guiCreator(const juce::String& name, juce::Array<juce::Array <juce::String>> *g, juce::Button *b);
+    guiCreator(const juce::String& name, juce::Array<EZDSPComponent> *g, juce::Button *b);
     ~guiCreator() override;
 
     void paint (juce::Graphics&) override;
@@ -46,7 +47,7 @@ public:
     juce::ComboBox addGUIComponent;
     
     juce::Component::SafePointer<juce::Component> createAComponentWindow;
-    juce::Array<juce::Array <juce::String>> *guiCodeArray;
+    juce::Array<EZDSPComponent> *guiCodeArray;
     juce::Button *runCodeButton;
     
     juce::Component::SafePointer<componentTable> myTable;

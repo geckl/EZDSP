@@ -10,9 +10,10 @@
 
 #include <JuceHeader.h>
 #include "guiCreator.h"
+//#include "ComponentTypes/Types.h"
 
 //==============================================================================
-guiCreator::guiCreator(const juce::String& name, juce::Array<juce::Array <juce::String>> *g, juce::Button *b)
+guiCreator::guiCreator(const juce::String& name, juce::Array<EZDSPComponent> *g, juce::Button *b)
 : TopLevelWindow (name, true)
 {
     // In your constructor, you should add any child components, and

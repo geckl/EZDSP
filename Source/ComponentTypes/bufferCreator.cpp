@@ -11,6 +11,8 @@
 #include <JuceHeader.h>
 #include "bufferCreator.h"
 #include "../Utils/Vectors.h"
+#include "Types.h"
+#include <string>
 //#include "guiCreator.h"
 
 //==============================================================================
@@ -93,8 +95,13 @@ void bufferCreator::buttonClicked(juce::Button* button)
     {
         if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
         {
-            juce::Array<juce::String> componentParameters;
             
+            const Buffer bufferComponent;
+            bufferComponent.name = nameValue.getText();
+            bufferComponent.type = typeValue.getText();
+            bufferComponent.size = std::stoi(sizeValue.getText());
+            
+            /*juce::Array<juce::String> componentParameters;
             
             componentParameters.add("BUFFER");
             componentParameters.add(nameValue.getText()+"[" + nameValue.getText() + "Index]");
@@ -106,10 +113,10 @@ void bufferCreator::buttonClicked(juce::Button* button)
             componentParameters.add(sizeValue.getText());
             componentParameters.add("OFF");
             componentParameters.add("3");
-            componentParameters.add(nameValue.getText());
+            componentParameters.add(nameValue.getText());*/
            
             
-            guiWindowCallback->guiCodeArray->add(componentParameters);
+            guiWindowCallback->guiCodeArray->add(bufferComponent);
             
             //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
             std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),

@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "buttonCreator.h"
 #include "../Utils/Vectors.h"
+#include "Types.h"
 //#include "guiCreator.h"
 
 //==============================================================================
@@ -82,8 +83,11 @@ void buttonCreator::buttonClicked(juce::Button* button)
     {
         if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
         {
-            juce::Array<juce::String> componentParameters;
             
+            const Button buttonComponent;
+            buttonComponent.name = nameValue.getText();
+            
+            /*juce::Array<juce::String> componentParameters;
             
             componentParameters.add("BUTTON");
             componentParameters.add(nameValue.getText());
@@ -95,10 +99,10 @@ void buttonCreator::buttonClicked(juce::Button* button)
             componentParameters.add("");
             componentParameters.add("OFF");
             componentParameters.add("2");
-            componentParameters.add(nameValue.getText());
+            componentParameters.add(nameValue.getText());*/
            
             
-            guiWindowCallback->guiCodeArray->add(componentParameters);
+            guiWindowCallback->guiCodeArray->add(buttonComponent);
             
             //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
             std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),

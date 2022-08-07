@@ -27,6 +27,7 @@
         <FILE id="xQgHje" name="Vectors.h" compile="0" resource="0" file="Source/Utils/Vectors.h"/>
       </GROUP>
       <GROUP id="{3FFB8025-A835-E444-C647-94B8850FA675}" name="ComponentTypes">
+        <FILE id="dkQnOg" name="Types.h" compile="0" resource="0" file="Source/ComponentTypes/Types.h"/>
         <FILE id="rJ85uk" name="bufferCreator.cpp" compile="1" resource="0"
               file="Source/ComponentTypes/bufferCreator.cpp"/>
         <FILE id="n7NtnI" name="bufferCreator.h" compile="0" resource="0" file="Source/ComponentTypes/bufferCreator.h"/>

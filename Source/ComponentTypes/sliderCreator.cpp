@@ -12,6 +12,7 @@
 #include <JuceHeader.h>
 #include "sliderCreator.h"
 #include "../Utils/Vectors.h"
+#include "Types.h"
 //#include "guiCreator.h"
 
 //==============================================================================
@@ -112,8 +113,15 @@ void sliderCreator::buttonClicked(juce::Button* button)
     {
         if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
         {
-            juce::Array<juce::String> componentParameters;
             
+            const Slider sliderComponent;
+            sliderComponent.name = nameValue.getText();
+            sliderComponent.minValue = std::stoi(minValue.getText());
+            sliderComponent.maxValue = std::stoi(maxValue.getText());
+            sliderComponent.initValue = std::stoi(initValue.getText());
+            sliderComponent.intervalValue = std::stoi(intervalValue.getText());
+            
+            /*juce::Array<juce::String> componentParameters;
             
             componentParameters.add("SLIDER");
             componentParameters.add(nameValue.getText());
@@ -126,10 +134,10 @@ void sliderCreator::buttonClicked(juce::Button* button)
             componentParameters.add("");
             componentParameters.add("OFF");
             componentParameters.add("1");
-            componentParameters.add(nameValue.getText());
+            componentParameters.add(nameValue.getText());*/
            
             
-            guiWindowCallback->guiCodeArray->add(componentParameters);
+            guiWindowCallback->guiCodeArray->add(sliderComponent);
             
             //Sort components so that variables appear last (standard vars must come after gui components in the soulpatch format)
             std::sort(guiWindowCallback->guiCodeArray->begin(), guiWindowCallback->guiCodeArray->end(),

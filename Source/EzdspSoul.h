@@ -28,6 +28,7 @@
 #include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
 #include "Utils/Vectors.h"
+#include "ComponentTypes/Types.h"
 
 
 namespace soul
@@ -59,9 +60,6 @@ public:
         updatePatchName();
         checkForSiblingPatch();
 
-        
-        //presetCode.copyFileTo(tempCode.getFile());
-        //presetPatch.copyFileTo(tempPatch.getFile());
         
         //Load default EZDSP patch from binary data into temp files
         tempCode.getFile().appendData(BinaryData::Default_soul, BinaryData::Default_soulSize);
@@ -570,24 +568,7 @@ public:
                 
                 for(int i=0; i< owner.guiArray.size();i++)
                 {
-                    if(owner.guiArray[i][0]== "NUMBER")
-                    {
-                        tempGuiCode+= owner.guiArray[i][2] + " " + owner.guiArray[i][10] + " = " + owner.guiArray[i][5] + ";\n";
-                    }
-                    
-                    else if(owner.guiArray[i][0]== "SLIDER")
-                    {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][10] + " [[ name: \"" +  owner.guiArray[i][10] + "\", min: " + owner.guiArray[i][3] +", max: " + owner.guiArray[i][4] + ", init:  " + owner.guiArray[i][5] + ", step: " + owner.guiArray[i][6] + " ]];\n";
-                    }
-                    else if(owner.guiArray[i][0]== "BUFFER")
-                    {
-                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][10] + ";\n" + "wrap<" + owner.guiArray[i][7] + "> " + owner.guiArray[i][10] + "Index;\n";
-                    }
-                    
-                    else if(owner.guiArray[i][0]== "BUTTON")
-                    {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][10] + " [[ name: \"" +  owner.guiArray[i][10] + "\", boolean ]];\n";
-                    }
+                    tempGuiCode+= guiArray[i].getCode();
                 }
                 
                 owner.guiCode.replaceAllContent(tempGuiCode);
@@ -708,7 +689,7 @@ private:
     std::unique_ptr<soul::patch::SOULPatchAudioProcessor> plugin;
     juce::ValueTree state;
     soul::patch::CompilerCache::Ptr compilerCache;
-    juce::Array<juce::Array <juce::String>> guiArray;
+    juce::Array<EZDSPComponent> guiArray;
 
     struct IDs
     {
