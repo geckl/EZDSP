@@ -34,7 +34,7 @@ struct EzdspTokeniserFunctions
             { "output", "return", "string", "struct", nullptr};
 
         static const char* const keywordsOther[] =
-            { "connection", "continue", "external", "float32", "float64", "namespace", "processor", "CURRENTSAMPLE", "DENOMINATOR", "NUMERATOR", "SAMPLESPERBEAT", nullptr };
+            { "connection", "continue", "external", "float32", "float64", "namespace", "processor", "CURRENTSAMPLE", "DENOMINATOR", "NUMERATOR", "SAMPLESPERBEAT", "SAMPLERATE", nullptr };
 
         const char* const* k;
 

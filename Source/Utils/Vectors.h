@@ -20,7 +20,7 @@ const std::vector<std::string> reservedWords = {
     "break", "clamp", "const", "event", "false", "float", "graph", "input", "int32", "int64", "using", "while",
     "output", "return", "string", "struct",
     "connection", "continue", "external", "float32", "float64", "namespace", "processor",
-    "BPM", "CURRENTSAMPLE", "DENOMINATOR", "NUMERATOR", "SAMPLESPERBEAT"
+    "BPM", "CURRENTSAMPLE", "DENOMINATOR", "NUMERATOR", "SAMPLERATE", "SAMPLESPERBEAT"
 };
 
 extern std::vector<std::string> usedWords;
