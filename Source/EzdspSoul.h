@@ -64,7 +64,7 @@ public:
         //presetPatch.copyFileTo(tempPatch.getFile());
         
         //Load default EZDSP patch from binary data into temp files
-        tempCode.getFile().appendText(BinaryData::Default_soul, BinaryData::Default_soulSize);
+        tempCode.getFile().appendData(BinaryData::Default_soul, BinaryData::Default_soulSize);
         tempPatch.getFile().appendData(BinaryData::Default_soulpatch, BinaryData::Default_soulpatchSize);
         
         //set new .soulpatch file to link up with new .soul file
