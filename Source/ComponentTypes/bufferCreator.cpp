@@ -25,6 +25,15 @@ bufferCreator::bufferCreator(guiCreator* g)
     sizeValue.setInputRestrictions(0,"0123456789");
     nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
     
+    bufferLabel.setFont (juce::Font (24.0f, juce::Font::bold));
+    bufferLabel.setJustificationType (juce::Justification::centred);
+    parametersLabel.setJustificationType (juce::Justification::centred);
+    
+    typeLabel.attachToComponent(&typeValue, true);
+    sizeLabel.attachToComponent(&sizeValue, true);
+    nameLabel.attachToComponent(&nameValue, true);
+    
+    addAndMakeVisible(bufferLabel);
     addAndMakeVisible(parametersLabel);
     addAndMakeVisible(nameLabel);
     addAndMakeVisible(sizeLabel);
@@ -63,11 +72,13 @@ void bufferCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    
+    g.fillRect (0, 0, getWidth(), 125);
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
     g.drawFittedText ("A buffer component is an array that can be used to store data (usually audio samples). Each buffer comes with an indexer that is initialized to zero and possesses the same name as the buffer with \"Index\" appended. This indexer is memory safe, meaning that any values outside the buffer range loop back around to the start of the buffer.", getLocalBounds().reduced(100, 50),
-                juce::Justification::centred, 8);   // Explain component
+                juce::Justification::centredTop, 8);   // Explain component
 }
 
 void bufferCreator::resized()
@@ -75,13 +86,12 @@ void bufferCreator::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
     
-    parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    nameLabel.setBounds(0, 40, 120, 20);
-    nameValue.setBounds(120, 40, 100, 20);
-    typeLabel.setBounds(0, 70, 120, 20);
-    typeValue.setBounds(120, 70, 100, 20);
-    sizeLabel.setBounds(0, 100, 120, 20);
-    sizeValue.setBounds(120, 100, 100, 20);
+    
+    bufferLabel.setBounds(0, 0, getWidth(), getHeight()*0.1);
+    parametersLabel.setBounds ((getWidth()/2)-100, 150, 200, 20);
+    typeValue.setBounds ((getWidth()/2)-50, 180, 100, 20);
+    sizeValue.setBounds ((getWidth()/2)-50, 210, 100, 20);
+    nameValue.setBounds((getWidth()/2)-50, 240, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }

@@ -38,13 +38,13 @@ public:
     
     juce::TextButton createComponent;
     
-    juce::Label componentLabel   { {}, "Component Type: "};
-    juce::Label parametersLabel  { {}, "Component Parameters: "};
+    juce::Label numberLabel { {}, "Number"};
+    juce::Label parametersLabel  { {}, "Component Parameters:"};
     juce::Label minLabel { {}, "Min Value: "};
     juce::Label maxLabel { {}, "Max Value: "};
     juce::Label initLabel { {}, "Initial Value: "};
     juce::Label intervalLabel { {}, "Step: "};
-    juce::Label nameLabel { {}, "Number Name: "};
+    juce::Label nameLabel { {}, "Variable Name: "};
     juce::Label typeLabel { {}, "Data Type: " };
     juce::Label sizeLabel { {}, "Size: " };
     

@@ -22,11 +22,18 @@ numberCreator::numberCreator(guiCreator* g)
     typeValue.addItem ("int",  1);
     typeValue.addItem ("float",  2);
     
-    
     initValue.setInputRestrictions(0, "0123456789.-");
     nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
     
+    numberLabel.setFont (juce::Font (24.0f, juce::Font::bold));
+    numberLabel.setJustificationType (juce::Justification::centred);
+    parametersLabel.setJustificationType (juce::Justification::centred);
    
+    initLabel.attachToComponent(&initValue, true);
+    nameLabel.attachToComponent(&nameValue, true);
+    typeLabel.attachToComponent(&typeValue, true);
+    
+    addAndMakeVisible(numberLabel);
     addAndMakeVisible(parametersLabel);
     addAndMakeVisible(initLabel);
     addAndMakeVisible(nameLabel);
@@ -40,7 +47,6 @@ numberCreator::numberCreator(guiCreator* g)
     initValue.setTooltip("The number's initial value ");
     nameValue.setTooltip("The variable name used to access the number's current value");
     typeValue.setTooltip("The value type that the number stores (integer or floating-point)");
-   
 
     createComponent.setSize(150,50);
     createComponent.setButtonText("Create");
@@ -67,11 +73,13 @@ void numberCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    
+    g.fillRect (0, 0, getWidth(), 125);
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
     g.drawFittedText ("A number stores a single real value that can be accessed from anywhere in your code. Use it to store numbers that may need to change throughout the duration of your signal processing.", getLocalBounds().reduced(100, 50),
-                juce::Justification::centred, 8);   // Explain component
+                juce::Justification::centredTop, 8);   // Explain component
 }
 
 void numberCreator::resized()
@@ -79,13 +87,11 @@ void numberCreator::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
     
-    parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    initLabel.setBounds (0, 40, 120, 20);
-    initValue.setBounds (120, 40, 100, 20);
-    nameLabel.setBounds(0, 70, 120, 20);
-    nameValue.setBounds(120, 70, 100, 20);
-    typeLabel.setBounds(0, 100, 120, 20);
-    typeValue.setBounds(120, 100, 100, 20);
+    numberLabel.setBounds(0, 0, getWidth(), getHeight()*0.1);
+    parametersLabel.setBounds ((getWidth()/2)-150, 150, 300, 20);
+    typeValue.setBounds((getWidth()/2)-50, 180, 100, 20);
+    initValue.setBounds ((getWidth()/2)-50, 210, 100, 20);
+    nameValue.setBounds ((getWidth()/2)-50, 240, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }

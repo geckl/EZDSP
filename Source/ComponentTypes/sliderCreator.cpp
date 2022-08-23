@@ -29,6 +29,17 @@ sliderCreator::sliderCreator(guiCreator* g)
     intervalValue.setInputRestrictions(0, "0123456789.-");
     nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
    
+    sliderLabel.setFont (juce::Font (24.0f, juce::Font::bold));
+    sliderLabel.setJustificationType (juce::Justification::centred);
+    parametersLabel.setJustificationType (juce::Justification::centred);
+    
+    minLabel.attachToComponent(&minValue, true);
+    maxLabel.attachToComponent(&maxValue, true);
+    initLabel.attachToComponent(&initValue, true);
+    intervalLabel.attachToComponent(&intervalValue, true);
+    nameLabel.attachToComponent(&nameValue, true);
+    
+    addAndMakeVisible(sliderLabel);
     addAndMakeVisible(parametersLabel);
     addAndMakeVisible(minLabel);
     addAndMakeVisible(maxLabel);
@@ -49,8 +60,7 @@ sliderCreator::sliderCreator(guiCreator* g)
     initValue.setTooltip("The slider's initial value");
     intervalValue.setTooltip("The interval between slider values");
     nameValue.setTooltip("The slider's label and the variable name used to access the slider's current value");
-   
-
+    
     createComponent.setSize(150,50);
     createComponent.setButtonText("Create");
     addAndMakeVisible(&createComponent);
@@ -76,11 +86,13 @@ void sliderCreator::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    
+    g.fillRect (0, 0, getWidth(), 125);
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawFittedText ("A slider component outputs a stream of values, meaning it's accompanying variable is constantly updated to reflect the slider's current position. Use this component to graphically control certain signal processing parameters.", getLocalBounds().reduced(100, 50),
-                juce::Justification::centred, 8);   // Explain component
+    g.drawFittedText ("A slider component outputs a stream of values, meaning it's accompanying variable is constantly updated to reflect the slider's current position. Use this component to graphically control certain signal processing parameters.", getLocalBounds().reduced(50, 50),
+                juce::Justification::centredTop, 8);   // Explain component
 }
 
 void sliderCreator::resized()
@@ -88,19 +100,15 @@ void sliderCreator::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
     
-    parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    minLabel.setBounds (0, 40, 120, 20);
-    minValue.setBounds (120, 40, 100, 20);
-    maxLabel.setBounds (0, 70, 120, 20);
-    maxValue.setBounds (120, 70, 100, 20);
-    initLabel.setBounds (0, 100, 120, 20);
-    initValue.setBounds (120, 100, 100, 20);
-    intervalLabel.setBounds (0, 130, 120, 20);
-    intervalValue.setBounds (120, 130, 100, 20);
-    nameLabel.setBounds(0, 160, 120, 20);
-    nameValue.setBounds(120, 160, 100, 20);
-    //typeLabel.setBounds(0, 190, 120, 20);
-    //typeValue.setBounds(120, 190, 100, 20);
+    sliderLabel.setBounds(0, 0, getWidth(), getHeight()*0.1);
+    parametersLabel.setBounds ((getWidth()/2)-100, 150, 200, 20);
+    minValue.setBounds ((getWidth()/2)-50, 180, 100, 20);
+    maxValue.setBounds ((getWidth()/2)-50, 210, 100, 20);
+    initValue.setBounds ((getWidth()/2)-50, 240, 100, 20);
+    intervalValue.setBounds ((getWidth()/2)-50, 270, 100, 20);
+    nameValue.setBounds((getWidth()/2)-50, 300, 100, 20);
+    //typeLabel.setBounds(0, 330, 120, 20);
+    //typeValue.setBounds(120, 330, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }
