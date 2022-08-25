@@ -304,10 +304,11 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
             
             for(int i = 0; i < params.size(); i++)
             {
-                DBG(juce::String(params[i]->name));
+                //DBG(juce::String(params[i]->name));
                 if(juce::String(params[i]->name) == slider1->getParameterID())
                 {
-                    params[i]->setValue(slider1->get());
+                    //convert from [0,1] to slider range
+                    params[i]->setValue((slider1->get()*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
                 }
             }
         }
