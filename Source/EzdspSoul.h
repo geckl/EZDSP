@@ -28,6 +28,7 @@
 #include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
 #include "Utils/Vectors.h"
+#include "renamableParameter.h"
 
 
 namespace soul
@@ -74,6 +75,7 @@ public:
         obj->setProperty("source",tempCode.getFile().getRelativePathFrom(tempPatch.getFile()));
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
+        addParameter (slider1 = new juce::AudioParameterFloat (juce::ParameterID { "GAIN",  2 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         
         //Create an initial gain slider component
         juce::Array<juce::String> initialComponentParameters;
@@ -117,6 +119,14 @@ public:
         
         updatePatch();
         updatePatchState();
+        
+        /*auto params = plugin -> getPatchParameters();
+        
+        for(int i = 0; i < params.size(); i++)
+        {
+            std::cout << "PATCH PARAMETERS\n";
+            std::cout << params[i]->getName(100);
+        }*/
     }
 
     ~EZDSPPlugin() override
@@ -270,6 +280,7 @@ public:
         
         if (plugin != nullptr)
             plugin->prepareToPlay (sampleRate, samplesPerBlock);
+        
     }
 
     void releaseResources() override
@@ -308,6 +319,7 @@ public:
         //plugin->getPatchPlayer()->applyNewTempo(bpm);
         
         if (plugin != nullptr && ! isSuspended())
+            plugin->updateParameters(slider1);
             return plugin->processBlock (audio, midi);
 
         audio.clear();
@@ -648,6 +660,8 @@ public:
     
     juce::AudioPlayHead* currentPlayHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
+    
+    juce::AudioParameterFloat* slider1;
 
 private:
     //==============================================================================
