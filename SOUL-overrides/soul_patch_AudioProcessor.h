@@ -311,6 +311,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                     params[i]->setValue((slider1->get()*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
                 }
             }
+            
+            updateHostDisplay();
         }
     }
 
