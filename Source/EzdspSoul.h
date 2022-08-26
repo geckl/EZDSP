@@ -50,7 +50,8 @@ namespace patch
 */
 
 template <typename PatchLibrary>
-class EZDSPPlugin  : public juce::AudioProcessor
+class EZDSPPlugin  : public juce::AudioProcessor,
+                     public juce::AudioProcessorParameter::Listener
 {
 public:
     EZDSPPlugin (PatchLibrary&& library)
@@ -76,6 +77,7 @@ public:
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
         addParameter (slider1 = new juce::AudioParameterFloat (juce::ParameterID { "GAIN",  2 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider1->addListener(this);
         
         //Create an initial gain slider component
         juce::Array<juce::String> initialComponentParameters;
@@ -302,6 +304,16 @@ public:
             plugin->setBusesLayout(getBusesLayout());
         }
     }
+    
+    void parameterValueChanged(int index, float newValue) override
+    {
+        plugin->updateParameter(getParameters()[index]->getName(25), newValue);
+    }
+    
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override
+    {
+        
+    }
 
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
     {
@@ -319,7 +331,6 @@ public:
         //plugin->getPatchPlayer()->applyNewTempo(bpm);
         
         if (plugin != nullptr && ! isSuspended())
-            plugin->updateParameters(slider1);
             return plugin->processBlock (audio, midi);
 
         audio.clear();

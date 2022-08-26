@@ -294,21 +294,22 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         midiKeyboardState.reset();
     }
     
-    void updateParameters(juce::AudioParameterFloat* slider1)
+    void updateParameter(juce::String parameterName, float newValue)
     {
         if (player != nullptr && player->isPlayable() && ! isSuspended())
         {
         
             auto params = player->getParameters();
-            std::cout << params.size();
+            //std::cout << params.size();
             
             for(int i = 0; i < params.size(); i++)
             {
                 //DBG(juce::String(params[i]->name));
-                if(juce::String(params[i]->name) == slider1->getParameterID())
+                if(juce::String(params[i]->name) == parameterName)
                 {
                     //convert from [0,1] to slider range
-                    params[i]->setValue((slider1->get()*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
+                    params[i]->setValue((newValue*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
+                    //slider1->setValueNotifyingHost(params[i]->getValue());
                 }
             }
             

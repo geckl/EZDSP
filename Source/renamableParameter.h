@@ -35,6 +35,9 @@ public:
         processor.updateHostDisplay (details);
     }
 
+    bool isMetaParameter() const override { return true; }
+    bool isOrientationInverted() const override { return true; }
+    
 private:
     juce::String name;
 };
