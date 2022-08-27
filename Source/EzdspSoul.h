@@ -76,8 +76,41 @@ public:
         obj->setProperty("source",tempCode.getFile().getRelativePathFrom(tempPatch.getFile()));
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
-        addParameter (slider1 = new juce::AudioParameterFloat (juce::ParameterID { "GAIN",  2 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         slider1->addListener(this);
+        
+        addParameter (slider2 = new Renameable (juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider2->addListener(this);
+        
+        addParameter (slider3 = new Renameable (juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider3->addListener(this);
+        
+        addParameter (slider4 = new Renameable (juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider4->addListener(this);
+        
+        addParameter (slider5 = new Renameable (juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider5->addListener(this);
+        
+        renameableParameters.add(slider1);
+        renameableParameters.add(slider2);
+        renameableParameters.add(slider3);
+        renameableParameters.add(slider4);
+        renameableParameters.add(slider5);
+        
+        /*addParameter (slider1 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "1PARAM",  1 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
+        slider1->addListener(this);
+        
+        addParameter (slider2 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
+        slider2->addListener(this);
+        
+        addParameter (slider3 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
+        slider3->addListener(this);
+        
+        addParameter (slider4 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
+        slider4->addListener(this);
+        
+        addParameter (slider5 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
+        slider5->addListener(this);*/
         
         //Create an initial gain slider component
         juce::Array<juce::String> initialComponentParameters;
@@ -238,6 +271,8 @@ public:
     {
         juce::String guiCode="";
         
+        int sliderCount = 0;
+        
         for(int i=0; i< guiArray.size();i++)
         {
             if(guiArray[i][0]== "NUMBER")
@@ -248,6 +283,15 @@ public:
             else if(guiArray[i][0]== "SLIDER")
             {
                 guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", min: " + guiArray[i][3] +", max: " + guiArray[i][4] + ", init:  " + guiArray[i][5] + ", step: " + guiArray[i][6] + " ]];\n";
+                
+                if(sliderCount < 5)
+                {
+                    renameableParameters[sliderCount]->setName(guiArray[i][10]);
+                    /*renameableParameters[sliderCount]->beginChangeGesture();
+                    renameableParameters[sliderCount]->setValueNotifyingHost((guiArray[i][5].getFloatValue()-guiArray[i][3].getFloatValue())*(1/(guiArray[i][4].getFloatValue() - guiArray[i][3].getFloatValue())));
+                    sliderCount++;
+                    renameableParameters[sliderCount]->endChangeGesture();*/
+                }
             }
             else if(guiArray[i][0]== "BUFFER")
             {
@@ -259,6 +303,8 @@ public:
                 guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
             }
         }
+        
+        updateHostDisplay();
         return guiCode;
     }
     
@@ -672,7 +718,8 @@ public:
     juce::AudioPlayHead* currentPlayHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
     
-    juce::AudioParameterFloat* slider1;
+    Renameable *slider1, *slider2, *slider3, *slider4, *slider5;
+    juce::OwnedArray<Renameable> renameableParameters;
 
 private:
     //==============================================================================

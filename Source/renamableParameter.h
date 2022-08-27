@@ -10,12 +10,17 @@
 
 #pragma once
 
-template<typename Parameter>
-class Renameable : public Parameter
+class Renameable : public juce::AudioParameterFloat
 {
 public:
-    template<typename... Args>
-    Renameable (Args&&... args) : Parameter (std::forward<Args>(args)...) {}
+    
+    //using juce::AudioParameterFloat::AudioParameterFloat;
+    
+    Renameable(const juce::ParameterID &parameterID, const juce::String &parameterName, juce::NormalisableRange< float > normalisableRange, float defaultValue, const juce::AudioParameterFloatAttributes &attributes={})
+    : AudioParameterFloat {parameterID, parameterName, normalisableRange, defaultValue, attributes}
+    {
+        setName(parameterName);
+    }
 
     juce::String getName (int maximumStringLength) const override
     {
@@ -35,9 +40,7 @@ public:
         processor.updateHostDisplay (details);
     }
 
-    bool isMetaParameter() const override { return true; }
-    bool isOrientationInverted() const override { return true; }
-    
 private:
     juce::String name;
 };
+
