@@ -10,6 +10,7 @@
 
 #pragma once
 
+// Custom Audio Parameter class that allows for editable parameter names
 class Renameable : public juce::AudioParameterFloat
 {
 public:

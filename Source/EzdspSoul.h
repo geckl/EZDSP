@@ -168,6 +168,7 @@ public:
         }
     }
     
+    // Generates EZDSP code and overwrites the patch
     void updatePatch()
     {
         suspendProcessing(true);
@@ -201,6 +202,7 @@ public:
         suspendProcessing(false);
     }
     
+    // Inserts user's DSP and GUI code into the EZDSP SOUL patch
     juce::String combineCode (juce::String guiCode, juce::String dspCode)
     {
         juce::String code1 = R"(
@@ -255,6 +257,7 @@ public:
         return combinedCode;
     }
     
+    // Takes an array of EZDSP component data and converts it into functional SOUL code
     juce::String guiArrayToCode(juce::Array<juce::Array <juce::String>> guiArray)
     {
         juce::String guiCode="";
@@ -295,6 +298,7 @@ public:
         return guiCode;
     }
     
+    // Updates the SOUL patch's built in SAMPLERATE variable
     void updateSampleRateVariable(double sampleRate)
     {
         //update sample rate global variable
@@ -338,6 +342,7 @@ public:
         }
     }
     
+    // Listens for automation changes and passes these values along to the SOUL patch
     void parameterValueChanged(int index, float newValue) override
     {
         if(!isSuspended())
