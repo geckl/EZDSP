@@ -76,7 +76,7 @@ public:
         obj->setProperty("source",tempCode.getFile().getRelativePathFrom(tempPatch.getFile()));
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
-        addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         slider1->addListener(this);
         
         addParameter (slider2 = new Renameable (juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
@@ -96,21 +96,6 @@ public:
         renameableParameters.add(slider3);
         renameableParameters.add(slider4);
         renameableParameters.add(slider5);
-        
-        /*addParameter (slider1 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "1PARAM",  1 }, "GAIN", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
-        slider1->addListener(this);
-        
-        addParameter (slider2 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
-        slider2->addListener(this);
-        
-        addParameter (slider3 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
-        slider3->addListener(this);
-        
-        addParameter (slider4 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
-        slider4->addListener(this);
-        
-        addParameter (slider5 = new Renameable <juce::AudioParameterFloat> {juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f});
-        slider5->addListener(this);*/
         
         //Create an initial gain slider component
         juce::Array<juce::String> initialComponentParameters;
@@ -185,6 +170,7 @@ public:
     
     void updatePatch()
     {
+        suspendProcessing(true);
         const juce::String guiCode = guiArrayToCode(guiArray);
         tempCode.getFile().replaceWithText(combineCode(guiCode, dspCode.getAllContent()),false,false,nullptr);
         
@@ -197,20 +183,22 @@ public:
             //add component names to vector of in-use variable names
             usedWords.push_back(guiArray[i][10].toStdString());
             
-            juce::Array<juce::var> parametersStorage;
+            juce::Array<juce::var> componentStorage;
             for(int j=0;j<guiArray[i].size();j++)
             {
                 //DBG("String Array Size: ");
                 //DBG(owner.guiArray[i].size());
-                parametersStorage.add(guiArray[i][j]);
+                componentStorage.add(guiArray[i][j]);
             }
-            componentsStorage.add(parametersStorage);
+            componentsStorage.add(componentStorage);
         }
         
         juce::var tempGUI= componentsStorage;
         state.setProperty(ids.patchComponents, tempGUI, nullptr);
         juce::var tempDSP = dspCode.getAllContent();
         state.setProperty(ids.patchDSP, tempDSP, nullptr);
+        
+        suspendProcessing(false);
     }
     
     juce::String combineCode (juce::String guiCode, juce::String dspCode)
@@ -286,11 +274,11 @@ public:
                 
                 if(sliderCount < 5)
                 {
-                    renameableParameters[sliderCount]->setName(guiArray[i][10]);
-                    /*renameableParameters[sliderCount]->beginChangeGesture();
+                    renameableParameters[sliderCount]->setNameNotifyingHost(guiArray[i][10], *this);
+                    renameableParameters[sliderCount]->beginChangeGesture();
                     renameableParameters[sliderCount]->setValueNotifyingHost((guiArray[i][5].getFloatValue()-guiArray[i][3].getFloatValue())*(1/(guiArray[i][4].getFloatValue() - guiArray[i][3].getFloatValue())));
+                    renameableParameters[sliderCount]->endChangeGesture();
                     sliderCount++;
-                    renameableParameters[sliderCount]->endChangeGesture();*/
                 }
             }
             else if(guiArray[i][0]== "BUFFER")
@@ -303,7 +291,6 @@ public:
                 guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
             }
         }
-        
         updateHostDisplay();
         return guiCode;
     }
@@ -353,7 +340,10 @@ public:
     
     void parameterValueChanged(int index, float newValue) override
     {
-        plugin->updateParameter(getParameters()[index]->getName(25), newValue);
+        if(!isSuspended())
+        {
+            plugin->updateParameter(getParameters()[index]->getName(25), newValue);
+        }
     }
     
     void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override

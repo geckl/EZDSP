@@ -300,7 +300,6 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         {
         
             auto params = player->getParameters();
-            //std::cout << params.size();
             
             for(int i = 0; i < params.size(); i++)
             {
@@ -309,7 +308,6 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                 {
                     //convert from [0,1] to slider range
                     params[i]->setValue((newValue*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
-                    //slider1->setValueNotifyingHost(params[i]->getValue());
                 }
             }
             
