@@ -28,6 +28,7 @@
 #include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
 #include "Utils/Vectors.h"
+#include "renamableParameter.h"
 
 
 namespace soul
@@ -49,7 +50,8 @@ namespace patch
 */
 
 template <typename PatchLibrary>
-class EZDSPPlugin  : public juce::AudioProcessor
+class EZDSPPlugin  : public juce::AudioProcessor,
+                     public juce::AudioProcessorParameter::Listener
 {
 public:
     EZDSPPlugin (PatchLibrary&& library)
@@ -74,6 +76,26 @@ public:
         obj->setProperty("source",tempCode.getFile().getRelativePathFrom(tempPatch.getFile()));
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
+        addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider1->addListener(this);
+        
+        addParameter (slider2 = new Renameable (juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider2->addListener(this);
+        
+        addParameter (slider3 = new Renameable (juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider3->addListener(this);
+        
+        addParameter (slider4 = new Renameable (juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider4->addListener(this);
+        
+        addParameter (slider5 = new Renameable (juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        slider5->addListener(this);
+        
+        renameableParameters.add(slider1);
+        renameableParameters.add(slider2);
+        renameableParameters.add(slider3);
+        renameableParameters.add(slider4);
+        renameableParameters.add(slider5);
         
         //Create an initial gain slider component
         juce::Array<juce::String> initialComponentParameters;
@@ -117,6 +139,14 @@ public:
         
         updatePatch();
         updatePatchState();
+        
+        /*auto params = plugin -> getPatchParameters();
+        
+        for(int i = 0; i < params.size(); i++)
+        {
+            std::cout << "PATCH PARAMETERS\n";
+            std::cout << params[i]->getName(100);
+        }*/
     }
 
     ~EZDSPPlugin() override
@@ -138,8 +168,10 @@ public:
         }
     }
     
+    // Generates EZDSP code and overwrites the patch
     void updatePatch()
     {
+        suspendProcessing(true);
         const juce::String guiCode = guiArrayToCode(guiArray);
         tempCode.getFile().replaceWithText(combineCode(guiCode, dspCode.getAllContent()),false,false,nullptr);
         
@@ -152,22 +184,25 @@ public:
             //add component names to vector of in-use variable names
             usedWords.push_back(guiArray[i][10].toStdString());
             
-            juce::Array<juce::var> parametersStorage;
+            juce::Array<juce::var> componentStorage;
             for(int j=0;j<guiArray[i].size();j++)
             {
                 //DBG("String Array Size: ");
                 //DBG(owner.guiArray[i].size());
-                parametersStorage.add(guiArray[i][j]);
+                componentStorage.add(guiArray[i][j]);
             }
-            componentsStorage.add(parametersStorage);
+            componentsStorage.add(componentStorage);
         }
         
         juce::var tempGUI= componentsStorage;
         state.setProperty(ids.patchComponents, tempGUI, nullptr);
         juce::var tempDSP = dspCode.getAllContent();
         state.setProperty(ids.patchDSP, tempDSP, nullptr);
+        
+        suspendProcessing(false);
     }
     
+    // Inserts user's DSP and GUI code into the EZDSP SOUL patch
     juce::String combineCode (juce::String guiCode, juce::String dspCode)
     {
         juce::String code1 = R"(
@@ -222,9 +257,12 @@ public:
         return combinedCode;
     }
     
+    // Takes an array of EZDSP component data and converts it into functional SOUL code
     juce::String guiArrayToCode(juce::Array<juce::Array <juce::String>> guiArray)
     {
         juce::String guiCode="";
+        
+        int sliderCount = 0;
         
         for(int i=0; i< guiArray.size();i++)
         {
@@ -236,6 +274,15 @@ public:
             else if(guiArray[i][0]== "SLIDER")
             {
                 guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", min: " + guiArray[i][3] +", max: " + guiArray[i][4] + ", init:  " + guiArray[i][5] + ", step: " + guiArray[i][6] + " ]];\n";
+                
+                if(sliderCount < 5)
+                {
+                    renameableParameters[sliderCount]->setNameNotifyingHost(guiArray[i][10], *this);
+                    renameableParameters[sliderCount]->beginChangeGesture();
+                    renameableParameters[sliderCount]->setValueNotifyingHost((guiArray[i][5].getFloatValue()-guiArray[i][3].getFloatValue())*(1/(guiArray[i][4].getFloatValue() - guiArray[i][3].getFloatValue())));
+                    renameableParameters[sliderCount]->endChangeGesture();
+                    sliderCount++;
+                }
             }
             else if(guiArray[i][0]== "BUFFER")
             {
@@ -247,9 +294,11 @@ public:
                 guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
             }
         }
+        updateHostDisplay();
         return guiCode;
     }
     
+    // Updates the SOUL patch's built in SAMPLERATE variable
     void updateSampleRateVariable(double sampleRate)
     {
         //update sample rate global variable
@@ -270,6 +319,7 @@ public:
         
         if (plugin != nullptr)
             plugin->prepareToPlay (sampleRate, samplesPerBlock);
+        
     }
 
     void releaseResources() override
@@ -290,6 +340,20 @@ public:
         {
             plugin->setBusesLayout(getBusesLayout());
         }
+    }
+    
+    // Listens for automation changes and passes these values along to the SOUL patch
+    void parameterValueChanged(int index, float newValue) override
+    {
+        if(!isSuspended())
+        {
+            plugin->updateParameter(getParameters()[index]->getName(25), newValue);
+        }
+    }
+    
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override
+    {
+        
     }
 
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
@@ -648,6 +712,9 @@ public:
     
     juce::AudioPlayHead* currentPlayHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
+    
+    Renameable *slider1, *slider2, *slider3, *slider4, *slider5;
+    juce::OwnedArray<Renameable> renameableParameters;
 
 private:
     //==============================================================================
