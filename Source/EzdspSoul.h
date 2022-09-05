@@ -139,18 +139,15 @@ public:
         
         updatePatch();
         updatePatchState();
-        
-        /*auto params = plugin -> getPatchParameters();
-        
-        for(int i = 0; i < params.size(); i++)
-        {
-            std::cout << "PATCH PARAMETERS\n";
-            std::cout << params[i]->getName(100);
-        }*/
     }
 
     ~EZDSPPlugin() override
     {
+        /*slider1->removeListener(this);
+        slider2->removeListener(this);
+        slider3->removeListener(this);
+        slider4->removeListener(this);
+        slider5->removeListener(this);*/
         plugin.reset();
         patchInstance = nullptr;
     }
@@ -714,7 +711,7 @@ public:
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
     
     Renameable *slider1, *slider2, *slider3, *slider4, *slider5;
-    juce::OwnedArray<Renameable> renameableParameters;
+    juce::Array<Renameable*> renameableParameters;
 
 private:
     //==============================================================================
