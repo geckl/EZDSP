@@ -143,11 +143,6 @@ public:
 
     ~EZDSPPlugin() override
     {
-        /*slider1->removeListener(this);
-        slider2->removeListener(this);
-        slider3->removeListener(this);
-        slider4->removeListener(this);
-        slider5->removeListener(this);*/
         plugin.reset();
         patchInstance = nullptr;
     }
