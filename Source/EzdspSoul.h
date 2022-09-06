@@ -112,21 +112,6 @@ public:
         initialComponentParameters.add("GAIN");
         guiArray.add(initialComponentParameters);
         
-        /*initialComponentParameters.clear();
-        
-        initialComponentParameters.add("NUMBER");
-        initialComponentParameters.add("SAMPLERATE");
-        initialComponentParameters.add("int");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("0");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("OFF");
-        initialComponentParameters.add("4");
-        initialComponentParameters.add("SAMPLERATE");
-        guiArray.add(initialComponentParameters);*/
-
         //Load soulpatch properties into ValueTree
         state = juce::ValueTree (ids.SOULPatchPlugin);
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
@@ -151,7 +136,6 @@ public:
     /** Sets a new .soulpatch file or URL for the plugin to load. */
     void setPatchURL (const std::string& newFileOrURL)
     {
-        //DBG(newFileOrURL);
         if (newFileOrURL != state.getProperty (ids.patchURL).toString().toStdString())
         {
             state = juce::ValueTree (ids.SOULPatchPlugin);
@@ -179,8 +163,6 @@ public:
             juce::Array<juce::var> componentStorage;
             for(int j=0;j<guiArray[i].size();j++)
             {
-                //DBG("String Array Size: ");
-                //DBG(owner.guiArray[i].size());
                 componentStorage.add(guiArray[i][j]);
             }
             componentsStorage.add(componentStorage);
@@ -293,25 +275,10 @@ public:
         updateHostDisplay();
         return guiCode;
     }
-    
-    // Updates the SOUL patch's built in SAMPLERATE variable
-    void updateSampleRateVariable(double sampleRate)
-    {
-        //update sample rate global variable
-        for(int i=0;i<guiArray.size();i++)
-        {
-            if(guiArray.getReference(i)[1]=="SAMPLERATE")
-            {
-                guiArray.getReference(i).set(5,juce::String(sampleRate));
-                break;
-            }
-        }
-    }
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override
     {
-        updateSampleRateVariable(sampleRate);
         
         if (plugin != nullptr)
             plugin->prepareToPlay (sampleRate, samplesPerBlock);
@@ -424,8 +391,6 @@ public:
             }
             
             guiArray=componentsStorage;
-            
-            // updateSampleRateVariable(getSampleRate());
             
             juce::String tempDSP = s.getProperty(ids.patchDSP);
             dspCode.replaceAllContent(tempDSP);
