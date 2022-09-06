@@ -112,7 +112,7 @@ public:
         initialComponentParameters.add("GAIN");
         guiArray.add(initialComponentParameters);
         
-        initialComponentParameters.clear();
+        /*initialComponentParameters.clear();
         
         initialComponentParameters.add("NUMBER");
         initialComponentParameters.add("SAMPLERATE");
@@ -125,7 +125,7 @@ public:
         initialComponentParameters.add("OFF");
         initialComponentParameters.add("4");
         initialComponentParameters.add("SAMPLERATE");
-        guiArray.add(initialComponentParameters);
+        guiArray.add(initialComponentParameters);*/
 
         //Load soulpatch properties into ValueTree
         state = juce::ValueTree (ids.SOULPatchPlugin);
@@ -213,6 +213,7 @@ public:
         event tempoIn (soul::timeline::Tempo t)
         {
         BPM = t.bpm;
+        SAMPLESPERBEAT = int(soul::timeline::framesPerBeat(t, processor.frequency));
         }
 
         event positionIn (soul::timeline::Position p)
@@ -226,8 +227,10 @@ public:
         DENOMINATOR = s.denominator;
         }
 
-        float BPM, SAMPLESPERBEAT;
-        int64 CURRENTSAMPLE, NUMERATOR, DENOMINATOR;
+        float BPM;
+        int32 NUMERATOR, DENOMINATOR, SAMPLESPERBEAT;
+        int32 SAMPLERATE = int32(processor.frequency);
+        int64 CURRENTSAMPLE;
 
         void run()
         {
@@ -248,6 +251,7 @@ public:
         juce::String combinedCode = code1 + guiCode + code2 + dspCode + code3;
         return combinedCode;
     }
+
     
     // Takes an array of EZDSP component data and converts it into functional SOUL code
     juce::String guiArrayToCode(juce::Array<juce::Array <juce::String>> guiArray)
@@ -358,10 +362,6 @@ public:
         {
             plugin->setPlayHead(currentPlayHead);
         }
-        //currentPlayHead->getCurrentPosition (currentPositionInfo);
-        //bpm = currentPositionInfo.bpm;
-        //std::cout << plugin->sendInputEvent("SAMPLES_PER_BEAT",(60/bpm)*getSampleRate());
-        //plugin->getPatchPlayer()->applyNewTempo(bpm);
         
         if (plugin != nullptr && ! isSuspended())
             return plugin->processBlock (audio, midi);
@@ -425,7 +425,7 @@ public:
             
             guiArray=componentsStorage;
             
-            updateSampleRateVariable(getSampleRate());
+            // updateSampleRateVariable(getSampleRate());
             
             juce::String tempDSP = s.getProperty(ids.patchDSP);
             dspCode.replaceAllContent(tempDSP);
