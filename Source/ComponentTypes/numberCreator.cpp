@@ -101,23 +101,35 @@ void numberCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
-        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
+        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) != reservedWords.end()) || (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) != usedWords.end()))
         {
-            juce::Array<juce::String> componentParameters;
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
+        } else if(typeValue.getSelectedId()<=0 || nameValue.getText().isEmpty() || initValue.getText().isEmpty())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Empty attribute");
+        } else if(typeValue.getSelectedId() == 1 && (initValue.getText().containsOnly("-") || initValue.getText().containsChar('.')))
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Invalid integer");
+        } else if(typeValue.getSelectedId() == 2 && initValue.getText().containsOnly(".-"))
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Invalid float");
+        } else{
             
+            auto init = initValue.getText().getFloatValue();
+            
+            juce::Array<juce::String> componentParameters;
             
             componentParameters.add("NUMBER");
             componentParameters.add(nameValue.getText());
             componentParameters.add(typeValue.getText());
             componentParameters.add("");
             componentParameters.add("");
-            componentParameters.add(initValue.getText());
+            componentParameters.add(juce::String(init));
             componentParameters.add("");
             componentParameters.add("");
             componentParameters.add("OFF");
             componentParameters.add("4");
             componentParameters.add(nameValue.getText());
-           
             
             guiWindowCallback->guiCodeArray->add(componentParameters);
             
@@ -131,11 +143,6 @@ void numberCreator::buttonClicked(juce::Button* button)
             
             //close the component creator window
             delete this->findParentComponentOfClass<juce::DialogWindow>();
-        }
-        
-        else{
-            //juce::AlertWindow keywordError("Error", "One of the values you enterred is a reserved keyword", juce::MessageBoxIconType::WarningIcon);
-            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
         }
     }
 }

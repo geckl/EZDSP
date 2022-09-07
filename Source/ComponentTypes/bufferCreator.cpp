@@ -101,10 +101,15 @@ void bufferCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
-        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
+        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) != reservedWords.end()) || (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) != usedWords.end()))
         {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
+        } else if(typeValue.getSelectedId()<=0 || nameValue.getText().isEmpty() || sizeValue.getText().isEmpty())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Empty attribute");
+        }
+        else{
             juce::Array<juce::String> componentParameters;
-            
             
             componentParameters.add("BUFFER");
             componentParameters.add(nameValue.getText()+"[" + nameValue.getText() + "Index]");
@@ -117,7 +122,6 @@ void bufferCreator::buttonClicked(juce::Button* button)
             componentParameters.add("OFF");
             componentParameters.add("3");
             componentParameters.add(nameValue.getText());
-           
             
             guiWindowCallback->guiCodeArray->add(componentParameters);
             
@@ -131,10 +135,6 @@ void bufferCreator::buttonClicked(juce::Button* button)
             
             //close the component creator window
             delete this->findParentComponentOfClass<juce::DialogWindow>();
-        }
-        else{
-            //juce::AlertWindow keywordError("Error", "One of the values you enterred is a reserved keyword", juce::MessageBoxIconType::WarningIcon);
-            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
         }
     }
 }
