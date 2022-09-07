@@ -331,10 +331,9 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
 
         if (player != nullptr && player->isPlayable() && ! isSuspended())
         {
-            //DBG("Suspended?: " << (isSuspended() ? "true" : "false"));
+            
             if (auto playhead = getPlayHead())
             {
-                //DBG("Get playhead!");
                 playheadState.updateAndApply (*playhead, *player);
             }
 
@@ -813,25 +812,21 @@ private:
     struct PlayheadState
     {
         soul::TimeSignature currentTimeSig;
-        float currentBPM = 0;
-        int64_t currentFramePos = 0;
-        double currentQuarterNotePos = 0;
-        double currentQuarterNoteBarStart = 0;
+        double currentBPM = 0;
+        juce::Optional<int64_t> currentFramePos = 0;
+        juce::Optional<double> currentQuarterNotePos = 0;
+        juce::Optional<double> currentQuarterNoteBarStart = 0;
         soul::TransportState currentTransportState = soul::TransportState::stopped;
 
         void reset()   { *this = {}; }
 
         void updateAndApply (juce::AudioPlayHead& playhead, soul::patch::PatchPlayer& playerToUse)
         {
-            juce::AudioPlayHead::CurrentPositionInfo info;
-            if (playhead.getCurrentPosition (info))
+            auto info = playhead.getPosition();
+            if (info)
             {
-                if(! info.isPlaying)
-                {
-                    playerToUse.reset();
-                }
-                auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info.timeSigNumerator),
-                                                        static_cast<uint16_t> (info.timeSigDenominator) };
+                auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info->getTimeSignature()->numerator),
+                    static_cast<uint16_t> (info->getTimeSignature()->denominator) };
 
                 if (newTimeSig != currentTimeSig)
                 {
@@ -839,18 +834,21 @@ private:
                     playerToUse.applyNewTimeSignature (newTimeSig);
                 }
 
-                auto newBPM = static_cast<float> (info.bpm);
+                auto newBPM = info->getBpm();
 
                 //DBG(newBPM);
-                if (newBPM != currentBPM)
+                if(newBPM)
                 {
-                    currentBPM = newBPM;
-                    playerToUse.applyNewTempo (newBPM);
+                    if (newBPM != currentBPM)
+                    {
+                        currentBPM = newBPM.orFallback(currentBPM);
+                        playerToUse.applyNewTempo (static_cast<float>(newBPM.orFallback(currentBPM)));
+                    }
                 }
 
-                auto newFramePos = info.timeInSamples;
-                auto newQuarterNotePos = info.ppqPosition;
-                auto newQuarterNoteBarStart = info.ppqPositionOfLastBarStart;
+                auto newFramePos = info->getTimeInSamples();
+                auto newQuarterNotePos = info->getPpqPosition();
+                auto newQuarterNoteBarStart = info->getPpqPositionOfLastBarStart();
 
                 if (newFramePos != currentFramePos
                      || newQuarterNotePos != currentQuarterNotePos
@@ -860,12 +858,11 @@ private:
                     currentQuarterNotePos = newQuarterNotePos;
                     currentQuarterNoteBarStart = newQuarterNoteBarStart;
 
-                    playerToUse.applyNewTimelinePosition ({ newFramePos, newQuarterNotePos, newQuarterNoteBarStart });
+                    playerToUse.applyNewTimelinePosition ({ newFramePos.orFallback(0), newQuarterNotePos.orFallback(0), newQuarterNoteBarStart.orFallback(0) });
                 }
 
-                auto newTransportState = info.isRecording ? soul::TransportState::recording
-                                                          : (info.isPlaying ? soul::TransportState::playing
-                                                                            : soul::TransportState::stopped);
+                auto newTransportState = info->getIsRecording() ? soul::TransportState::recording
+                : (info->getIsPlaying() ? soul::TransportState::playing : soul::TransportState::stopped);
 
                 if (currentTransportState != newTransportState)
                 {
