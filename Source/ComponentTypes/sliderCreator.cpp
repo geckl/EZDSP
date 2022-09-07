@@ -26,7 +26,7 @@ sliderCreator::sliderCreator(guiCreator* g)
     minValue.setInputRestrictions(0, "0123456789.-");
     maxValue.setInputRestrictions(0, "0123456789.-");
     initValue.setInputRestrictions(0, "0123456789.-");
-    intervalValue.setInputRestrictions(0, "0123456789.-");
+    intervalValue.setInputRestrictions(0, "0123456789.");
     nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
    
     sliderLabel.setFont (juce::Font (24.0f, juce::Font::bold));
@@ -118,24 +118,45 @@ void sliderCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
-        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
+        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) != reservedWords.end()) || (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) != usedWords.end()))
         {
-            juce::Array<juce::String> componentParameters;
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
+        } else if(nameValue.getText().isEmpty() || minValue.getText().isEmpty() || maxValue.getText().isEmpty() || initValue.getText().isEmpty())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Empty attribute");
+        } else if(initValue.getText().containsOnly(".-") || minValue.getText().containsOnly(".-") || maxValue.getText().containsOnly(".-") || intervalValue.getText().containsOnly(".-"))
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Not a valid floating point number");
+        } else if(minValue.getText().getFloatValue() >= maxValue.getText().getFloatValue())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Min Value must be less than Max Value");
+        } else if(initValue.getText().getFloatValue() < minValue.getText().getFloatValue() || initValue.getText().getFloatValue() > maxValue.getText().getFloatValue())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Initial Value must be in between Min Value and Max Value");
+        } else if(intervalValue.getText().getFloatValue() > (maxValue.getText().getFloatValue() - minValue.getText().getFloatValue()))
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Interval Value cannot be greater than the difference between Min Value and Max Value");
+        } else{
             
+            auto min = minValue.getText().getFloatValue();
+            auto max = maxValue.getText().getFloatValue();
+            auto init = initValue.getText().getFloatValue();
+            auto interval = intervalValue.getText().getFloatValue();
+            
+            juce::Array<juce::String> componentParameters;
             
             componentParameters.add("SLIDER");
             componentParameters.add(nameValue.getText());
             //componentParameters.add(typeValue.getText());
             componentParameters.add("");
-            componentParameters.add(minValue.getText());
-            componentParameters.add(maxValue.getText());
-            componentParameters.add(initValue.getText());
-            componentParameters.add(intervalValue.getText());
+            componentParameters.add(juce::String(min));
+            componentParameters.add(juce::String(max));
+            componentParameters.add(juce::String(init));
+            componentParameters.add(juce::String(interval));
             componentParameters.add("");
             componentParameters.add("OFF");
             componentParameters.add("1");
             componentParameters.add(nameValue.getText());
-           
             
             guiWindowCallback->guiCodeArray->add(componentParameters);
             
@@ -149,11 +170,6 @@ void sliderCreator::buttonClicked(juce::Button* button)
             
             //close the component creator window
             delete this->findParentComponentOfClass<juce::DialogWindow>();
-        }
-        
-        else{
-            //juce::AlertWindow keywordError("Error", "One of the values you enterred is a reserved keyword", juce::MessageBoxIconType::WarningIcon);
-            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
         }
     }
 }
