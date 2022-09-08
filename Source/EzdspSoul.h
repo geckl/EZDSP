@@ -77,19 +77,14 @@ public:
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
         addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
-        slider1->addListener(this);
         
         addParameter (slider2 = new Renameable (juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
-        slider2->addListener(this);
         
         addParameter (slider3 = new Renameable (juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
-        slider3->addListener(this);
         
         addParameter (slider4 = new Renameable (juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
-        slider4->addListener(this);
         
         addParameter (slider5 = new Renameable (juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
-        slider5->addListener(this);
         
         renameableParameters.add(slider1);
         renameableParameters.add(slider2);
@@ -240,6 +235,12 @@ public:
     {
         juce::String guiCode="";
         
+        for (int i = 0; i < 5; i++)
+        {
+            renameableParameters[i] ->addListener(this);
+            renameableParameters[i]->setNameNotifyingHost("", *this);
+        }
+        
         int sliderCount = 0;
         
         for(int i=0; i< guiArray.size();i++)
@@ -259,6 +260,7 @@ public:
                     renameableParameters[sliderCount]->beginChangeGesture();
                     renameableParameters[sliderCount]->setValueNotifyingHost((guiArray[i][5].getFloatValue()-guiArray[i][3].getFloatValue())*(1/(guiArray[i][4].getFloatValue() - guiArray[i][3].getFloatValue())));
                     renameableParameters[sliderCount]->endChangeGesture();
+                    renameableParameters[sliderCount] ->addListener(this);
                     sliderCount++;
                 }
             }
@@ -272,6 +274,7 @@ public:
                 guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
             }
         }
+        
         updateHostDisplay();
         return guiCode;
     }
