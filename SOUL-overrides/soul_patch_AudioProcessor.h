@@ -1159,7 +1159,7 @@ private:
             auto patchFolder = patch.getManifestFile().getParentDirectory();
             goToFolderButton.setEnabled (patchFolder.isDirectory());
             goToFolderButton.onClick = [=] { patchFolder.startAsProcess(); };
-            addAndMakeVisible (goToFolderButton);
+            //addAndMakeVisible (goToFolderButton);
 
             setSize (700, 300);
             setResizeLimits (400, 150, 1000, 500);
