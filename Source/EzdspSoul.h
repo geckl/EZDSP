@@ -237,7 +237,7 @@ public:
         
         for (int i = 0; i < 5; i++)
         {
-            renameableParameters[i] ->addListener(this);
+            renameableParameters[i] ->removeListener(this);
             renameableParameters[i]->setNameNotifyingHost("", *this);
         }
         
