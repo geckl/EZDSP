@@ -17,10 +17,10 @@
 #endif
 
 
-#include "../SOUL-master/include/soul/soul_patch.h"
-#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
-#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
-//#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_AudioProcessor.h"
+#include "../SOUL/include/soul/soul_patch.h"
+#include "../SOUL/include/soul/patch/helper_classes/soul_patch_Utilities.h"
+#include "../SOUL/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
+//#include "../SOUL/include/soul/patch/helper_classes/soul_patch_AudioProcessor.h"
 #include "../SOUL-overrides/soul_patch_AudioProcessor.h"
 
 #include "../JuceLibraryCode/BinaryData.h"
