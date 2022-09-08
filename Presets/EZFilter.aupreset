@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>data</key>
+	<data>
+	AAAAAAAAAAAAAAAFWCOW3D9bbbdZ2G97AAAAAFuNSBoAAAAAXUIguQAAAABe9vlYAAAA
+	AA==
+	</data>
+	<key>element-name</key>
+	<dict>
+		<key>1</key>
+		<dict>
+			<key>0</key>
+			<string>Input</string>
+		</dict>
+		<key>2</key>
+		<dict>
+			<key>0</key>
+			<string>Output</string>
+		</dict>
+	</dict>
+	<key>jucePluginState</key>
+	<data>
+	U09VTFBhdGNoUGx1Z2luAAEEcGF0Y2hVUkwAAUEFL1VzZXJzL0dlY2tsL0xpYnJhcnkv
+	Q2FjaGVzL0VaRFNQX1BsdWdpbi90ZW1wXzU0NzJjNDEuc291bHBhdGNoAHBhdGNoQ29t
+	cG9uZW50cwABsAcBAgFVBwELAQgFU0xJREVSAAEGBUdBSU4AAQcFZmxvYXQAAQcFLTYw
+	LjAAAQYFMTAuMAABBQUwLjAAAQUFMC4xAAECBQABBQVPRkYAAQMFMQABBgVHQUlOAAFU
+	BwELAQgFU0xJREVSAAEIBUN1dG9mZgABAgUAAQUFMTAwAAEHBTIwMDAwAAEGBTEwMDAA
+	AQUFMTAwAAECBQABBQVPRkYAAQMFMQABCAVDdXRvZmYAcGF0Y2hEU1AAAtgBBXNvdWw6
+	OmZpbHRlcnM6OmJpcXVhZDo6U3RhdGVbMl0gczsKc291bDo6ZmlsdGVyczo6YmlxdWFk
+	OjpDb2VmZnNbMl0gYzsKDQovLyBVc2UgaW5uZXIgbG9vcCB0byBwcmV2ZW50IEJpcXVh
+	ZCBTdGF0ZS9Db2VmZmljaWVudHMgZnJvbSBiZWluZyByZWluaXRpYWxpemVkCmxvb3AK
+	ew0KICAgIGZvciAod3JhcDxjLnNpemU+IGkpCiAgICB7CiAgICAgICAgc291bDo6Zmls
+	dGVyczo6cmJqX2VxOjp1cGRhdGUoY1tpXSwgU0FNUExFUkFURSwgMCwgQ3V0b2ZmLCAw
+	LjUsIDAuMCk7CiAgICAgICAgYy5hdCAoaSkuc2V0Tm9ybWFsaXNlZCAoY1tpXSk7CiAg
+	ICB9DQoNCiAgICBsZXQgbWFzdGVyR2FpbiA9IHNvdWw6OmRCdG9HYWluIChHQUlOKTsN
+	CgogICAgYXVkaW9PdXQgPDwgc291bDo6ZmlsdGVyczo6YmlxdWFkOjpwcm9jZXNzQ2Fz
+	Y2FkZVRERklJIChhdWRpb0luLCBzLCBjKSAqIG1hc3RlckdhaW47CiAgICBhZHZhbmNl
+	KCk7Cn0KAHBhdGNoSUQAAQ8FZXpkc3AuZGVmYXVsdAABAVNPVUxQYXRjaAABAmlkAAEP
+	BWV6ZHNwLmRlZmF1bHQAdmVyc2lvbgABBQUxLjAAAQNFRElUT1JTAAEBZGVmYXVsdFZp
+	ZXcAAQkFNjAwIDM2NAAAUEFSQU0AAQJpZAABBgVHQUlOAHZhbHVlAAEJBAAAAAAAAAAA
+	AFBBUkFNAAECaWQAAQgFQ3V0b2ZmAHZhbHVlAAEJBAAAAAAAQI9AAA==
+	</data>
+	<key>manufacturer</key>
+	<integer>1298230901</integer>
+	<key>name</key>
+	<string>EZFilter</string>
+	<key>subtype</key>
+	<integer>1516467063</integer>
+	<key>type</key>
+	<integer>1635085670</integer>
+	<key>version</key>
+	<integer>0</integer>
+</dict>
+</plist>
