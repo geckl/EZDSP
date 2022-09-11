@@ -17,35 +17,35 @@ While most SOUL functions require the use of the *soul::* namespace, a number of
 
 #### Arithmetic:
 
-abs() sqrt() pow() exp() log() log10() floor() ceil() fmod(numer, denom) remainder(numer, denom)
+<mark>abs()</mark> <mark>sqrt()</mark> <mark>pow()</mark> <mark>exp()</mark> <mark>log()</mark> <mark>log10()</mark> <mark>floor()</mark> <mark>ceil()</mark> <mark>fmod(numer, denom)</mark> <mark>remainder(numer, denom)</mark>
 
 #### Comparison and ranges:
 
-min(v1, v2) max(v1, v2) clamp(value, low, high) wrap(v, max)
+<mark>min(v1, v2)</mark> <mark>max(v1, v2)</mark> <mark>clamp(value, low, high)</mark> <mark>wrap(v, max)</mark>
 
 #### Trigonometry:
 
-sin() cos() tan() acos() asin() atan() atan2() sinh() cosh() tanh() asinh() acosh() atanh()
+<mark>sin()</mark> <mark>cos()</mark> <mark>tan()</mark> <mark>acos()</mark> <mark>asin()</mark> <mark>atan()</mark> <mark>atan2()</mark> <mark>sinh()</mark> <mark>cosh()</mark> <mark>tanh()</mark> <mark>asinh()</mark> <mark>acosh()</mark> <mark>atanh()</mark>
 
 ### Global Variables:
 
 These variables reflect important information about your current DAW Project:
 
-- BPM : The current tempo in beats per minute
-- CURRENTSAMPLE : The current sample number starting from the beginning of the timeline
-- SAMPLERATE : The current sample rate in hertz
-- SAMPLESPERBEAT : The number of samples per quarter note, given the current tempo and sample rate
-- NUMERATOR : The current time signature numerator (the number of beats per measure)
-- DENOMINATOR : The current time signature denominator (the beat value)
+<mark>BPM</mark> - The current tempo in beats per minute
+<mark>CURRENTSAMPLE</mark> - The current sample number starting from the beginning of the timeline
+<mark>SAMPLERATE</mark> - The current sample rate in hertz
+<mark>SAMPLESPERBEAT</mark> - The number of samples per quarter note, given the current tempo and sample rate
+<mark>NUMERATOR</mark> - The current time signature numerator (the number of beats per measure)
+<mark>DENOMINATOR</mark> - The current time signature denominator (the beat value)
 
 Additionally, the follow global constants are provided:
 
-- pi : \ pi
-- twoPi : 2\pi
-- nan : Not a Number
-- inf : Infinity
-- processor.period : the duration in seconds of one frame
-- processor.session : a unique int32 which is different each time the program runs.
+<mark>pi</mark> - \pi
+<mark>twoPi</mark> - 2\pi
+<mark>nan</mark> - Not a Number
+<mark>inf</mark> - Infinity
+<mark>processor.period</mark> - the duration in seconds of one frame
+<mark>processor.session</mark> - a unique int32 which is different each time the program runs.
 
 
 ### Local Variables
@@ -63,6 +63,15 @@ loop(44100)
 ```
 
 This example will update the gain value every 44,100 samples
+
+### Casting
+
+Users are encouraged to initialize variables without any indication of bit size (i.e "int" or "float). However, there are certain variables and functions that can only be accessed via either 32 bit or 64 bit values. In this scenario, a user may recieve an error stating that 64 bit values must be explicitly cast to 32 bits. Explicit casting can be done as shown below:
+
+```
+int64 firstValue = 10;
+int32 secondValue = int32(firstValue) * 2;
+```
 
 
 ## The Components Window:
