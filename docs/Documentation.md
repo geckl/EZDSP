@@ -3,7 +3,7 @@
 The EZDSP interface consists of two main elements: The DSP Code Editor and the Components Window. Understanding how these elements interact is key to getting your first plug-in up and running.
 
 
-## The DSP Code Editor
+## The DSP Code Editor:
 
 This is where you will write your DSP code. This code exists within a loop, meaning that it will be executed iteratively for each incoming sample of audio.
 
@@ -17,35 +17,35 @@ While most SOUL functions require the use of the *soul::* namespace, a number of
 
 #### Arithmetic:
 
-<mark>abs()</mark> <mark>sqrt()</mark> <mark>pow()</mark> <mark>exp()</mark> <mark>log()</mark> <mark>log10()</mark> <mark>floor()</mark> <mark>ceil()</mark> <mark>fmod(numer, denom)</mark> <mark>remainder(numer, denom)</mark>
+`abs()` `sqrt()` `pow()` `exp()` `log()` `log10()` `floor()` `ceil()` `fmod(numer, denom)` `remainder(numer, denom)`
 
 #### Comparison and ranges:
 
-<mark>min(v1, v2)</mark> <mark>max(v1, v2)</mark> <mark>clamp(value, low, high)</mark> <mark>wrap(v, max)</mark>
+`min(v1, v2)` `max(v1, v2)` `clamp(value, low, high)` `wrap(v, max)`
 
 #### Trigonometry:
 
-<mark>sin()</mark> <mark>cos()</mark> <mark>tan()</mark> <mark>acos()</mark> <mark>asin()</mark> <mark>atan()</mark> <mark>atan2()</mark> <mark>sinh()</mark> <mark>cosh()</mark> <mark>tanh()</mark> <mark>asinh()</mark> <mark>acosh()</mark> <mark>atanh()</mark>
+`sin()` `cos()` `tan()` `acos()` `asin()` `atan()` `atan2()` `sinh()` `cosh()` `tanh()` `asinh()` `acosh()` `atanh()`
 
 ### Global Variables:
 
 These variables reflect important information about your current DAW Project:
 
-<mark>BPM</mark> - The current tempo in beats per minute
-<mark>CURRENTSAMPLE</mark> - The current sample number starting from the beginning of the timeline
-<mark>SAMPLERATE</mark> - The current sample rate in hertz
-<mark>SAMPLESPERBEAT</mark> - The number of samples per quarter note, given the current tempo and sample rate
-<mark>NUMERATOR</mark> - The current time signature numerator (the number of beats per measure)
-<mark>DENOMINATOR</mark> - The current time signature denominator (the beat value)
+`BPM` - The current tempo in beats per minute<br>
+`CURRENTSAMPLE` - The current sample number starting from the beginning of the timeline<br>
+`SAMPLERATE` - The current sample rate in hertz<br>
+`SAMPLESPERBEAT` - The number of samples per quarter note, given the current tempo and sample rate<br>
+`NUMERATOR` - The current time signature numerator (the number of beats per measure)<br>
+`DENOMINATOR` - The current time signature denominator (the beat value)<br>
 
 Additionally, the follow global constants are provided:
 
-<mark>pi</mark> - \pi
-<mark>twoPi</mark> - 2\pi
-<mark>nan</mark> - Not a Number
-<mark>inf</mark> - Infinity
-<mark>processor.period</mark> - the duration in seconds of one frame
-<mark>processor.session</mark> - a unique int32 which is different each time the program runs.
+`pi` - Pi<br>
+`twoPi` - Two PI<br>
+`nan` - Not a Number<br>
+`inf` - Infinity<br>
+`processor.period` - the duration in seconds of one frame<br>
+`processor.session` - a unique int32 which is different each time the program runs.<br>
 
 
 ### Local Variables
