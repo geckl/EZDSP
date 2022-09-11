@@ -1,68 +1,103 @@
 # EZDSP Documentation
 
-## What is EZDSP?
-
-EZDSP is an audio plug-in that allows users to edit the plug-in's DSP source code from directly within their favorite DAW.  
-
-## How does it work?
-
-
 The EZDSP interface consists of two main elements: The DSP Code Editor and the Components Window. Understanding how these elements interact is key to getting your first plug-in up and running.
 
-### The DSP Code Editor
+
+## The DSP Code Editor
 
 This is where you will write your DSP code. This code exists within a loop, meaning that it will be executed iteratively for each incoming sample of audio.
 
-The DSP Code Editor is powered by the SOUL language, and as such all SOUL functions and operators can be accessed from within the "soul::" namespace. More info on the SOUL language syntax can be found here: [SOUL Documentation](https://github.com/soul-lang/SOUL/blob/master/docs/SOUL_Language.md)
+EZDSP is powered by the SOUL programming language. More info on the SOUL language syntax can be found here: [SOUL Language Guide](https://github.com/soul-lang/SOUL/blob/master/docs/SOUL_Language.md)
 
-While variables can be declared locally from within the DSP Code Editor, it's important to remember that this code is executed iteratively, meaning that any variables declared from the DSP Code Editor will be reset to their initial value for each sample processed. 
+### SOUL Functions:
 
-### The Components Window:
+All SOUL functions and operators can be accessed from within the code editor. A full list of available functions can be found here: [SOUL Library Reference](https://soul-lang.github.io/SOUL/docs/soul_library.html)
 
-This is where you will add global variables that can be accessed from within your DSP Code. These variables can be standalone values, or they can be linked to a slider or button. A component's value can be accessed from your DSP Code via the component's given name. The four types of components are:
+While most SOUL functions require the use of the *soul::* namespace, a number of lower level functions can be called directly:
+
+#### Arithmetic:
+
+abs() sqrt() pow() exp() log() log10() floor() ceil() fmod(numer, denom) remainder(numer, denom)
+
+#### Comparison and ranges:
+
+min(v1, v2) max(v1, v2) clamp(value, low, high) wrap(v, max)
+
+#### Trigonometry:
+
+sin() cos() tan() acos() asin() atan() atan2() sinh() cosh() tanh() asinh() acosh() atanh()
+
+### Global Variables:
+
+These variables reflect important information about your current DAW Project:
+
+- BPM : The current tempo in beats per minute
+- CURRENTSAMPLE : The current sample number starting from the beginning of the timeline
+- SAMPLERATE : The current sample rate in hertz
+- SAMPLESPERBEAT : The number of samples per quarter note, given the current tempo and sample rate
+- NUMERATOR : The current time signature numerator (the number of beats per measure)
+- DENOMINATOR : The current time signature denominator (the beat value)
+
+Additionally, the follow global constants are provided:
+
+- pi : \ pi
+- twoPi : 2\pi
+- nan : Not a Number
+- inf : Infinity
+- processor.period : the duration in seconds of one frame
+- processor.session : a unique int32 which is different each time the program runs.
+
+
+### Local Variables
+
+Local variables declared within the DSP Code Editor will be reinitialized for each sample by default. To circumvent this, users can create inner loops to process chunks of samples at a time. For example:
+
+```
+let masterGain = pow (10.0f, GAIN * 0.05f);
+
+loop(44100)
+{
+    audioOut << audioIn * masterGain;
+    advance();
+}
+```
+
+This example will update the gain value every 44,100 samples
+
+
+## The Components Window:
+
+This is where you will add components that can be accessed from within your DSP Code. A component's value can be accessed from your DSP Code via the component's given name. The four types of components are:
 
 1) **Slider** - This will output a stream of values, which is constantly updated to reflect the current position of the slider. This is a visual component.
 ```markdown
-  Parameters:  
-  Min: The slider's minimum value  
-  Max: The sliders maximum value  
-  Init: The slider's initial value  
+  Parameters:
+  Variable Name: The slider's label and the variable name used to access the slider's current value 
+  Min Value: The slider's minimum value  
+  Max Value: The sliders maximum value  
+  Initial Value: The slider's initial value  
   Step: The interval between slider values  
-  Name: The slider's label and the variable name used to access the slider's current value  
 ```
 2) **Button** - This will output a binary value (0=OFF,1=ON). This is a visual component.
 ```markdown
   Parameters:  
-  Name: The button's label and the variable name used to access the button's current value  
+  Variable Name: The button's label and the variable name used to access the button's current value  
 ```  
 3) **Buffer** - This will store an array of values (most often an array of audio samples). Additionally, each Buffer created comes with a memory safe "indexer" variable that is initialized to zero. This indexer takes the name of the corresponding buffer, with "Index" appended.
 ```markdown
   Parameters:  
-  Name: The variable name used to access a buffer value  
-  Type: The value type that the buffer stores (integer or floating point numbers)  
+  Variable Name: The variable name used to access a buffer value  
+  Data Type: The value type that the buffer stores (integer or floating point numbers)  
   Size: The number of values to be stored in the buffer  
 ``` 
 4) **Number** - This will store a single numeric value.
 ```markdown
-  Parameters:  
-  Init: The variable's initial value  
-  Name: The variable name used to access the variable's current value  
-  Type: The value type that the variable stores (integer or floating point number)  
+  Parameters:
+  Name: The variable name used to access the variable's current value
+  Initial Value: The variable's initial value  
+  Data Type: The value type that the variable stores (integer or floating point number)  
 ```
 
-### Keywords
-
-These variables reflect important information about your current DAW Project
-
-- BPM - The current tempo in beats per minute
-- SAMPLERATE - The current sample rate in hertz
-- SAMPLESPERBEAT - The number of samples per quarter note, given the current tempo and sample rate
-- NUMERATOR - The current time signature numerator (the number of beats per measure)
-- DENOMINATOR - The current time signature denominator (the beat value)
-
-## Why EZDSP?
-
-Audio programming is a uniquely tedious and complicated subsect of computer programming. The goal of EZDSP is to strip these details away, providing a clear and intuitive way of learning the basics of digital signal processing. Creating a simple delay plug-in with C++ can require hundreds of lines of code, with EZDSP it can be done with three. We want to make audio programming as accessible as possible, bringing together programmers and musicians to create digital audio effects that can be easily created, used, and shared
 
 ## Need help?
 

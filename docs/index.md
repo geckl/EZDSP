@@ -8,7 +8,7 @@ EZDSP is an audio plug-in that allows users to edit the plug-in's DSP source cod
 ## How does it work?
 
 
-The EZDSP interface consists of two main elements: The DSP Code Editor and the Components Window. Understanding how these elements interact is key to getting your first plug-in up and running.
+The EZDSP interface consists of two main elements: The DSP Code Editor and the Components Window. Understanding how these elements interact is key to getting your first plug-in up and running. See [Examples](Examples.md) and [Documentation](Documentation.md) for more info.
 
 
 ## Why EZDSP?
