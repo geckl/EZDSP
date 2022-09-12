@@ -190,12 +190,12 @@ public:
         event tempoIn (soul::timeline::Tempo t)
         {
         BPM = t.bpm;
-        SAMPLESPERBEAT = int(soul::timeline::framesPerBeat(t, processor.frequency));
+        SAMPLESPERBEAT = int32(soul::timeline::framesPerBeat(t, processor.frequency));
         }
 
         event positionIn (soul::timeline::Position p)
         {
-        CURRENTSAMPLE = p.currentFrame;
+        CURRENTSAMPLE = int32(p.currentFrame);
         }
 
         event timesignatureIn (soul::timeline::TimeSignature s)
@@ -204,10 +204,10 @@ public:
         DENOMINATOR = s.denominator;
         }
 
-        float BPM;
+        float32 BPM;
         int32 NUMERATOR, DENOMINATOR, SAMPLESPERBEAT;
         int32 SAMPLERATE = int32(processor.frequency);
-        int64 CURRENTSAMPLE;
+        int32 CURRENTSAMPLE;
 
         void run()
         {
@@ -252,7 +252,7 @@ public:
             
             else if(guiArray[i][0]== "SLIDER")
             {
-                guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", min: " + guiArray[i][3] +", max: " + guiArray[i][4] + ", init:  " + guiArray[i][5] + ", step: " + guiArray[i][6] + " ]];\n";
+                guiCode+= "input stream float32 " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", min: " + guiArray[i][3] +", max: " + guiArray[i][4] + ", init:  " + guiArray[i][5] + ", step: " + guiArray[i][6] + " ]];\n";
                 
                 if(sliderCount < 5)
                 {
@@ -271,7 +271,7 @@ public:
             
             else if(guiArray[i][0]== "BUTTON")
             {
-                guiCode+= "input stream float " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
+                guiCode+= "input stream float32 " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
             }
         }
         
