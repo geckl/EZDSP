@@ -9,6 +9,25 @@ This is where you will write your DSP code. This code exists within a loop, mean
 
 EZDSP is powered by the SOUL programming language. More info on the SOUL language syntax can be found here: [SOUL Language Guide](https://github.com/soul-lang/SOUL/blob/master/docs/SOUL_Language.md)
 
+### Data Types
+
+SOUL supports int, float, complex, and string data types. Although all numeric data types can be initialized as 32 or 64 bit variables, EZDSP uses 32 bit ints and floats. To initialize a 32 bit float, an 'f' must be appended onto the end of the number. The best way to initialize numbers in EZDSP is as follows:
+
+```
+int i = 32;
+float f = 32.0f;
+float g = f + 1.5f;
+```
+
+#### Casting
+
+Users are encouraged to initialize variables without any indication of bit size (i.e "int" or "float"). However, there are certain SOUL functions that require 64 bit values. In this scenario, a user may recieve an error stating that 64 bit values must be explicitly cast to 32 bits. Explicit casting can be done as shown below:
+
+```
+int64 sixtyFourBitValue = 10;
+int thirtyTwoBitValue = int32(firstValue) * 2;
+```
+
 ### SOUL Functions:
 
 All SOUL functions and operators can be accessed from within the code editor. A full list of available functions can be found here: [SOUL Library Reference](https://soul-lang.github.io/SOUL/docs/soul_library.html)
@@ -63,15 +82,6 @@ loop(44100)
 ```
 
 This example will update the gain value every 44,100 samples
-
-### Casting
-
-Users are encouraged to initialize variables without any indication of bit size (i.e "int" or "float). However, there are certain variables and functions that can only be accessed via either 32 bit or 64 bit values. In this scenario, a user may recieve an error stating that 64 bit values must be explicitly cast to 32 bits. Explicit casting can be done as shown below:
-
-```
-int64 firstValue = 10;
-int32 secondValue = int32(firstValue) * 2;
-```
 
 
 ## The Components Window:
