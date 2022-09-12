@@ -23,14 +23,14 @@ let masterGain = pow (10.0f, GAIN * 0.05f); // [1]
 let driveGain = pow (10.0f, DRIVE * 0.05f); // [2]
 let driveSig = driveGain * audioIn; // [3]
 
-float32 distSig;
+float distSig;
 
 if (driveSig > 0) // [4]
 {
-   distSig = 1 - pow(float32(2.718), -driveSig);
+   distSig = 1 - pow(2.718f, -driveSig);
 } else
 {
-   distSig = -1 + pow(float32(2.718), driveSig);
+   distSig = -1 + pow(2.718f, driveSig);
 }
 
 audioOut << distSig * masterGain / driveGain; // [5]
