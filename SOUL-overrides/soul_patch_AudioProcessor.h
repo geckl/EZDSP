@@ -314,7 +314,7 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
             for(int i = 0; i < params.size(); i++)
             {
                 //DBG(juce::String(params[i]->name));
-                if(juce::String(params[i]->name) == parameterName)
+                if(params[i]->name.toString<juce::String>() == parameterName)
                 {
                     //convert from [0,1] to slider range
                     params[i]->setValue((newValue*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
@@ -569,7 +569,7 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
     struct PatchParameter  : public juce::AudioProcessorParameterWithID
     {
         PatchParameter (soul::patch::Parameter::Ptr p)
-            : AudioProcessorParameterWithID (p->ID, p->name),
+            : AudioProcessorParameterWithID (p->ID.toString<juce::String>(), p->name.toString<juce::String>()),
               param (std::move (p)),
               unit (param->unit.toString<juce::String>()),
               textValues (parseTextValues (String::Ptr (param->getProperty ("text")))),
