@@ -1,0 +1,3 @@
+[submodule "SOUL"]
+	path = SOUL
+	url = git@github.com:geckl/SOUL.git

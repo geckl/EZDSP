@@ -24,9 +24,6 @@ componentCreator::componentCreator(guiCreator* g, juce::String t)
     addAndMakeVisible(bufferComponent);
     addAndMakeVisible(buttonComponent);
     
-    
-    
-    
     variableComponent.onClick = [this] { updateToggleState (&variableComponent, "Variable");};
     sliderComponent.onClick = [this] { updateToggleState (&sliderComponent, "Slider");};
     buttonComponent.onClick = [this] { updateToggleState (&buttonComponent, "Button");};

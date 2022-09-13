@@ -17,10 +17,10 @@
 #endif
 
 
-#include "../SOUL-master/include/soul/soul_patch.h"
-#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
-#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
-//#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_AudioProcessor.h"
+#include "../SOUL/include/soul/soul_patch.h"
+#include "../SOUL/include/soul/patch/helper_classes/soul_patch_Utilities.h"
+#include "../SOUL/include/soul/patch/helper_classes/soul_patch_CompilerCacheFolder.h"
+//#include "../SOUL/include/soul/patch/helper_classes/soul_patch_AudioProcessor.h"
 #include "../SOUL-overrides/soul_patch_AudioProcessor.h"
 
 #include "../JuceLibraryCode/BinaryData.h"
@@ -28,6 +28,7 @@
 #include "EzdspHelp.h"
 #include "Utils/EzdspCodeTokenizer.h"
 #include "Utils/Vectors.h"
+#include "renamableParameter.h"
 
 
 namespace soul
@@ -49,7 +50,8 @@ namespace patch
 */
 
 template <typename PatchLibrary>
-class EZDSPPlugin  : public juce::AudioProcessor
+class EZDSPPlugin  : public juce::AudioProcessor,
+                     public juce::AudioProcessorParameter::Listener
 {
 public:
     EZDSPPlugin (PatchLibrary&& library)
@@ -67,10 +69,6 @@ public:
         tempCode.getFile().appendData(BinaryData::Default_soul, BinaryData::Default_soulSize);
         tempPatch.getFile().appendData(BinaryData::Default_soulpatch, BinaryData::Default_soulpatchSize);
         
-        //set input and output streams to SOUL file
-        input= std::unique_ptr<juce::FileInputStream> (tempCode.getFile().createInputStream());
-        output= std::unique_ptr<juce::FileOutputStream> (tempCode.getFile().createOutputStream());
-        
         //set new .soulpatch file to link up with new .soul file
         juce::var parsedJson= juce::JSON::parse(tempPatch.getFile());
         auto obj(parsedJson["soulPatchV1"].getDynamicObject());
@@ -78,7 +76,21 @@ public:
         obj->setProperty("source",tempCode.getFile().getRelativePathFrom(tempPatch.getFile()));
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
-        loadCode();
+        addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        
+        addParameter (slider2 = new Renameable (juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        
+        addParameter (slider3 = new Renameable (juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        
+        addParameter (slider4 = new Renameable (juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        
+        addParameter (slider5 = new Renameable (juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        
+        renameableParameters.add(slider1);
+        renameableParameters.add(slider2);
+        renameableParameters.add(slider3);
+        renameableParameters.add(slider4);
+        renameableParameters.add(slider5);
         
         //Create an initial gain slider component
         juce::Array<juce::String> initialComponentParameters;
@@ -95,44 +107,18 @@ public:
         initialComponentParameters.add("GAIN");
         guiArray.add(initialComponentParameters);
         
-        initialComponentParameters.clear();
-        
-        initialComponentParameters.add("NUMBER");
-        initialComponentParameters.add("SAMPLERATE");
-        initialComponentParameters.add("int");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("0");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("");
-        initialComponentParameters.add("OFF");
-        initialComponentParameters.add("4");
-        initialComponentParameters.add("SAMPLERATE");
-        guiArray.add(initialComponentParameters);
-
         //Load soulpatch properties into ValueTree
         state = juce::ValueTree (ids.SOULPatchPlugin);
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
-        state.setProperty(ids.patchCode, fullCode.getAllContent(), nullptr);
         
-        //store array of components in vars and load into ValueTree
-        juce::Array<juce::var> componentsStorage;
-        for(int i=0;i<guiArray.size();i++)
-        {
-            juce::Array<juce::var> parametersStorage;
-            for(int j=0;j<guiArray[i].size();j++)
-            {
-                //DBG("String Array Size: ");
-                //DBG(guiArray[i].size());
-                parametersStorage.add(guiArray[i][j]);
-            }
-            componentsStorage.add(parametersStorage);
-        }
-        juce::var tempStorage= componentsStorage;
-        state.setProperty(ids.patchComponents, tempStorage, nullptr);
         
+        juce::String initialDSP = "let masterGain = soul::dBtoGain (GAIN);\n\naudioOut << audioIn * masterGain;";
+        
+        
+        dspCode.replaceAllContent(initialDSP);
+        
+        updatePatch();
         updatePatchState();
-        
     }
 
     ~EZDSPPlugin() override
@@ -145,7 +131,6 @@ public:
     /** Sets a new .soulpatch file or URL for the plugin to load. */
     void setPatchURL (const std::string& newFileOrURL)
     {
-        //DBG(newFileOrURL);
         if (newFileOrURL != state.getProperty (ids.patchURL).toString().toStdString())
         {
             state = juce::ValueTree (ids.SOULPatchPlugin);
@@ -154,101 +139,153 @@ public:
         }
     }
     
-    //loads code from input stream into three CodeDocuments, one containing the full soul code, one containing only the DSP, and one containing only the GUI components
-    void loadCode ()
+    // Generates EZDSP code and overwrites the patch
+    void updatePatch()
     {
-        int flag1 = 0;
-        int flag2 = 0;
-        juce::TextEditor tempFullCode, tempDspCode, tempGuiCode;
-        tempFullCode.setMultiLine(true);
-        tempDspCode.setMultiLine(true);
-        juce::int64 tempDspEndPosition=0, tempDspStartPosition=0, tempGuiEndPosition=0, tempGuiStartPosition=0;
+        suspendProcessing(true);
+        const juce::String guiCode = guiArrayToCode(guiArray);
+        tempCode.getFile().replaceWithText(combineCode(guiCode, dspCode.getAllContent()),false,false,nullptr);
         
-        //Read .soul file line by line. Use Markers to add select lines to DSP and GUI CodeDocuments.
+        usedWords.clear();
         
-        input->setPosition(0);
-        while (! input->isExhausted())
-            {
-                auto line = input->readNextLine();
-                if (line.startsWith ("//ENDDSP"))
-                {
-                    flag1=0;
-                    tempDspEndPosition=input->getPosition()-line.length()-3;
-                }
-                
-                if(flag1==1)
-                {
-                    // append the text to the textContent
-                    tempDspCode.insertTextAtCaret (line + juce::newLine);
-                }
-                
-                if (line.startsWith ("//BEGINDSP"))
-                {
-                    flag1=1;
-                    tempDspStartPosition=input->getPosition();
-                }
-                
-                if (line.startsWith ("//ENDGUI"))
-                {
-                    flag2=0;
-                    tempGuiEndPosition=input->getPosition()-line.length()-1;
-                }
-                
-                if(flag2==1)
-                {
-                    // append the text to the textContent
-                    tempGuiCode.insertTextAtCaret (line + juce::newLine);
-                }
-                
-                if (line.startsWith ("//BEGINGUI"))
-                {
-                    flag2=1;
-                    tempGuiStartPosition=input->getPosition();
-                }
-                
-                tempFullCode.insertTextAtCaret(line + juce::newLine);
-            }
-        
-        fullCode.replaceAllContent(tempFullCode.getText());
-        dspCode.replaceAllContent(tempDspCode.getText());
-        guiCode.replaceAllContent(tempGuiCode.getText());
-        
-        //Record the Start/End positions of DSP and GUI sections. These are used to replace the sections when user changes the plugin
-        dspEndPosition= juce::CodeDocument::Position(fullCode,tempDspEndPosition);
-        dspStartPosition= juce::CodeDocument::Position(fullCode,tempDspStartPosition);
-        
-        guiEndPosition= juce::CodeDocument::Position(fullCode,tempGuiEndPosition);
-        guiStartPosition= juce::CodeDocument::Position(fullCode,tempGuiStartPosition);
-        
-        //This tracks the position of these markers. As code is added their position within the document will change
-        dspEndPosition.setPositionMaintained(true);
-        dspStartPosition.setPositionMaintained(true);
-        
-        guiEndPosition.setPositionMaintained(true);
-        guiStartPosition.setPositionMaintained(true);
-        
-    }
-    
-    void updateSampleRateVariable(double sampleRate)
-    {
-        //update sample rate global variable
+        //store array of components in vars and add to ValueTree
+        juce::Array<juce::var> componentsStorage;
         for(int i=0;i<guiArray.size();i++)
         {
-            if(guiArray.getReference(i)[1]=="SAMPLERATE")
+            //add component names to vector of in-use variable names
+            usedWords.push_back(guiArray[i][10].toStdString());
+            
+            juce::Array<juce::var> componentStorage;
+            for(int j=0;j<guiArray[i].size();j++)
             {
-                guiArray.getReference(i).set(5,juce::String(sampleRate));
-                break;
+                componentStorage.add(guiArray[i][j]);
+            }
+            componentsStorage.add(componentStorage);
+        }
+        
+        juce::var tempGUI= componentsStorage;
+        state.setProperty(ids.patchComponents, tempGUI, nullptr);
+        juce::var tempDSP = dspCode.getAllContent();
+        state.setProperty(ids.patchDSP, tempDSP, nullptr);
+        
+        suspendProcessing(false);
+    }
+    
+    // Inserts user's DSP and GUI code into the EZDSP SOUL patch
+    juce::String combineCode (juce::String guiCode, juce::String dspCode)
+    {
+        juce::String code1 = R"(
+        processor Test [[main]]
+        {
+            input stream float32 audioIn;
+            input event soul::timeline::Tempo tempoIn;
+            input event soul::timeline::Position positionIn;
+            input event soul::timeline::TimeSignature timesignatureIn;
+            output stream float32 audioOut;
+        
+        )";
+        
+        juce::String code2 = R"(
+        
+        event tempoIn (soul::timeline::Tempo t)
+        {
+        BPM = t.bpm;
+        SAMPLESPERBEAT = int32(soul::timeline::framesPerBeat(t, processor.frequency));
+        }
+
+        event positionIn (soul::timeline::Position p)
+        {
+        CURRENTSAMPLE = int32(p.currentFrame);
+        }
+
+        event timesignatureIn (soul::timeline::TimeSignature s)
+        {
+        NUMERATOR = s.numerator;
+        DENOMINATOR = s.denominator;
+        }
+
+        float32 BPM;
+        int32 NUMERATOR, DENOMINATOR, SAMPLESPERBEAT;
+        int32 SAMPLERATE = int32(processor.frequency);
+        int32 CURRENTSAMPLE;
+
+        void run()
+        {
+            loop
+            {
+
+        )";
+        
+        juce::String code3 = R"(
+        
+            advance();
             }
         }
+        }
+
+        )";
+        
+        juce::String combinedCode = code1 + guiCode + code2 + dspCode + code3;
+        return combinedCode;
+    }
+
+    
+    // Takes an array of EZDSP component data and converts it into functional SOUL code
+    juce::String guiArrayToCode(juce::Array<juce::Array <juce::String>> guiArray)
+    {
+        juce::String guiCode="";
+        
+        for (int i = 0; i < 5; i++)
+        {
+            renameableParameters[i] ->removeListener(this);
+            renameableParameters[i]->setNameNotifyingHost("", *this);
+        }
+        
+        int sliderCount = 0;
+        
+        for(int i=0; i< guiArray.size();i++)
+        {
+            if(guiArray[i][0]== "NUMBER")
+            {
+                guiCode+= guiArray[i][2] + " " + guiArray[i][10] + " = " + guiArray[i][5] + ";\n";
+            }
+            
+            else if(guiArray[i][0]== "SLIDER")
+            {
+                guiCode+= "input stream float32 " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", min: " + guiArray[i][3] +", max: " + guiArray[i][4] + ", init:  " + guiArray[i][5] + ", step: " + guiArray[i][6] + " ]];\n";
+                
+                if(sliderCount < 5)
+                {
+                    renameableParameters[sliderCount]->setNameNotifyingHost(guiArray[i][10], *this);
+                    renameableParameters[sliderCount]->beginChangeGesture();
+                    renameableParameters[sliderCount]->setValueNotifyingHost((guiArray[i][5].getFloatValue()-guiArray[i][3].getFloatValue())*(1/(guiArray[i][4].getFloatValue() - guiArray[i][3].getFloatValue())));
+                    renameableParameters[sliderCount]->endChangeGesture();
+                    renameableParameters[sliderCount] ->addListener(this);
+                    sliderCount++;
+                }
+            }
+            else if(guiArray[i][0]== "BUFFER")
+            {
+                guiCode+= guiArray[i][2] + "[" + guiArray[i][7] + "] " + guiArray[i][10] + ";\n" + "wrap<" + guiArray[i][7] + "> " + guiArray[i][10] + "Index;\n";
+            }
+            
+            else if(guiArray[i][0]== "BUTTON")
+            {
+                guiCode+= "input stream float32 " + guiArray[i][10] + " [[ name: \"" +  guiArray[i][10] + "\", boolean ]];\n";
+            }
+        }
+        
+        updateHostDisplay();
+        return guiCode;
     }
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override
     {
-        updateSampleRateVariable(sampleRate);
         
         if (plugin != nullptr)
             plugin->prepareToPlay (sampleRate, samplesPerBlock);
+        
     }
 
     void releaseResources() override
@@ -270,6 +307,20 @@ public:
             plugin->setBusesLayout(getBusesLayout());
         }
     }
+    
+    // Listens for automation changes and passes these values along to the SOUL patch
+    void parameterValueChanged(int index, float newValue) override
+    {
+        if(!isSuspended())
+        {
+            plugin->updateParameter(getParameters()[index]->getName(25), newValue);
+        }
+    }
+    
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override
+    {
+        
+    }
 
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
     {
@@ -281,10 +332,6 @@ public:
         {
             plugin->setPlayHead(currentPlayHead);
         }
-        //currentPlayHead->getCurrentPosition (currentPositionInfo);
-        //bpm = currentPositionInfo.bpm;
-        //std::cout << plugin->sendInputEvent("SAMPLES_PER_BEAT",(60/bpm)*getSampleRate());
-        //plugin->getPatchPlayer()->applyNewTempo(bpm);
         
         if (plugin != nullptr && ! isSuspended())
             return plugin->processBlock (audio, midi);
@@ -330,42 +377,29 @@ public:
         
         auto s = juce::ValueTree::readFromData (data, (size_t) size);
         
-        //write preset's code into temp soul file
-        if(output->openedOk())
-        {
-            output->setPosition(0);
-            output->truncate();
-            //output->setNewLineString("\n");
-            output->writeText(s.getProperty(ids.patchCode).toString().toStdString(),false,false, nullptr);
-            output->flush();
-            
-            //write preset's DSP code into CodeWindow
-            loadCode();
-            
-            state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
-        }
-        
-        juce::Array<juce::Array<juce::String>> componentsStorage;
-        
-        for(int i=0;i<s.getProperty(ids.patchComponents).getArray()->size();i++)
-        {
-            juce::Array<juce::String> parametersStorage;
-            for(int j=0;j<s.getProperty(ids.patchComponents)[i].getArray()->size();j++)
-            {
-                //DBG("Var Array Size: ");
-                //DBG(s.getProperty(ids.patchComponents)[i].getArray()->size());
-                parametersStorage.add(s.getProperty(ids.patchComponents)[i].getArray()->getReference(j));
-            }
-            componentsStorage.add(parametersStorage);
-        }
-        
-        guiArray=componentsStorage;
-        
-        updateSampleRateVariable(getSampleRate());
-
         if (s.hasType (ids.SOULPatchPlugin))
         {
-            state = std::move (s);
+            juce::Array<juce::Array<juce::String>> componentsStorage;
+            
+            for(int i=0;i<s.getProperty(ids.patchComponents).getArray()->size();i++)
+            {
+                juce::Array<juce::String> parametersStorage;
+                for(int j=0;j<s.getProperty(ids.patchComponents)[i].getArray()->size();j++)
+                {
+                    //DBG("Var Array Size: ");
+                    //DBG(s.getProperty(ids.patchComponents)[i].getArray()->size());
+                    parametersStorage.add(s.getProperty(ids.patchComponents)[i].getArray()->getReference(j));
+                }
+                componentsStorage.add(parametersStorage);
+            }
+            
+            guiArray=componentsStorage;
+            
+            juce::String tempDSP = s.getProperty(ids.patchDSP);
+            dspCode.replaceAllContent(tempDSP);
+            
+            updatePatch();
+            //state = std::move (s);
             //updatePatchState();
         }
     }
@@ -561,67 +595,9 @@ public:
         
         void buttonClicked(juce::Button* button) override
         {
-            if (button == &runCode && owner.output->openedOk())
+            if (button == &runCode && owner.tempCode.getFile().exists())
             {
-                
-                owner.fullCode.replaceSection(owner.dspStartPosition.getPosition(),owner.dspEndPosition.getPosition(),owner.dspCode.getAllContent());
-                
-                juce::String tempGuiCode="";
-                
-                for(int i=0; i< owner.guiArray.size();i++)
-                {
-                    if(owner.guiArray[i][0]== "NUMBER")
-                    {
-                        tempGuiCode+= owner.guiArray[i][2] + " " + owner.guiArray[i][10] + " = " + owner.guiArray[i][5] + ";\n";
-                    }
-                    
-                    else if(owner.guiArray[i][0]== "SLIDER")
-                    {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][10] + " [[ name: \"" +  owner.guiArray[i][10] + "\", min: " + owner.guiArray[i][3] +", max: " + owner.guiArray[i][4] + ", init:  " + owner.guiArray[i][5] + ", step: " + owner.guiArray[i][6] + " ]];\n";
-                    }
-                    else if(owner.guiArray[i][0]== "BUFFER")
-                    {
-                        tempGuiCode+= owner.guiArray[i][2] + "[" + owner.guiArray[i][7] + "] " + owner.guiArray[i][10] + ";\n" + "wrap<" + owner.guiArray[i][7] + "> " + owner.guiArray[i][10] + "Index;\n";
-                    }
-                    
-                    else if(owner.guiArray[i][0]== "BUTTON")
-                    {
-                        tempGuiCode+= "input stream float " + owner.guiArray[i][10] + " [[ name: \"" +  owner.guiArray[i][10] + "\", boolean ]];\n";
-                    }
-                }
-                
-                owner.guiCode.replaceAllContent(tempGuiCode);
-                owner.fullCode.replaceSection(owner.guiStartPosition.getPosition(),owner.guiEndPosition.getPosition(),owner.guiCode.getAllContent());
-                
-                owner.output->setPosition(0);
-                owner.output->truncate();
-                owner.output->writeText(owner.fullCode.getAllContent(),false,false, nullptr);
-                owner.output->flush();
-                owner.state.setProperty(owner.ids.patchCode, owner.fullCode.getAllContent(), nullptr);
-                
-               
-                usedWords.clear();
-                
-                //store array of components in vars and add to ValueTree
-                juce::Array<juce::var> componentsStorage;
-                for(int i=0;i<owner.guiArray.size();i++)
-                {
-                    //add component names to vector of in-use variable names
-                    usedWords.push_back(owner.guiArray[i][10].toStdString());
-                    
-                    juce::Array<juce::var> parametersStorage;
-                    for(int j=0;j<owner.guiArray[i].size();j++)
-                    {
-                        //DBG("String Array Size: ");
-                        //DBG(owner.guiArray[i].size());
-                        parametersStorage.add(owner.guiArray[i][j]);
-                    }
-                    componentsStorage.add(parametersStorage);
-                }
-                
-                juce::var tempStorage= componentsStorage;
-                owner.state.setProperty(owner.ids.patchComponents, tempStorage, nullptr);
-                //owner.updatePatchState();
+                owner.updatePatch();
             }
             
             else if (button == &addGUI)
@@ -688,17 +664,17 @@ public:
     juce::TemporaryFile tempCode = juce::TemporaryFile(".soul");
     juce::TemporaryFile tempPatch = juce::TemporaryFile(".soulpatch");
     
-    std::unique_ptr<juce::FileOutputStream> output;
-    std::unique_ptr<juce::FileInputStream> input;
     
     std::unique_ptr<juce::FileOutputStream> outputPatch;
     std::unique_ptr<juce::FileInputStream> inputPatch;
     
-    juce::CodeDocument fullCode ,guiCode, dspCode;
-    juce::CodeDocument::Position dspStartPosition, dspEndPosition, guiStartPosition, guiEndPosition;
+    juce::CodeDocument dspCode;
     
     juce::AudioPlayHead* currentPlayHead;
     juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
+    
+    Renameable *slider1, *slider2, *slider3, *slider4, *slider5;
+    juce::Array<Renameable*> renameableParameters;
 
 private:
     //==============================================================================
@@ -715,7 +691,7 @@ private:
         const juce::Identifier SOULPatchPlugin   { "SOULPatchPlugin" },
                                patchURL          { "patchURL" },
                                patchID           { "patchID" },
-                               patchCode         {"patchCode"},
+                               patchDSP         {"patchDSP"},
                                patchComponents   {"patchComponents"};
     };
 

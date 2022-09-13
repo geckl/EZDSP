@@ -3,7 +3,6 @@
     |   __|     |  |  |  |
     |__   |  |  |  |  |  |__
     |_____|_____|_____|_____|
-
     Copyright (c) 2018 - ROLI Ltd.
 */
 
@@ -13,9 +12,9 @@
  #error "this header is designed to be included in JUCE projects that contain the juce_audio_processors module"
 #endif
 
-#include "../SOUL-master/include/soul/soul_patch.h"
-#include "../SOUL-master/include/soul/patch/helper_classes/soul_patch_Utilities.h"
-#include "../SOUL-master/include/soul/common/soul_ProgramDefinitions.h"
+#include "../SOUL/include/soul/soul_patch.h"
+#include "../SOUL/include/soul/patch/helper_classes/soul_patch_Utilities.h"
+#include "../SOUL/include/soul/common/soul_ProgramDefinitions.h"
 
 namespace soul
 {
@@ -25,10 +24,8 @@ namespace patch
 //==============================================================================
 /**
     Wraps up a SOUL patch inside a juce::AudioPluginInstance.
-
     Just include this in a JUCE project and create an instance from your
     PatchInstance object.
-
     NOTE: Unlike a normal AudioProcessor, you also need to provide a callback
     function using the askHostToReinitialise parameter - the object will
     use its own background thread to recompile the SOUL code, and will use
@@ -40,7 +37,6 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                                     private juce::Timer
 {
     /** Creates a SOULPatchAudioProcessor from a PatchInstance.
-
         @param patchToLoad          the instance to load - this must not be null
         @param compilerCache        if non-null, this is a user-provided class that can store and reload
                                     cached binaries to avoid re-compiling the same code multiple times
@@ -84,13 +80,11 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
     /** This callback can be set by a host, and the processor will call it if the
         SOUL patch code has changed in a way that means the processor needs to be
         rebuilt.
-
         When your host gets this callback, it should stop the processor, and once
         no audio or parameter change functions are being called, it should call the
         reinitialise() method, which will cause the processor to refresh its bus layout,
         parameter list and other properties. After calling reinitialise(), the host
         can call prepareToPlay again and start playing the processor again.
-
         The processor has its own background thread that re-compiles new SOUL patch
         code behind the scenes while the plugin is still running, and once it has a
         new build ready, it triggers a call to this function from the message thread.
@@ -137,8 +131,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         juce::StringArray errors;
 
         for (auto& m : player->getCompileMessages())
-            errors.add (m.description); //(std::string(m.fullMessage).substr(std::string(m.fullMessage).find("\n") + 1));
-            
+            errors.add (m.description);
+            //(std::string(m.fullMessage).substr(std::string(m.fullMessage).find("\n") + 1));
 
         return errors.joinIntoString ("\n");
     }
@@ -155,6 +149,21 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         d = createPluginDescription (*patch);
     }
 
+    template <typename T>
+    static auto setUID (T& d, int value) -> decltype (T::uniqueId)
+    {
+        d.uniqueId = value;
+        d.deprecatedUid = value;
+        return 0;
+    }
+
+    template <typename T>
+    static auto setUID (T& d, int value) -> decltype (T::uid)
+    {
+        d.uid = value;
+        return 0;
+    }
+
     static juce::PluginDescription createPluginDescription (soul::patch::PatchInstance& instance)
     {
         juce::PluginDescription d;
@@ -169,8 +178,9 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         d.fileOrIdentifier    = String::Ptr (instance.getLocation()->getAbsolutePath());
         d.lastFileModTime     = juce::Time (instance.getLastModificationTime());
         d.lastInfoUpdateTime  = juce::Time::getCurrentTime();
-        d.uniqueId            = static_cast<int> (juce::String (desc->UID).hash());
         d.isInstrument        = desc->isInstrument;
+
+        setUID (d, static_cast<int> (juce::String (desc->UID).hash()));
 
         return d;
     }
@@ -293,16 +303,49 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
         reset();
         midiKeyboardState.reset();
     }
+    
+    void updateParameter(juce::String parameterName, float newValue)
+    {
+        if (player != nullptr && player->isPlayable() && ! isSuspended())
+        {
+        
+            auto params = player->getParameters();
+            
+            for(int i = 0; i < params.size(); i++)
+            {
+                //DBG(juce::String(params[i]->name));
+                if(juce::String(params[i]->name) == parameterName)
+                {
+                    //convert from [0,1] to slider range
+                    params[i]->setValue((newValue*(params[i]->maxValue - params[i]->minValue))+params[i]->minValue);
+                }
+            }
+            
+            updateHostDisplay();
+        }
+    }
 
     using juce::AudioProcessor::processBlock;
+
+    static void splitMidiMessage (juce::MidiMessageMetadata& message, std::function<void (const choc::midi::ShortMessage&)> publish)
+    {
+        for (int i = 0; i < message.numBytes; i += 3)
+        {
+            auto availableBytes = message.numBytes - i;
+
+            auto m = choc::midi::ShortMessage (message.data[i],
+                                               availableBytes > 1 ? message.data[i + 1] : 0,
+                                               availableBytes > 2 ? message.data[i + 2] : 0);
+
+            publish (m);
+        }
+    }
 
     void processBlock (juce::AudioBuffer<float>& audio, juce::MidiBuffer& midi) override
     {
         auto numFrames = audio.getNumSamples();
 
         outputBuffer.setSize (juce::jmax (numPatchOutputChannels, getTotalNumOutputChannels()), numFrames, false, false, true);
-        //outputBuffer.setSize (getTotalNumOutputChannels(), numFrames, false, false, true);
-
         outputBuffer.clear();
 
         inputBuffer.setSize (juce::jmax (numPatchInputChannels, getTotalNumInputChannels()), numFrames, false, false, true);
@@ -310,12 +353,8 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
 
         if (player != nullptr && player->isPlayable() && ! isSuspended())
         {
-            //DBG("Suspended?: " << (isSuspended() ? "true" : "false"));
             if (auto playhead = getPlayHead())
-            {
-                //DBG("Get playhead!");
                 playheadState.updateAndApply (*playhead, *player);
-            }
 
             soul::patch::PatchPlayer::RenderContext rc;
 
@@ -351,9 +390,11 @@ struct SOULPatchAudioProcessor    : public juce::AudioPluginInstance,
                 {
                     auto message = *iter++;
 
-                    if (message.numBytes < 4)
-                        messageSpaceIn[i++] = { static_cast<uint32_t> (message.samplePosition),
-                                                { message.data[0], message.data[1], message.data[2] } };
+                    splitMidiMessage (message, [&] (const choc::midi::ShortMessage& m)
+                                      {
+                                          if (i < maxEvents)
+                                              messageSpaceIn[i++] = {static_cast<uint32_t> (message.samplePosition), m};
+                                      });
                 }
 
                 rc.numMIDIMessagesIn = (uint32_t) i;
@@ -792,25 +833,21 @@ private:
     struct PlayheadState
     {
         soul::TimeSignature currentTimeSig;
-        float currentBPM = 0;
-        int64_t currentFramePos = 0;
-        double currentQuarterNotePos = 0;
-        double currentQuarterNoteBarStart = 0;
+        double currentBPM = 0;
+        juce::Optional<int64_t> currentFramePos = 0;
+        juce::Optional<double> currentQuarterNotePos = 0;
+        juce::Optional<double> currentQuarterNoteBarStart = 0;
         soul::TransportState currentTransportState = soul::TransportState::stopped;
 
         void reset()   { *this = {}; }
 
         void updateAndApply (juce::AudioPlayHead& playhead, soul::patch::PatchPlayer& playerToUse)
         {
-            juce::AudioPlayHead::CurrentPositionInfo info;
-            if (playhead.getCurrentPosition (info))
+            auto info = playhead.getPosition();
+            if (info)
             {
-                if(! info.isPlaying)
-                {
-                    playerToUse.reset();
-                }
-                auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info.timeSigNumerator),
-                                                        static_cast<uint16_t> (info.timeSigDenominator) };
+                auto newTimeSig = soul::TimeSignature { static_cast<uint16_t> (info->getTimeSignature()->numerator),
+                    static_cast<uint16_t> (info->getTimeSignature()->denominator) };
 
                 if (newTimeSig != currentTimeSig)
                 {
@@ -818,18 +855,21 @@ private:
                     playerToUse.applyNewTimeSignature (newTimeSig);
                 }
 
-                auto newBPM = static_cast<float> (info.bpm);
+                auto newBPM = info->getBpm();
 
                 //DBG(newBPM);
-                if (newBPM != currentBPM)
+                if(newBPM)
                 {
-                    currentBPM = newBPM;
-                    playerToUse.applyNewTempo (newBPM);
+                    if (newBPM != currentBPM)
+                    {
+                        currentBPM = newBPM.orFallback(currentBPM);
+                        playerToUse.applyNewTempo (static_cast<float>(newBPM.orFallback(currentBPM)));
+                    }
                 }
 
-                auto newFramePos = info.timeInSamples;
-                auto newQuarterNotePos = info.ppqPosition;
-                auto newQuarterNoteBarStart = info.ppqPositionOfLastBarStart;
+                auto newFramePos = info->getTimeInSamples();
+                auto newQuarterNotePos = info->getPpqPosition();
+                auto newQuarterNoteBarStart = info->getPpqPositionOfLastBarStart();
 
                 if (newFramePos != currentFramePos
                      || newQuarterNotePos != currentQuarterNotePos
@@ -839,12 +879,11 @@ private:
                     currentQuarterNotePos = newQuarterNotePos;
                     currentQuarterNoteBarStart = newQuarterNoteBarStart;
 
-                    playerToUse.applyNewTimelinePosition ({ newFramePos, newQuarterNotePos, newQuarterNoteBarStart });
+                    playerToUse.applyNewTimelinePosition ({ newFramePos.orFallback(0), newQuarterNotePos.orFallback(0), newQuarterNoteBarStart.orFallback(0) });
                 }
 
-                auto newTransportState = info.isRecording ? soul::TransportState::recording
-                                                          : (info.isPlaying ? soul::TransportState::playing
-                                                                            : soul::TransportState::stopped);
+                auto newTransportState = info->getIsRecording() ? soul::TransportState::recording
+                : (info->getIsPlaying() ? soul::TransportState::playing : soul::TransportState::stopped);
 
                 if (currentTransportState != newTransportState)
                 {

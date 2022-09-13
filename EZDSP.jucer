@@ -16,6 +16,10 @@
       <FILE id="mhx4pS" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
             file="Resources/SOUL_PatchLoader.dylib"/>
     </GROUP>
+    <GROUP id="{D7B01DEB-42A8-46D3-6C48-7D764E290503}" name="SOUL-overrides">
+      <FILE id="tsYf1U" name="soul_patch_AudioProcessor.h" compile="0" resource="0"
+            file="SOUL-overrides/soul_patch_AudioProcessor.h"/>
+    </GROUP>
     <GROUP id="{D613C43B-7197-5FCA-4372-AC3446E57C2B}" name="Source">
       <FILE id="QGM6Ts" name="EzdspHelp.h" compile="0" resource="0" file="Source/EzdspHelp.h"/>
       <GROUP id="{9ABBA60E-5A50-F38B-5CC3-734F0B497AC8}" name="Utils">
@@ -49,6 +53,9 @@
       <FILE id="aKbYS6" name="componentTable.h" compile="0" resource="0"
             file="Source/componentTable.h"/>
       <FILE id="pO8QGY" name="EzdspSoul.h" compile="0" resource="0" file="Source/EzdspSoul.h"/>
+      <FILE id="iykRVr" name="guiCreator.h" compile="0" resource="0" file="Source/guiCreator.h"/>
+      <FILE id="P4VeJo" name="renamableParameter.h" compile="0" resource="0"
+            file="Source/renamableParameter.h"/>
       <FILE id="UZ7i8I" name="PatchLoaderPlugin.cpp" compile="1" resource="0"
             file="Source/PatchLoaderPlugin.cpp"/>
     </GROUP>

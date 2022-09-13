@@ -19,18 +19,20 @@ buttonCreator::buttonCreator(guiCreator* g)
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
     
-
-   
-    addAndMakeVisible(parametersLabel);
-    addAndMakeVisible(nameLabel);
+    nameLabel.attachToComponent(&nameValue, true);
     
     nameValue.setInputRestrictions(30,"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
     
+    buttonLabel.setFont (juce::Font (24.0f, juce::Font::bold));
+    buttonLabel.setJustificationType (juce::Justification::centred);
+    parametersLabel.setJustificationType (juce::Justification::centred);
+    
+    addAndMakeVisible(parametersLabel);
+    addAndMakeVisible(buttonLabel);
     addAndMakeVisible(nameValue);
     
     nameValue.setTooltip("The button's label and the variable name used to access the button's current value ");
    
-
     createComponent.setSize(150,50);
     createComponent.setButtonText("Create");
     addAndMakeVisible(&createComponent);
@@ -57,10 +59,12 @@ void buttonCreator::paint (juce::Graphics& g)
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
+    g.fillRect (0, 0, getWidth(), 125);
+    
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
     g.drawFittedText ("A button component is a simple binary switch (On=1, Off=0). Buttons are great for controlling the flow of your signal processing, use them to turn certain features on and off.", getLocalBounds().reduced(100, 50),
-                juce::Justification::centred, 8);   // Explain component
+                juce::Justification::centredTop, 8);   // Explain component
 }
 
 void buttonCreator::resized()
@@ -68,9 +72,10 @@ void buttonCreator::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
     
-    parametersLabel.setBounds (10, 10, getWidth() - 20, 20);
-    nameLabel.setBounds(0, 40, 120, 20);
-    nameValue.setBounds(120, 40, 100, 20);
+    
+    buttonLabel.setBounds(0, 0, getWidth(), getHeight()*0.1);
+    parametersLabel.setBounds ((getWidth()/2)-100, 150, 200, 20);
+    nameValue.setBounds((getWidth()/2)-50, 180, 100, 20);
     
     createComponent.setBounds(getWidth()/4, getHeight()/1.1, getWidth()/2, getHeight()/10);
 }
@@ -80,10 +85,14 @@ void buttonCreator::buttonClicked(juce::Button* button)
     //create array of component parameters and append to array of components
     if (button == &createComponent)
     {
-        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) == reservedWords.end()) && (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) == usedWords.end()))
+        if((std::find(reservedWords.begin(), reservedWords.end(), nameValue.getText()) != reservedWords.end()) || (std::find(usedWords.begin(), usedWords.end(), nameValue.getText()) != usedWords.end()))
         {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
+        } else if(nameValue.getText().isEmpty())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Empty attribute");
+        } else{
             juce::Array<juce::String> componentParameters;
-            
             
             componentParameters.add("BUTTON");
             componentParameters.add(nameValue.getText());
@@ -96,7 +105,6 @@ void buttonCreator::buttonClicked(juce::Button* button)
             componentParameters.add("OFF");
             componentParameters.add("2");
             componentParameters.add(nameValue.getText());
-           
             
             guiWindowCallback->guiCodeArray->add(componentParameters);
             
@@ -110,11 +118,6 @@ void buttonCreator::buttonClicked(juce::Button* button)
             
             //close the component creator window
             delete this->findParentComponentOfClass<juce::DialogWindow>();
-        }
-        
-        else{
-            //juce::AlertWindow keywordError("Error", "One of the values you enterred is a reserved keyword", juce::MessageBoxIconType::WarningIcon);
-            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "One of the values you enterred is a reserved keyword");
         }
     }
 }
