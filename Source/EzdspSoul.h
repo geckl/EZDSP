@@ -76,15 +76,15 @@ public:
         obj->setProperty("source",tempCode.getFile().getRelativePathFrom(tempPatch.getFile()));
         tempPatch.getFile().replaceWithText(juce::JSON::toString(parsedJson));
         
-        addParameter (slider1 = new Renameable (juce::ParameterID { "Slider1",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider1 = new Renameable (juce::ParameterID { "1PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         
-        addParameter (slider2 = new Renameable (juce::ParameterID { "Slider2",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider2 = new Renameable (juce::ParameterID { "2PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         
-        addParameter (slider3 = new Renameable (juce::ParameterID { "Slider3",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider3 = new Renameable (juce::ParameterID { "3PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         
-        addParameter (slider4 = new Renameable (juce::ParameterID { "Slider4",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider4 = new Renameable (juce::ParameterID { "4PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         
-        addParameter (slider5 = new Renameable (juce::ParameterID { "Slider5",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
+        addParameter (slider5 = new Renameable (juce::ParameterID { "5PARAM",  1 }, "", juce::NormalisableRange<float> (0.0f, 1.0f), 0.0f));
         
         renameableParameters.add(slider1);
         renameableParameters.add(slider2);
