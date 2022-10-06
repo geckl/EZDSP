@@ -112,7 +112,7 @@ public:
         state.setProperty (ids.patchURL, tempPatch.getFile().getFullPathName(), nullptr);
         
         
-        juce::String initialDSP = "let masterGain = soul::dBtoGain (GAIN);\n\naudioOut << audioIn * masterGain;";
+        juce::String initialDSP = "let masterGain = pow (10.0f, GAIN * 0.05f);\n\naudioOut << audioIn * masterGain;";
         
         
         dspCode.replaceAllContent(initialDSP);
@@ -485,14 +485,15 @@ public:
             addAndMakeVisible(codeWindow);
             
             runCode.setButtonText("Run");
+            runCode.setColour(juce::TextButton::buttonColourId , juce::Colour::fromRGB(21,87,153));
             addAndMakeVisible(runCode);
             runCode.addListener(this);
             
-            addGUI.setButtonText("Components");
+            addGUI.setButtonText("Component Creator");
             addAndMakeVisible(addGUI);
             addGUI.addListener(this);
             
-            expandText.setButtonText("Text Editor");
+            expandText.setButtonText("DSP Editor");
             addAndMakeVisible(expandText);
             expandText.addListener(this);
             
@@ -561,8 +562,8 @@ public:
                 
                 codeWindow.setBounds(0, getHeight()-250, getWidth(), 150);
                 runCode.setBounds(15, getHeight()-75, 50, 30);
-                addGUI.setBounds(80, getHeight()-75, 125, 30);
-                expandText.setBounds(395, getHeight()-75, 125, 30);
+                addGUI.setBounds(75, getHeight()-75, 150, 30);
+                expandText.setBounds(375, getHeight()-75, 150, 30);
                 getHelp.setBounds(535, getHeight()-75, 50, 30);
                 logoComponent.setBounds(220, getHeight()-95, 160, 90);
                 
