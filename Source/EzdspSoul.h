@@ -400,7 +400,7 @@ public:
             
             updatePatch();
             //state = std::move (s);
-            //updatePatchState();
+            updatePatchState();
         }
     }
     
@@ -599,6 +599,7 @@ public:
             if (button == &runCode && owner.tempCode.getFile().exists())
             {
                 owner.updatePatch();
+                owner.updatePatchState();
             }
             
             else if (button == &addGUI)
