@@ -148,7 +148,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>/Users/Geckl/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDelay.aupreset</string>
+																	<string>/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDelay.aupreset</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -164,7 +164,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>/Users/Geckl/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDistortion.aupreset</string>
+																	<string>/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDistortion.aupreset</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -180,7 +180,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>/Users/Geckl/Library/Audio/Presets/Squatch Sounds/EZDSP/EZFilter.aupreset</string>
+																	<string>/Library/Audio/Presets/Squatch Sounds/EZDSP/EZFilter.aupreset</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -805,7 +805,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>/Users/Geckl/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDelay.vstpreset</string>
+																	<string>/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDelay.vstpreset</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -821,7 +821,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>/Users/Geckl/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDistortion.vstpreset</string>
+																	<string>/Library/Audio/Presets/Squatch Sounds/EZDSP/EZDistortion.vstpreset</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
@@ -837,7 +837,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>/Users/Geckl/Library/Audio/Presets/Squatch Sounds/EZDSP/EZFilter.vstpreset</string>
+																	<string>/Library/Audio/Presets/Squatch Sounds/EZDSP/EZFilter.vstpreset</string>
 																	<key>PATH_TYPE</key>
 																	<integer>0</integer>
 																	<key>PERMISSIONS</key>
