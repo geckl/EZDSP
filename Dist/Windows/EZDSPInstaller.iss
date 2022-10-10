@@ -25,7 +25,7 @@ CreateAppDir=no
 ChangesAssociations=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=EZDSPInstaller
+OutputBaseFilename=EZDSP_Win64VST3
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -36,9 +36,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "C:\Program Files\Common Files\VST3\EZDSP_Plugin.vst3"; DestDir: "{commonpf64}\VST3";
 Source: "C:\Program Files\Common Files\VST3\SOUL_PatchLoader.dll"; DestDir: "{commonpf64}\VST3";
-Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\EZDelay.vstpreset"; DestDir: "{win}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
-Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\EZDistortion.vstpreset"; DestDir: "{win}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
-Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\EZFilter.vstpreset"; DestDir: "{win}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
+Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\EZDelay.vstpreset"; DestDir: "{sd}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
+Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\EZDistortion.vstpreset"; DestDir: "{sd}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
+Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\EZFilter.vstpreset"; DestDir: "{sd}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
+Source: "C:\ProgramData\VST3 Presets\Squatch Sounds\EZDSP\Default.vstpreset"; DestDir: "{sd}\ProgramData\VST3 Presets\Squatch Sounds\EZDSP";
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
