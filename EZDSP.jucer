@@ -9,12 +9,18 @@
               bundleIdentifier="dev.squatchsounds.EZDSP" displaySplashScreen="1">
   <MAINGROUP id="M2AbSF" name="EZDSP">
     <GROUP id="{A1282000-9ED7-6217-E188-340D7A20691E}" name="Resources">
+      <GROUP id="{B4B20AF5-8D86-510B-E522-3BE4E0AB1609}" name="arm64">
+        <FILE id="V7nKMZ" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
+              file="Resources/arm64/SOUL_PatchLoader.dylib"/>
+      </GROUP>
+      <GROUP id="{8DDF49E5-B415-5527-DEFC-F21CA36A288A}" name="x64">
+        <FILE id="frcic6" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
+              file="Resources/x64/SOUL_PatchLoader.dylib"/>
+      </GROUP>
       <FILE id="FhGBgL" name="Default.soul" compile="0" resource="1" file="Resources/Default.soul"/>
       <FILE id="Qu1G0C" name="Default.soulpatch" compile="0" resource="1"
             file="Resources/Default.soulpatch"/>
       <FILE id="CUYLIc" name="EZDSPLogo.png" compile="0" resource="1" file="Resources/EZDSPLogo.png"/>
-      <FILE id="mhx4pS" name="SOUL_PatchLoader.dylib" compile="0" resource="0"
-            file="Resources/SOUL_PatchLoader.dylib"/>
     </GROUP>
     <GROUP id="{D7B01DEB-42A8-46D3-6C48-7D764E290503}" name="SOUL-overrides">
       <FILE id="tsYf1U" name="soul_patch_AudioProcessor.h" compile="0" resource="0"
@@ -53,7 +59,6 @@
       <FILE id="aKbYS6" name="componentTable.h" compile="0" resource="0"
             file="Source/componentTable.h"/>
       <FILE id="pO8QGY" name="EzdspSoul.h" compile="0" resource="0" file="Source/EzdspSoul.h"/>
-      <FILE id="iykRVr" name="guiCreator.h" compile="0" resource="0" file="Source/guiCreator.h"/>
       <FILE id="P4VeJo" name="renamableParameter.h" compile="0" resource="0"
             file="Source/renamableParameter.h"/>
       <FILE id="UZ7i8I" name="PatchLoaderPlugin.cpp" compile="1" resource="0"

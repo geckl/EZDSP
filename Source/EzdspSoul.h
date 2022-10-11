@@ -311,7 +311,7 @@ public:
     // Listens for automation changes and passes these values along to the SOUL patch
     void parameterValueChanged(int index, float newValue) override
     {
-        if(!isSuspended())
+        if(!isSuspended() && getParameters()[index]->getName(25) != "")
         {
             plugin->updateParameter(getParameters()[index]->getName(25), newValue);
         }
@@ -527,7 +527,7 @@ public:
         {
             //setDragOver (false);
             pluginEditor.reset();
-            setSize (400, 300);
+            //setSize (400, 300);
             repaint();
         }
 
