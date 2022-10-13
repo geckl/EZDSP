@@ -1,7 +1,5 @@
 # EZDSP Downloads
 
-## Prebuilt Binaries
-
 ### Mac
 
 #### These builds are larger in size, but will work with any combination of arm64 and x64 architecture
